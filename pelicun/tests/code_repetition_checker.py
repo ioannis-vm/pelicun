@@ -130,7 +130,20 @@ def all_test_files():
         5.00,
         6.00,
     ]
-    very_long_string = 'some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is very long.'
+    very_long_string = (
+        'some very long thing which is some very '
+        'long thing which is some very long thing '
+        'which is some very long thing which is '
+        'some very long thing which is some very '
+        'long thing which is some very long thing '
+        'which is some very long thing which is '
+        'some very long thing which is some very '
+        'long thing which is some very long thing '
+        'which is some very long thing which is '
+        'very long indeed.'
+    )
+    assert very_long_line is not None
+    assert very_long_string is not None
     for file in test_files:
         print()
         print(file)
