@@ -80,6 +80,8 @@ def all_test_files():
     runs the main function to find and print repeated line blocks in each file.
     """
     test_files = glob('tests/*.py')
+    very_long_line = [1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00]
+    very_long_string = 'some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is some very long thing which is very long.'
     for file in test_files:
         print()
         print(file)
