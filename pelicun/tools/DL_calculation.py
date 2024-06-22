@@ -63,24 +63,6 @@ from colorama import Style
 from jsonschema import validate
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 """
 
 
@@ -88,23 +70,6 @@ This is for testing.
 
 
 """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 import pelicun
