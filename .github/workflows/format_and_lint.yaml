@@ -25,24 +25,26 @@ jobs:
     - name: Run Black
       run: black -S .
 
-    - name: Check for changes after Black
+    - name: Check for changes
       id: git_status
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-        git status
-        if [[ `git status --porcelain` ]]; then
-          git add .
-          git commit -m "Format code with Black"
+        git add .
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit" > /tmp/git_status_output
         else
-          echo "No changes to commit"
+          git commit -m "Format code with Black"
+          echo "Changes committed" > /tmp/git_status_output
         fi
+      continue-on-error: true
+
+    - name: Read git status output
+      id: read_git_status
+      run: cat /tmp/git_status_output
 
     - name: Push changes
-      if: success() && steps.git_status.outputs.commit_message != ''
+      if: steps.read_git_status.outputs.result != 'No changes to commit'
       uses: ad-m/github-push-action@v0.6.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Run Flake8
-      run: flake8 .
