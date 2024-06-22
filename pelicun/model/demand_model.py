@@ -1360,60 +1360,6 @@ def _assemble_required_demand_data(
 
             edp_values[edp] = demand
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         # evaluate expression
         if expression is not None:
             # build a dict of values
