@@ -141,9 +141,7 @@ class TestAssetModel(TestPelicunModel):
             check_dtype=False,
         )
 
-        expected_cmp_units = pd.Series(
-            data=['ea'], index=['component_a'], name='Units'
-        )
+        expected_cmp_units = pd.Series(data=['ea'], index=['component_a'], name='Units')
 
         pd.testing.assert_series_equal(
             expected_cmp_units,

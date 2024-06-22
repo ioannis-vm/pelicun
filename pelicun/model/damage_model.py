@@ -376,9 +376,7 @@ class DamageModel(PelicunModel):
         )
 
         if filepath is not None:
-            self.log.msg(
-                'Damage sample successfully saved.', prepend_timestamp=False
-            )
+            self.log.msg('Damage sample successfully saved.', prepend_timestamp=False)
             return None
 
         # else:
@@ -431,9 +429,7 @@ class DamageModel(PelicunModel):
         available_components = self._get_component_id_set()
 
         missing_components = [
-            component
-            for component in cmp_list
-            if component not in available_components
+            component for component in cmp_list if component not in available_components
         ]
 
         if missing_components and warn_missing:
@@ -614,9 +610,7 @@ class DamageModel_Base(PelicunModel):
         ]
 
         # Sum up the number of blocks for each performance group
-        component_blocks = component_blocks.groupby(
-            ['loc', 'dir', 'cmp', 'uid']
-        ).sum()
+        component_blocks = component_blocks.groupby(['loc', 'dir', 'cmp', 'uid']).sum()
         component_blocks.sort_index(axis=0, inplace=True)
 
         # Calculate cumulative sum of blocks
@@ -930,9 +924,7 @@ class DamageModel_DS(DamageModel_Base):
 
         # get the capacity and lsds samples
         capacity_sample = (
-            pd.DataFrame(capacity_RVs.RV_sample)
-            .sort_index(axis=0)
-            .sort_index(axis=1)
+            pd.DataFrame(capacity_RVs.RV_sample).sort_index(axis=0).sort_index(axis=1)
         )
         capacity_sample = base.convert_to_MultiIndex(capacity_sample, axis=1)['FRG']
         capacity_sample.columns.names = ['cmp', 'loc', 'dir', 'uid', 'block', 'ls']
@@ -1010,9 +1002,7 @@ class DamageModel_DS(DamageModel_Base):
             # Create a DataFrame with demand values repeated for the
             # number of PGs and assign the columns as PG_cols
             demand_df.append(
-                pd.concat(
-                    [pd.Series(demand_vals)] * len(PG_cols), axis=1, keys=PG_cols
-                )
+                pd.concat([pd.Series(demand_vals)] * len(PG_cols), axis=1, keys=PG_cols)
             )
 
         # Concatenate all demand DataFrames into a single DataFrame
@@ -1264,9 +1254,7 @@ class DamageModel_DS(DamageModel_Base):
         for PG in PGB.index:
             # determine demand capacity adjustment operation, if required
             cmp_loc_dir = '-'.join(PG[0:3])
-            capacity_adjustment_operation = scaling_specification.get(
-                cmp_loc_dir, None
-            )
+            capacity_adjustment_operation = scaling_specification.get(cmp_loc_dir, None)
 
             cmp_id = PG[0]
             blocks = PGB.loc[PG, 'Blocks']
@@ -1745,9 +1733,7 @@ class DamageModel_DS(DamageModel_Base):
 
         # Get the header for the results that we can use to identify
         # cmp-loc-dir-uid sets
-        dmg_header = (
-            dmg_sample.groupby(level=[0, 1, 2, 3], axis=1).first().iloc[:2, :]
-        )
+        dmg_header = dmg_sample.groupby(level=[0, 1, 2, 3], axis=1).first().iloc[:2, :]
         damaged_components = set(dmg_header.columns.get_level_values('cmp'))
 
         # get the number of possible limit states
@@ -1779,9 +1765,7 @@ class DamageModel_DS(DamageModel_Base):
 
                     else:
                         # or if there are more than one, how many
-                        ds_count += len(
-                            cmp_data[(ls, 'DamageStateWeights')].split('|')
-                        )
+                        ds_count += len(cmp_data[(ls, 'DamageStateWeights')].split('|'))
 
             # get the list of valid cmp-loc-dir-uid sets
             if cmp_id not in damaged_components:

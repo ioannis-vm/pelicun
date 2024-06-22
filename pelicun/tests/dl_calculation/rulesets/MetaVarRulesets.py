@@ -357,10 +357,7 @@ def parse_BIM(BIM_in, location, hazards):
             WBD = False
         else:
             WBD = (
-                (
-                    BIM['FloodZone'].startswith('A')
-                    or BIM['FloodZone'].startswith('V')
-                )
+                (BIM['FloodZone'].startswith('A') or BIM['FloodZone'].startswith('V'))
                 and BIM['V_ult'] >= flood_lim
             ) or (BIM['V_ult'] >= general_lim)
 

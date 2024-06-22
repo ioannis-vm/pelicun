@@ -191,9 +191,7 @@ def test__get_theta():
 def test__get_limit_probs():
     # verify that it works for valid inputs
 
-    res = uq._get_limit_probs(
-        np.array((0.10, 0.20)), 'normal', np.array((0.15, 1.00))
-    )
+    res = uq._get_limit_probs(np.array((0.10, 0.20)), 'normal', np.array((0.15, 1.00)))
     assert np.allclose(res, np.array((0.4800611941616275, 0.5199388058383725)))
 
     res = uq._get_limit_probs(
@@ -1023,9 +1021,7 @@ def test_LogNormalRandomVariable_cdf():
         rv.xyz = 123
     x = (-1.0, 0.0, 0.5, 1.0, 2.0)
     cdf = rv.cdf(x)
-    assert np.allclose(
-        cdf, (0.0, 0.0, 0.23597085, 0.49461712, 0.75326339), rtol=1e-5
-    )
+    assert np.allclose(cdf, (0.0, 0.0, 0.23597085, 0.49461712, 0.75326339), rtol=1e-5)
 
     # upper truncation
     rv = uq.LogNormalRandomVariable(
@@ -1035,9 +1031,7 @@ def test_LogNormalRandomVariable_cdf():
     )
     x = (-1.0, 0.0, 0.5, 1.0, 2.0)
     cdf = rv.cdf(x)
-    assert np.allclose(
-        cdf, (0.00, 0.00, 0.25797755, 0.52840734, 0.79883714), rtol=1e-5
-    )
+    assert np.allclose(cdf, (0.00, 0.00, 0.25797755, 0.52840734, 0.79883714), rtol=1e-5)
 
     # no truncation
     rv = uq.LogNormalRandomVariable('test_rv', theta=(1.0, 1.0))
@@ -1221,10 +1215,7 @@ def test_WeibullRandomVariable_inverse_transform():
     inverse_transform = rv.sample
     truncated_samples = weibull_min.ppf(
         samples
-        * (
-            weibull_min.cdf(2.5, 2.0, scale=1.5)
-            - weibull_min.cdf(0.5, 2.0, scale=1.5)
-        )
+        * (weibull_min.cdf(2.5, 2.0, scale=1.5) - weibull_min.cdf(0.5, 2.0, scale=1.5))
         + weibull_min.cdf(0.5, 2.0, scale=1.5),
         2.0,
         scale=1.5,
@@ -1235,9 +1226,7 @@ def test_WeibullRandomVariable_inverse_transform():
 def test_MultinomialRandomVariable():
     # multinomial with invalid p values provided in the theta vector
     with pytest.raises(ValueError):
-        uq.MultinomialRandomVariable(
-            'rv_invalid', np.array((0.20, 0.70, 0.10, 42.00))
-        )
+        uq.MultinomialRandomVariable('rv_invalid', np.array((0.20, 0.70, 0.10, 42.00)))
 
 
 def test_MultilinearCDFRandomVariable():
@@ -1350,9 +1339,7 @@ def test_DeterministicRandomVariable_inverse_transform():
     rv = uq.DeterministicRandomVariable('test_rv', theta=np.array((0.00,)))
     rv.inverse_transform_sampling(4)
     inverse_transform = rv.sample
-    assert np.allclose(
-        inverse_transform, np.array((0.00, 0.00, 0.00, 0.00)), rtol=1e-5
-    )
+    assert np.allclose(inverse_transform, np.array((0.00, 0.00, 0.00, 0.00)), rtol=1e-5)
 
 
 def test_RandomVariable_Set():
@@ -1388,9 +1375,7 @@ def test_RandomVariable_perfect_correlation():
 
 
 def test_RandomVariable_Set_apply_correlation(reset=False):
-    data_dir = (
-        'pelicun/tests/basic/data/uq/test_random_variable_set_apply_correlation'
-    )
+    data_dir = 'pelicun/tests/basic/data/uq/test_random_variable_set_apply_correlation'
     file_incr = 0
 
     # correlated, uniform
@@ -1463,9 +1448,7 @@ def test_RandomVariable_Set_apply_correlation_special():
 
 
 def test_RandomVariable_Set_orthotope_density(reset=False):
-    data_dir = (
-        'pelicun/tests/basic/data/uq/test_random_variable_set_orthotope_density'
-    )
+    data_dir = 'pelicun/tests/basic/data/uq/test_random_variable_set_orthotope_density'
 
     # create some random variables
     rv_1 = uq.Normal_COV(
@@ -1523,9 +1506,7 @@ def test_RandomVariable_Set_orthotope_density(reset=False):
 
 
 def test_RandomVariableRegistry_generate_sample(reset=False):
-    data_dir = (
-        'pelicun/tests/basic/data/uq/test_RandomVariableRegistry_generate_sample'
-    )
+    data_dir = 'pelicun/tests/basic/data/uq/test_RandomVariableRegistry_generate_sample'
     file_incr = 0
 
     for method in ('LHS_midpoint', 'LHS', 'MonteCarlo'):

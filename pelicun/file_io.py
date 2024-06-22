@@ -407,22 +407,16 @@ def load_data(
 
             conversion_factors = units.map(
                 lambda unit: (
-                    1.00
-                    if pd.isna(unit)
-                    else unit_conversion_factors.get(unit, 1.00)
+                    1.00 if pd.isna(unit) else unit_conversion_factors.get(unit, 1.00)
                 )
             )
 
             if orientation == 1:
-                data.loc[:, numeric_elements] = data.loc[
-                    :, numeric_elements
-                ].multiply(
+                data.loc[:, numeric_elements] = data.loc[:, numeric_elements].multiply(
                     conversion_factors, axis=axis[orientation]
                 )  # type: ignore
             else:
-                data.loc[numeric_elements, :] = data.loc[
-                    numeric_elements, :
-                ].multiply(
+                data.loc[numeric_elements, :] = data.loc[numeric_elements, :].multiply(
                     conversion_factors, axis=axis[orientation]
                 )  # type: ignore
 

@@ -218,13 +218,10 @@ class TestDemandModel(TestModelModule):
         res = demand_model_with_sample.estimate_RID(demands, params)
         assert list(res.columns) == [('RID', '1', '1')]
         assert (
-            demand_model_with_sample.estimate_RID(demands, params, method='xyz')
-            is None
+            demand_model_with_sample.estimate_RID(demands, params, method='xyz') is None
         )
 
-    def test_calibrate_model(
-        self, calibrated_demand_model, demand_model_with_sample_C
-    ):
+    def test_calibrate_model(self, calibrated_demand_model, demand_model_with_sample_C):
         assert calibrated_demand_model.marginal_params['Family'].to_list() == [
             'normal',
             'normal',
@@ -343,9 +340,7 @@ class TestDemandModel(TestModelModule):
     def test_generate_sample_exceptions(self, demand_model):
         # generating a sample from a non calibrated model should fail
         with pytest.raises(ValueError):
-            demand_model.generate_sample(
-                {"SampleSize": 3, 'PreserveRawOrder': False}
-            )
+            demand_model.generate_sample({"SampleSize": 3, 'PreserveRawOrder': False})
 
     def test_generate_sample(self, calibrated_demand_model):
         calibrated_demand_model.generate_sample(

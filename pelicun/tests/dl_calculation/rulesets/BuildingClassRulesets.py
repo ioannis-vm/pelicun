@@ -76,9 +76,7 @@ def building_class(BIM, hazard):
                 # Wood Single-Family Homes (WSF1 or WSF2)
                 # OR roof type = flat (HAZUS can only map flat to WSF1)
                 # OR default (by '')
-                if (
-                    BIM['RoofShape'] == 'flt'
-                ):  # checking if there is a misclassication
+                if BIM['RoofShape'] == 'flt':  # checking if there is a misclassication
                     BIM['RoofShape'] = (
                         # ensure the WSF has gab (by default, note gab
                         # is more vulneable than hip)

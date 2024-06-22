@@ -341,9 +341,7 @@ class LossModel(PelicunModel):
         # remove items
         #
 
-        self.log.msg(
-            'Removing unused loss model parameters.', prepend_timestamp=False
-        )
+        self.log.msg('Removing unused loss model parameters.', prepend_timestamp=False)
 
         for loss_model in self._loss_models:
             # drop unused loss parameter definitions
@@ -358,9 +356,7 @@ class LossModel(PelicunModel):
         # convert units
         #
 
-        self.log.msg(
-            'Converting loss model parameter units.', prepend_timestamp=False
-        )
+        self.log.msg('Converting loss model parameter units.', prepend_timestamp=False)
         for loss_model in self._loss_models:
             loss_model._convert_loss_parameter_units()
 
@@ -848,13 +844,9 @@ class LossModel(PelicunModel):
 
     def _validate_input_replacement_thresholds(
         self,
-        replacement_configuration: tuple[
-            uq.RandomVariableRegistry, dict[str, float]
-        ],
+        replacement_configuration: tuple[uq.RandomVariableRegistry, dict[str, float]],
     ) -> None:
-        replacement_consequence_RV_reg, replacement_ratios = (
-            replacement_configuration
-        )
+        replacement_consequence_RV_reg, replacement_ratios = replacement_configuration
         if not isinstance(replacement_consequence_RV_reg, uq.RandomVariableRegistry):
             raise TypeError(
                 f'Invalid type for replacement consequence RV registry: '
@@ -883,9 +875,7 @@ class LossModel(PelicunModel):
         # triggered, we need to assign a consequence for all DVs.
         for key in self.decision_variables:
             if key not in replacement_consequence_RV_reg.RV:
-                raise ValueError(
-                    f'Missing replacement consequence RV ' f'for `{key}`.'
-                )
+                raise ValueError(f'Missing replacement consequence RV ' f'for `{key}`.')
 
     def _apply_loss_combinations(
         self, loss_combination: dict, sample: pd.DataFrame
@@ -1031,9 +1021,7 @@ class LossModel(PelicunModel):
                         )
                     else:
                         domains, reference_values = combination_parameters
-                        interp_func = RegularGridInterpolator(
-                            domains, reference_values
-                        )
+                        interp_func = RegularGridInterpolator(domains, reference_values)
                     combined_loss = interp_func(values)
                     combined_loss_col = (
                         decision_variable,
@@ -1150,9 +1138,7 @@ class LossModel(PelicunModel):
                     combination_array[:, 0],
                     combination_array[0, :],
                 )
-                loss_combination_converted[decision_variable][
-                    components_to_combine
-                ] = (
+                loss_combination_converted[decision_variable][components_to_combine] = (
                     combination_index,
                     combination_array,
                 )
@@ -1214,9 +1200,7 @@ class LossModel(PelicunModel):
 
         # Convert units ..
         column_measures = [
-            x.replace('repair_', '')
-            .replace('-sequential', '')
-            .replace('-parallel', '')
+            x.replace('repair_', '').replace('-sequential', '').replace('-parallel', '')
             for x in df_agg.columns.get_level_values(0)
         ]
         column_units = [cmp_units[x.title()] for x in column_measures]
@@ -1252,9 +1236,7 @@ class LossModel(PelicunModel):
             exceedance_bool_df = pd.DataFrame(index=sample.index, dtype=bool)
             return sample, exceedance_bool_df
 
-        replacement_consequence_RV_reg, replacement_ratios = (
-            replacement_configuration
-        )
+        replacement_consequence_RV_reg, replacement_ratios = replacement_configuration
         exceedance_bool_df = pd.DataFrame(
             False,
             index=sample.index,
@@ -1286,9 +1268,7 @@ class LossModel(PelicunModel):
                 no_replacement_mask, no_replacement_columns
             ].sum(axis=1)
             if not consequence_sum_given_no_replacement.empty:
-                consequence_values = replacement_consequence_RV_reg.RV[
-                    sample_dv
-                ].sample
+                consequence_values = replacement_consequence_RV_reg.RV[sample_dv].sample
                 exceedance_mask = (
                     consequence_sum_given_no_replacement
                     > consequence_values[no_replacement_mask]
@@ -1360,9 +1340,7 @@ class LossModel(PelicunModel):
 
         if not rows_df.empty:
             replacement_rows = (
-                np.argwhere(np.any(rows_df.values > 0.0, axis=1))
-                .reshape(-1)
-                .tolist()
+                np.argwhere(np.any(rows_df.values > 0.0, axis=1)).reshape(-1).tolist()
             )
         ds_sample.iloc[replacement_rows, ~replacement_columns] = 0.00
         if lf_sample is not None:
@@ -1449,9 +1427,7 @@ class LossModel(PelicunModel):
 
         required = []
         for dv in self.decision_variables:
-            required.extend(
-                [(component, dv) for component in self._loss_map['Repair']]
-            )
+            required.extend([(component, dv) for component in self._loss_map['Repair']])
         missing_set = set(required)
 
         for model in (self.ds_model, self.lf_model):
@@ -1510,9 +1486,7 @@ class RepairModel_Base(PelicunModel):
             data = pd.concat((self.loss_params, data), axis=0)
 
         # drop redefinitions of components
-        data = (
-            data.groupby(level=[0, 1]).first().transform(lambda x: x.fillna(np.nan))
-        )
+        data = data.groupby(level=[0, 1]).first().transform(lambda x: x.fillna(np.nan))
         # note: .groupby introduces None entries. We replace them with
         # NaN for consistency.
 
@@ -1843,20 +1817,16 @@ class RepairModel_DS(RepairModel_Base):
                 ds_list = []
 
                 for ds in (
-                    medians[decision_variable]
-                    .loc[:, component]
-                    .columns.unique(level=0)
+                    medians[decision_variable].loc[:, component].columns.unique(level=0)
                 ):
                     loc_list = []
 
                     for loc_id, loc in enumerate(
-                        dmg_quantities.loc[:, (component, ds)].columns.unique(
-                            level=0
-                        )
+                        dmg_quantities.loc[:, (component, ds)].columns.unique(level=0)
                     ):
-                        if (
-                            self._asmnt.options.eco_scale["AcrossFloors"] is True
-                        ) and (loc_id > 0):
+                        if (self._asmnt.options.eco_scale["AcrossFloors"] is True) and (
+                            loc_id > 0
+                        ):
                             break
 
                         if self._asmnt.options.eco_scale["AcrossFloors"] is True:
@@ -1965,9 +1935,7 @@ class RepairModel_DS(RepairModel_Base):
 
         self.loss_params.drop(columns=ds_to_drop, level=0, inplace=True)
 
-    def _create_DV_RVs(
-        self, cases: pd.MultiIndex
-    ) -> uq.RandomVariableRegistry | None:
+    def _create_DV_RVs(self, cases: pd.MultiIndex) -> uq.RandomVariableRegistry | None:
         """
         Prepare the random variables associated with decision
         variables, such as repair cost and time.
@@ -2099,9 +2067,7 @@ class RepairModel_DS(RepairModel_Base):
                         )
                     )
 
-        self.log.msg(
-            f"\n{rv_count} random variables created.", prepend_timestamp=False
-        )
+        self.log.msg(f"\n{rv_count} random variables created.", prepend_timestamp=False)
 
         if rv_count > 0:
             return RV_reg
@@ -2218,9 +2184,7 @@ class RepairModel_DS(RepairModel_Base):
                     # get the corresponding aggregate damage quantities
                     # to consider economies of scale
                     if 'ds' in eco_qnt.columns.names:
-                        avail_ds = eco_qnt.loc[:, loss_cmp_id].columns.unique(
-                            level=0
-                        )
+                        avail_ds = eco_qnt.loc[:, loss_cmp_id].columns.unique(level=0)
 
                         if ds_id not in avail_ds:
                             continue
@@ -2539,9 +2503,7 @@ class RepairModel_LF(RepairModel_Base):
 
         return medians
 
-    def _create_DV_RVs(
-        self, cases: pd.MultiIndex
-    ) -> uq.RandomVariableRegistry | None:
+    def _create_DV_RVs(self, cases: pd.MultiIndex) -> uq.RandomVariableRegistry | None:
         """
         Prepare the random variables associated with decision
         variables, such as repair cost and time.
@@ -2638,9 +2600,7 @@ class RepairModel_LF(RepairModel_Base):
                         )
                     )
 
-        self.log.msg(
-            f"\n{rv_count} random variables created.", prepend_timestamp=False
-        )
+        self.log.msg(f"\n{rv_count} random variables created.", prepend_timestamp=False)
 
         if rv_count > 0:
             return RV_reg

@@ -75,9 +75,7 @@ class TestPelicunModel(TestModelModule):
         )
         units = pd.Series(['ea'], index=marginal_params.index)
         arg_units = None
-        res = pelicun_model._convert_marginal_params(
-            marginal_params, units, arg_units
-        )
+        res = pelicun_model._convert_marginal_params(marginal_params, units, arg_units)
 
         # >>> res
         #             Theta_0
@@ -115,9 +113,7 @@ class TestPelicunModel(TestModelModule):
         )
         units = pd.Series(['ea', 'ft', 'in', 'in2'], index=marginal_params.index)
         arg_units = None
-        res = pelicun_model._convert_marginal_params(
-            marginal_params, units, arg_units
-        )
+        res = pelicun_model._convert_marginal_params(marginal_params, units, arg_units)
 
         expected_df = pd.DataFrame(
             {
@@ -153,9 +149,7 @@ class TestPelicunModel(TestModelModule):
         )
         units = pd.Series(['test_three'], index=marginal_params.index)
         arg_units = pd.Series(['test_two'], index=marginal_params.index)
-        res = pelicun_model._convert_marginal_params(
-            marginal_params, units, arg_units
-        )
+        res = pelicun_model._convert_marginal_params(marginal_params, units, arg_units)
 
         # >>> res
         #                              Theta_0

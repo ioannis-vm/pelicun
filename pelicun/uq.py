@@ -1895,9 +1895,7 @@ class WeibullRandomVariable(RandomVariable):
 
             p_a, p_b = [weibull_min.cdf(lim, kappa, scale=lambda_) for lim in (a, b)]
 
-            result = weibull_min.ppf(
-                values * (p_b - p_a) + p_a, kappa, scale=lambda_
-            )
+            result = weibull_min.ppf(values * (p_b - p_a) + p_a, kappa, scale=lambda_)
 
         else:
             result = weibull_min.ppf(values, kappa, scale=lambda_)
@@ -2174,9 +2172,7 @@ class CoupledEmpiricalRandomVariable(UtilityRandomVariable):
         """
 
         raw_sample_count = len(self._raw_samples)
-        new_sample = np.tile(
-            self._raw_samples, int(sample_size / raw_sample_count) + 1
-        )
+        new_sample = np.tile(self._raw_samples, int(sample_size / raw_sample_count) + 1)
         result = new_sample[:sample_size]
         return result
 

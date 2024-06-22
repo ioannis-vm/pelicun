@@ -433,9 +433,7 @@ class Logger:
         msg_lines = msg.split('\n')
         formatted_msg = '\n'
         for msg_line in msg_lines:
-            formatted_msg += (
-                self.spaces + Fore.RED + msg_line + Style.RESET_ALL + '\n'
-            )
+            formatted_msg += self.spaces + Fore.RED + msg_line + Style.RESET_ALL + '\n'
         if formatted_msg not in self.warning_stack:
             self.warning_stack.append(formatted_msg)
 
@@ -895,9 +893,7 @@ def show_matrix(data, use_describe=False):
 
     """
     if use_describe:
-        pp.pprint(
-            pd.DataFrame(data).describe(percentiles=[0.01, 0.1, 0.5, 0.9, 0.99])
-        )
+        pp.pprint(pd.DataFrame(data).describe(percentiles=[0.01, 0.1, 0.5, 0.9, 0.99]))
     else:
         pp.pprint(pd.DataFrame(data))
 

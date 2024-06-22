@@ -19,9 +19,7 @@ def benchmark():
     start_time = time.time()
     {col: df[col].tolist() for col in df.columns}
     end_time = time.time()
-    print(
-        f'Time taken with dictionary comprehension: {end_time - start_time} seconds'
-    )
+    print(f'Time taken with dictionary comprehension: {end_time - start_time} seconds')
 
     # Measure time for dictionary comprehension without to list
     start_time = time.time()

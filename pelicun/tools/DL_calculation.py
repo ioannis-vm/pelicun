@@ -599,9 +599,7 @@ def run_pelicun(
         config = json.load(f)
 
     # load the schema
-    with open(
-        f'{base.pelicun_path}/settings/schema.json', 'r', encoding='utf-8'
-    ) as f:
+    with open(f'{base.pelicun_path}/settings/schema.json', 'r', encoding='utf-8') as f:
         schema = json.load(f)
 
     # Validate the configuration against the schema
@@ -742,9 +740,7 @@ def run_pelicun(
     # If the user did not prescribe anything for ListAllDamageStates,
     # then use True as default for DL_calculations regardless of what
     # the Pelicun default is.
-    update(
-        config, 'DL/Options/ListAllDamageStates', True, only_if_empty_or_none=True
-    )
+    update(config, 'DL/Options/ListAllDamageStates', True, only_if_empty_or_none=True)
 
     PAL = Assessment(get(config, 'DL/Options'))
 
@@ -792,9 +788,7 @@ def run_pelicun(
     # if a loss assessment is requested
     if not is_unspecified(config, 'DL/Losses'):
         try:
-            agg_repair = _loss(
-                config, PAL, custom_dl_file_path, output_path, out_files
-            )
+            agg_repair = _loss(config, PAL, custom_dl_file_path, output_path, out_files)
         except ValueError as e:
             print(f'Exception occurred: {str(e)}. Terminating analysis')
             return -1
@@ -834,10 +828,7 @@ def write_json_files(out_files, config, output_path):
     for filename in out_files:
         filename_json = filename[:-3] + 'json'
 
-        if (
-            get(config, 'DL/Outputs/Settings/SimpleIndexInJSON', default=False)
-            is True
-        ):
+        if get(config, 'DL/Outputs/Settings/SimpleIndexInJSON', default=False) is True:
             df = pd.read_csv(output_path / filename, index_col=0)
         else:
             df = convert_to_MultiIndex(
@@ -845,20 +836,14 @@ def write_json_files(out_files, config, output_path):
             )
 
         if "Units" in df.index:
-            df_units = convert_to_SimpleIndex(
-                df.loc['Units', :].to_frame().T, axis=1
-            )
+            df_units = convert_to_SimpleIndex(df.loc['Units', :].to_frame().T, axis=1)
 
             df.drop("Units", axis=0, inplace=True)
 
             out_dict = convert_df_to_dict(df)
 
             out_dict.update(
-                {
-                    "Units": {
-                        col: df_units.loc["Units", col] for col in df_units.columns
-                    }
-                }
+                {"Units": {col: df_units.loc["Units", col] for col in df_units.columns}}
             )
 
         else:
@@ -946,9 +931,7 @@ def _damage_save(PAL, config, output_path, out_files):
 
                 damage_units = damage_units.groupby(level=[0, 1, 4], axis=1).first()
 
-            grp_damage = damage_groupby.sum().mask(
-                damage_groupby.count() == 0, np.nan
-            )
+            grp_damage = damage_groupby.sum().mask(damage_groupby.count() == 0, np.nan)
 
             # if requested, condense DS output
             if (
@@ -1218,9 +1201,7 @@ def _demand(config, config_path, length_unit, PAL, sample_size):
     PAL.demand.generate_sample(
         {
             "SampleSize": sample_size,
-            'PreserveRawOrder': get(
-                config, 'DL/Demands/CoupledDemands', default=False
-            ),
+            'PreserveRawOrder': get(config, 'DL/Demands/CoupledDemands', default=False),
             'DemandCloning': get(config, 'DL/Demands/DemandCloning', default=False),
         }
     )
@@ -1295,9 +1276,7 @@ def _asset(config, PAL, demand_sample, cpref, csuff):
                     cmp_marginals.loc['excessive.coll.DEM', 'Units'] = 'ea'
 
                     locs = demand_sample[coll_DEM].columns.unique(level=0)
-                    cmp_marginals.loc['excessive.coll.DEM', 'Location'] = ','.join(
-                        locs
-                    )
+                    cmp_marginals.loc['excessive.coll.DEM', 'Location'] = ','.join(locs)
 
                     dirs = demand_sample[coll_DEM].columns.unique(level=1)
                     cmp_marginals.loc['excessive.coll.DEM', 'Direction'] = ','.join(
@@ -1372,9 +1351,7 @@ def _damage(config, custom_dl_file_path, PAL, cmp_marginals, length_unit):
         extra_comps = get(config, 'DL/Asset/ComponentDatabasePath')
 
         if 'CustomDLDataFolder' in extra_comps:
-            extra_comps = extra_comps.replace(
-                'CustomDLDataFolder', custom_dl_file_path
-            )
+            extra_comps = extra_comps.replace('CustomDLDataFolder', custom_dl_file_path)
 
         component_db += [
             extra_comps,
@@ -1478,9 +1455,7 @@ def _damage(config, custom_dl_file_path, PAL, cmp_marginals, length_unit):
         # input file
         adf.loc['excessiveRID', ('Demand', 'Directional')] = 1
         adf.loc['excessiveRID', ('Demand', 'Offset')] = 0
-        adf.loc['excessiveRID', ('Demand', 'Type')] = (
-            'Residual Interstory Drift Ratio'
-        )
+        adf.loc['excessiveRID', ('Demand', 'Type')] = 'Residual Interstory Drift Ratio'
 
         adf.loc['excessiveRID', ('Demand', 'Unit')] = 'unitless'
         adf.loc['excessiveRID', ('LS1', 'Theta_0')] = get(
@@ -1561,9 +1536,7 @@ def _damage(config, custom_dl_file_path, PAL, cmp_marginals, length_unit):
                         if isinstance(target_vals, str):
                             for cmp_type, cmp_id in cmp_map.items():
                                 if (cmp_type in target_vals) and (cmp_id != ''):
-                                    target_vals = target_vals.replace(
-                                        cmp_type, cmp_id
-                                    )
+                                    target_vals = target_vals.replace(cmp_type, cmp_id)
 
                             new_target_vals = target_vals
 
@@ -1709,9 +1682,9 @@ def _load_consequence_info(config, PAL, custom_dl_file_path):
         ]
 
         conseq_df = PAL.get_default_data(
-            default_DBs['repair'][
-                get(config, 'DL/Losses/Repair/ConsequenceDatabase')
-            ][:-4]
+            default_DBs['repair'][get(config, 'DL/Losses/Repair/ConsequenceDatabase')][
+                :-4
+            ]
         )
     else:
         consequence_db = []
@@ -1725,9 +1698,7 @@ def _load_consequence_info(config, PAL, custom_dl_file_path):
         extra_comps = get(config, 'DL/Losses/Repair/ConsequenceDatabasePath')
 
         if 'CustomDLDataFolder' in extra_comps:
-            extra_comps = extra_comps.replace(
-                'CustomDLDataFolder', custom_dl_file_path
-            )
+            extra_comps = extra_comps.replace('CustomDLDataFolder', custom_dl_file_path)
 
         consequence_db += [extra_comps]
 
@@ -1768,8 +1739,7 @@ def _loss_save(PAL, config, output_path, out_files, agg_repair):
         )
 
     out_reqs = [
-        out if val else ""
-        for out, val in get(config, 'DL/Outputs/Loss/Repair').items()
+        out if val else "" for out, val in get(config, 'DL/Outputs/Loss/Repair').items()
     ]
 
     if np.any(
@@ -1816,9 +1786,7 @@ def _loss_save(PAL, config, output_path, out_files, agg_repair):
 
             repair_units = repair_units.groupby(level=[0, 1, 2], axis=1).first()
 
-            grp_repair = repair_groupby.sum().mask(
-                repair_groupby.count() == 0, np.nan
-            )
+            grp_repair = repair_groupby.sum().mask(repair_groupby.count() == 0, np.nan)
 
             if 'GroupedSample' in out_reqs:
                 grp_repair_s = pd.concat([grp_repair, repair_units])
@@ -1871,9 +1839,7 @@ def _loss__map_user(custom_dl_file_path, config):
     if get(config, 'DL/Losses/Repair/MapFilePath', default=False) is not False:
         loss_map_path = get(config, 'DL/Losses/Repair/MapFilePath')
 
-        loss_map_path = loss_map_path.replace(
-            'CustomDLDataFolder', custom_dl_file_path
-        )
+        loss_map_path = loss_map_path.replace('CustomDLDataFolder', custom_dl_file_path)
 
     else:
         raise ValueError('Missing loss map path.')

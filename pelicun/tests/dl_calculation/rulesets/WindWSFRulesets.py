@@ -121,18 +121,14 @@ def WSF_config(BIM):
         else:
             RDA = '8d'  # 8d @ 6"/12" ('B' in the Reorganized Rulesets - WIND)
     elif year > 1995:
-        if (BIM['SheathingThickness'] >= 0.3125) and (
-            BIM['SheathingThickness'] <= 0.5
-        ):
+        if (BIM['SheathingThickness'] >= 0.3125) and (BIM['SheathingThickness'] <= 0.5):
             RDA = '6d'  # 6d @ 6"/12" ('A' in the Reorganized Rulesets - WIND)
         elif (BIM['SheathingThickness'] >= 0.59375) and (
             BIM['SheathingThickness'] <= 1.125
         ):
             RDA = '8d'  # 8d @ 6"/12" ('B' in the Reorganized Rulesets - WIND)
     elif year > 1986:
-        if (BIM['SheathingThickness'] >= 0.3125) and (
-            BIM['SheathingThickness'] <= 0.5
-        ):
+        if (BIM['SheathingThickness'] >= 0.3125) and (BIM['SheathingThickness'] <= 0.5):
             RDA = '6d'  # 6d @ 6"/12" ('A' in the Reorganized Rulesets - WIND)
         elif (BIM['SheathingThickness'] >= 0.59375) and (
             BIM['SheathingThickness'] <= 1.0
@@ -140,9 +136,7 @@ def WSF_config(BIM):
             RDA = '8d'  # 8d @ 6"/12" ('B' in the Reorganized Rulesets - WIND)
     else:
         # year <= 1986
-        if (BIM['SheathingThickness'] >= 0.3125) and (
-            BIM['SheathingThickness'] <= 0.5
-        ):
+        if (BIM['SheathingThickness'] >= 0.3125) and (BIM['SheathingThickness'] <= 0.5):
             RDA = '6d'  # 6d @ 6"/12" ('A' in the Reorganized Rulesets - WIND)
         elif (BIM['SheathingThickness'] >= 0.625) and (
             BIM['SheathingThickness'] <= 1.0

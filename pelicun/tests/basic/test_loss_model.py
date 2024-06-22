@@ -233,9 +233,7 @@ class TestLossModel(TestPelicunModel):
             ),
         )
         with pytest.warns(PelicunWarning) as record:
-            loss_model.load_model_parameters(
-                [ds_loss_parameters, lf_loss_parameters]
-            )
+            loss_model.load_model_parameters([ds_loss_parameters, lf_loss_parameters])
 
         # assert len(record) == 1
         # TODO: re-enable the line above once we address other
@@ -483,9 +481,7 @@ class TestLossModel(TestPelicunModel):
         )
         # Add a threshold for `Carbon`
         RV_reg.add_RV(
-            uq.rv_class_map('deterministic')(
-                name='Carbon', theta=np.array((100.00,))
-            )
+            uq.rv_class_map('deterministic')(name='Carbon', theta=np.array((100.00,)))
         )
         df_agg, exceedance_bool_df = loss_model_with_ones.aggregate_losses(
             replacement_configuration=(RV_reg, {'Cost': 0.50, 'Carbon': 1.00}),
@@ -501,9 +497,7 @@ class TestLossModel(TestPelicunModel):
             {'Cost': [False, False, True], 'Carbon': [False, True, True]}
         )
         pd.testing.assert_frame_equal(df_agg, df_agg_expected)
-        pd.testing.assert_frame_equal(
-            exceedance_bool_df, exceedance_bool_df_expected
-        )
+        pd.testing.assert_frame_equal(exceedance_bool_df, exceedance_bool_df_expected)
 
     def test_consequence_scaling(self, loss_model_with_ones):
 
@@ -528,9 +522,7 @@ class TestLossModel(TestPelicunModel):
             .T.astype(float)
         )
         expected_ds.index = pd.RangeIndex(range(len(expected_ds)))
-        pd.testing.assert_frame_equal(
-            loss_model_with_ones.ds_model.sample, expected_ds
-        )
+        pd.testing.assert_frame_equal(loss_model_with_ones.ds_model.sample, expected_ds)
 
         expected_lf = (
             pd.read_csv(
@@ -548,9 +540,7 @@ class TestLossModel(TestPelicunModel):
             .T.astype(float)
         )
         expected_lf.index = pd.RangeIndex(range(len(expected_lf)))
-        pd.testing.assert_frame_equal(
-            loss_model_with_ones.lf_model.sample, expected_lf
-        )
+        pd.testing.assert_frame_equal(loss_model_with_ones.lf_model.sample, expected_lf)
 
 
 class TestRepairModel_Base(TestPelicunModel):
@@ -640,9 +630,7 @@ class TestRepairModel_DS(TestRepairModel_Base):
                     ('DS1', 'Theta_1'): [0.20, None],
                     ('DS1', 'Family'): ['lognormal', None],
                 },
-                index=pd.MultiIndex.from_tuples(
-                    [('cmpA', 'Cost'), ('cmpB', 'Cost')]
-                ),
+                index=pd.MultiIndex.from_tuples([('cmpA', 'Cost'), ('cmpB', 'Cost')]),
             ),
         )
 
@@ -804,9 +792,7 @@ class TestRepairModel_DS(TestRepairModel_Base):
                 ('DS3', 'Theta_0'): [200.00, '2.00,1.00|5.00,10.00'],
                 ('DS3', 'Theta_1'): [None, 0.30],
             },
-            index=pd.MultiIndex.from_tuples(
-                [('cmp.A', 'my_DV'), ('cmp.B', 'my_DV')]
-            ),
+            index=pd.MultiIndex.from_tuples([('cmp.A', 'my_DV'), ('cmp.B', 'my_DV')]),
         ).rename_axis(index=['Loss Driver', 'Decision Variable'])
         ds_model._missing = {('missing_cmp', 'my_DV')}
         medians = ds_model._calc_median_consequence(eco_qnt)
@@ -928,9 +914,7 @@ class TestRepairModel_LF(TestRepairModel_Base):
                         '3,3|9.80665,9.80665',
                     ],
                 },
-                index=pd.MultiIndex.from_tuples(
-                    [('cmpA', 'Cost'), ('cmpB', 'Cost')]
-                ),
+                index=pd.MultiIndex.from_tuples([('cmpA', 'Cost'), ('cmpB', 'Cost')]),
             ),
         )
 
@@ -967,9 +951,7 @@ class TestRepairModel_LF(TestRepairModel_Base):
             medians,
             pd.DataFrame(
                 {('dv.A', 'cmp.A', 'cmp.A', '0', '1', '0', '0'): [1.0, 4.0, 9.0]},
-            ).rename_axis(
-                columns=['dv', 'loss', 'dmg', 'loc', 'dir', 'uid', 'block']
-            ),
+            ).rename_axis(columns=['dv', 'loss', 'dmg', 'loc', 'dir', 'uid', 'block']),
         )
         # test small interpolation domain warning
         demand_dict = {'PFA-1-1': np.array((1.00, 2.00, 1e3))}

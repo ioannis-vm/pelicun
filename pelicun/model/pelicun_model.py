@@ -212,9 +212,7 @@ class PelicunModel:
 
                     if arg_unit != '1 EA':
                         # get the scale factor
-                        arg_unit_factor = self._asmnt.calc_unit_scale_factor(
-                            arg_unit
-                        )
+                        arg_unit_factor = self._asmnt.calc_unit_scale_factor(arg_unit)
 
                         # scale arguments, if needed
                         for a_i, arg in enumerate(args):
@@ -243,9 +241,7 @@ class PelicunModel:
                         )
 
                 # and update the values in the DF
-                marginal_params.loc[row_id, ['Theta_0', 'Theta_1', 'Theta_2']] = (
-                    theta
-                )
+                marginal_params.loc[row_id, ['Theta_0', 'Theta_1', 'Theta_2']] = theta
 
                 marginal_params.loc[row_id, ['TruncateLower', 'TruncateUpper']] = (
                     tr_limits
@@ -408,6 +404,4 @@ class PelicunModel:
                 return np.arange(int(d_low[0]), int(d_high[0]) + 1).astype(str)
 
             # else:
-            raise ValueError(
-                f"Cannot parse direction string: " f"{dir_str}"
-            ) from exc
+            raise ValueError(f"Cannot parse direction string: " f"{dir_str}") from exc

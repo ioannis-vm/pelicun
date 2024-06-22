@@ -125,9 +125,7 @@ def Assm_config(BIM):
         1979,
     ]
     for i in range(0, 22):
-        PostFIRM = (
-            (BIM['City'] == city_list[i]) and (year > year_list[i])
-        ) or PostFIRM
+        PostFIRM = ((BIM['City'] == city_list[i]) and (year > year_list[i])) or PostFIRM
 
     # fl_assm
     fl_assm = (

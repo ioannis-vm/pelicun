@@ -160,9 +160,7 @@ class DemandModel(PelicunModel):
         )
 
         if filepath is not None:
-            self.log.msg(
-                'Demand sample successfully saved.', prepend_timestamp=False
-            )
+            self.log.msg('Demand sample successfully saved.', prepend_timestamp=False)
             return None
 
         # else:
@@ -704,9 +702,7 @@ class DemandModel(PelicunModel):
             distribution=cal_df.loc[:, 'Family'].values,
             censored_count=censored_count,
             detection_limits=cal_df.loc[:, ['CensorLower', 'CensorUpper']].values,
-            truncation_limits=cal_df.loc[
-                :, ['TruncateLower', 'TruncateUpper']
-            ].values,
+            truncation_limits=cal_df.loc[:, ['TruncateLower', 'TruncateUpper']].values,
             multi_fit=False,
             logger_object=self._asmnt.log,
         )
@@ -740,8 +736,7 @@ class DemandModel(PelicunModel):
         self.marginal_params = model_params
 
         self.log.msg(
-            "\nCalibrated demand model marginal distributions:\n"
-            + str(model_params),
+            "\nCalibrated demand model marginal distributions:\n" + str(model_params),
             prepend_timestamp=False,
         )
 
@@ -751,8 +746,7 @@ class DemandModel(PelicunModel):
         )
 
         self.log.msg(
-            "\nCalibrated demand model correlation matrix:\n"
-            + str(self.correlation),
+            "\nCalibrated demand model correlation matrix:\n" + str(self.correlation),
             prepend_timestamp=False,
         )
 
@@ -859,9 +853,7 @@ class DemandModel(PelicunModel):
         )
         marginal_params.index.set_names(['type', 'loc', 'dir'], inplace=True)
 
-        marginal_params = self._convert_marginal_params(
-            marginal_params.copy(), units
-        )
+        marginal_params = self._convert_marginal_params(marginal_params.copy(), units)
 
         self.marginal_params = marginal_params
         self.user_units = units
@@ -1334,9 +1326,7 @@ def _assemble_required_demand_data(
             if direction == '0':
 
                 # non-directional
-                demand = (
-                    demand_sample.loc[:, (edp_type, location)].max(axis=1).values
-                )
+                demand = demand_sample.loc[:, (edp_type, location)].max(axis=1).values
 
                 if edp_type in nondirectional_multipliers:
                     multiplier = nondirectional_multipliers[edp_type]

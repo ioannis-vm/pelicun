@@ -157,9 +157,7 @@ def test_compatibility_DesignSafe_PRJ_3411_Example01():
     with pytest.warns(PelicunWarning):
         P58_data = PAL.get_default_data('bldg_repair_DB_FEMA_P58_2nd')
 
-    P58_data_for_this_assessment = P58_data.loc[
-        loss_map['BldgRepair'].values[:-2], :
-    ]
+    P58_data_for_this_assessment = P58_data.loc[loss_map['BldgRepair'].values[:-2], :]
 
     additional_consequences = pd.DataFrame(
         columns=pd.MultiIndex.from_tuples(
