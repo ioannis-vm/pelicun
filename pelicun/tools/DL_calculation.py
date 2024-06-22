@@ -63,15 +63,6 @@ from colorama import Style
 from jsonschema import validate
 
 
-"""
-
-
-This is for testing.
-
-
-"""
-
-
 import pelicun
 from pelicun.auto import auto_populate
 from pelicun.base import str2bool
