@@ -17,5 +17,9 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --diff -S"
+      - name: Install Flake8
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
       - name: Run Flake8
         run: flake8 .
