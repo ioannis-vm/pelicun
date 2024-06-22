@@ -1365,7 +1365,7 @@ def _assemble_required_demand_data(
             # build a dict of values
             value_dict = {}
             for i, edp_value in enumerate(edp_values.values()):
-                value_dict[f'X{i+1}'] = edp_value
+                value_dict[f'X{i + 1}'] = edp_value
             demand = ne.evaluate(
                 _clean_up_expression(expression), local_dict=value_dict
             )

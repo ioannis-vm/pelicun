@@ -60,7 +60,6 @@ import colorama
 from colorama import Fore
 from colorama import Style
 
-import jsonschema
 from jsonschema import validate
 
 import pelicun

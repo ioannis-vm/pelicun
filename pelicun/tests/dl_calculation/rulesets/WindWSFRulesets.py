@@ -287,7 +287,7 @@ def WSF_config(BIM):
     # building configuration tag
     bldg_config = (
         f"W.SF."
-        f"{int(min(BIM['NumberOfStories'],2))}."
+        f"{int(min(BIM['NumberOfStories'], 2))}."
         f"{BIM['RoofShape']}."
         f"{int(SWR)}."
         f"{RDA}."

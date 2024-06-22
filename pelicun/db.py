@@ -2707,43 +2707,43 @@ def create_Hazus_Flood_repair_db(source_file_dir: str, target_data_file: str):
         )
         source_data[subassembly_type] = pd.read_csv(source_file)
 
-    def eda():
-        """
-        Exploratory data analysis code.
-        """
+    # def eda():
+    #     """
+    #     Exploratory data analysis code.
+    #     """
 
-        subassembly_type = 'contents'
-        df = source_data[subassembly_type]
+    #     subassembly_type = 'contents'
+    #     df = source_data[subassembly_type]
 
-        # General sense
-        print(df.shape)
-        print(df.info())
-        print(df.head())
-        print(df.describe())
+    #     # General sense
+    #     print(df.shape)
+    #     print(df.info())
+    #     print(df.head())
+    #     print(df.describe())
 
-        # Unique categorical values
-        categorical_columns = ('Default', 'Occupancy', 'Source')
-        for column in categorical_columns:
-            print(f"Unique values in {column}: {df[column].unique()}")
+    #     # Unique categorical values
+    #     categorical_columns = ('Default', 'Occupancy', 'Source')
+    #     for column in categorical_columns:
+    #         print(f"Unique values in {column}: {df[column].unique()}")
 
-        # Histograms for numerical columns
-        numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
-        df[numerical_columns].hist(figsize=(15, 10), bins=30)
-        plt.show()
+    #     # Histograms for numerical columns
+    #     numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
+    #     df[numerical_columns].hist(figsize=(15, 10), bins=30)
+    #     plt.show()
 
-        # Bar charts of categorical data
-        for column in categorical_columns:
-            df[column].value_counts().plot(kind='bar')
-            plt.title(column)
-            plt.show()
+    #     # Bar charts of categorical data
+    #     for column in categorical_columns:
+    #         df[column].value_counts().plot(kind='bar')
+    #         plt.title(column)
+    #         plt.show()
 
-        # Some `contents` loss functions are on inventory, while there is
-        # a specific `inventory` subassembly.
-        print(
-            source_data['contents']['Description'][
-                source_data['contents']['Description'].str.contains('entory')
-            ]
-        )
+    #     # Some `contents` loss functions are on inventory, while there is
+    #     # a specific `inventory` subassembly.
+    #     print(
+    #         source_data['contents']['Description'][
+    #             source_data['contents']['Description'].str.contains('entory')
+    #         ]
+    #     )
 
     # We have a dedicated column for `subassembly`, so we don't need
     # special names for the function ID for each subassembly set.
