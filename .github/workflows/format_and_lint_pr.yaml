@@ -1,4 +1,4 @@
-name: Format and lint code
+name: Lint code
 on:
   pull_request:
 permissions:
@@ -15,5 +15,7 @@ jobs:
           python-version: '3.x'
       - name: Run Black
         uses: psf/black@stable
+        with:
+          options: "--check --diff -S"
       - name: Run Flake8
         run: flake8 .
