@@ -1,0 +1,48 @@
+name: Code Formatting and Linting
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  format_and_lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Black and Flake8
+      run: |
+        python -m pip install --upgrade pip
+        pip install black flake8
+
+    - name: Run Black
+      run: black -S .
+
+    - name: Check for changes after Black
+      id: git_status
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+        git status
+        if [[ `git status --porcelain` ]]; then
+          git add .
+          git commit -m "Format code with Black"
+        else
+          echo "No changes to commit"
+        fi
+
+    - name: Push changes
+      if: success() && steps.git_status.outputs.commit_message != ''
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run Flake8
+      run: flake8 .
