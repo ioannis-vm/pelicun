@@ -1,4 +1,4 @@
-name: Push commit
+name: Format and lint code
 on:
   push:
   pull_request:
