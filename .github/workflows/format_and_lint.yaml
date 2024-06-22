@@ -27,8 +27,8 @@ jobs:
             echo "No changes to commit."
           else
             git commit -m "Format code with Black."
+            git push
           fi
-          git push
       - name: Install Flake8
         run: |
           python -m pip install --upgrade pip
