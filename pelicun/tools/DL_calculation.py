@@ -73,7 +73,8 @@ from pelicun.base import update
 from pelicun.base import is_specified
 from pelicun.base import is_unspecified
 from pelicun import base
-from pelicun.assessment import DLCalculationAssessment
+from pelicun.assessment import GeneralAssessment
+from pelicun.assessment import WaterNetworkAssessment
 from pelicun.warnings import PelicunInvalidConfigError
 
 
@@ -342,7 +343,10 @@ def run_pelicun(
     out_files = []
 
     # Run the assessment
-    assessment = DLCalculationAssessment(config_options=get(config, 'DL/Options'))
+    if is_specified(config, 'DL/Asset/ComponentDatabase/Water'):
+        assessment = WaterNetworkAssessment(config_options=get(config, 'DL/Options'))
+    else:
+        assessment = GeneralAssessment(config_options=get(config, 'DL/Options'))
 
     assessment.calculate_demand(
         demand_path=Path(get(config, 'DL/Demands/DemandFilePath')).resolve(),
@@ -383,9 +387,6 @@ def run_pelicun(
             ),
             collapse_fragility=get(
                 config, 'DL/Damage/CollapseFragility', default=None
-            ),
-            is_for_water_network_assessment=is_specified(
-                config, 'DL/Asset/ComponentDatabase/Water'
             ),
             irreparable_damage=get(
                 config, 'DL/Damage/IrreparableDamage', default=None

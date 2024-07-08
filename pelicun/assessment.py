@@ -50,7 +50,6 @@ import numpy as np
 import pandas as pd
 from pelicun.base import get
 from pelicun import base
-from pelicun import uq
 from pelicun import file_io
 from pelicun import model
 from pelicun.base import EDP_to_demand_type
@@ -98,9 +97,9 @@ damage_process_approaches = {
 # pylint: enable=consider-using-namedtuple-or-dataclass
 
 
-class AssessmentBase:
+class Assessment:
     """
-    Base class for Assessment objects.
+    Base class for scenario-based assessment objects.
 
     Assessment objects manage the models, data, and calculations in pelicun.
 
@@ -125,7 +124,9 @@ class AssessmentBase:
         ----------
         config_options (Optional[dict]):
             User-specified configuration dictionary.
+
         """
+
         self.stories: int | None = None
         self.options = base.Options(config_options, self)
         self.unit_conversion_factors = base.parse_units(self.options.units_file)
@@ -337,260 +338,7 @@ class AssessmentBase:
         return scale_factor
 
 
-class Assessment(AssessmentBase):
-    """
-    Assessment class.
-
-    Has methods implementing a Scenario-Based assessment.
-
-    """
-
-    __slots__: list[str] = []
-
-    def calculate_damage(
-        self,
-        num_stories: int,
-        demand_config: dict,
-        demand_data_source: str | dict,
-        cmp_data_source: str | dict[str, pd.DataFrame],
-        damage_data_paths: list[str | pd.DataFrame],
-        dmg_process: dict | None = None,
-        scaling_specification: dict | None = None,
-        yield_drift_configuration: dict | None = None,
-        collapse_fragility_configuration: dict | None = None,
-        block_batch_size: int = 1000,
-    ) -> None:
-        """
-        Calculates damage.
-
-        Paraemters
-        ----------
-        num_stories: int
-            Number of stories of the asset. Applicable to buildings.
-        demand_config: dict
-            A dictionary containing configuration options for the
-            sample generation. Key options include:
-            * 'SampleSize': The number of samples to generate.
-            * 'PreserveRawOrder': Boolean indicating whether to
-            preserve the order of the raw data. Defaults to False.
-            * 'DemandCloning': Specifies if and how demand cloning
-            should be applied. Can be a boolean or a detailed
-            configuration.
-        demand_data_source: string or dict
-            If string, the demand_data_source is a file prefix
-            (<prefix> in the following description) that identifies
-            the following files: <prefix>_marginals.csv,
-            <prefix>_empirical.csv, <prefix>_correlation.csv. If dict,
-            the demand data source is a dictionary with the following
-            optional keys: 'marginals', 'empirical', and
-            'correlation'. The value under each key shall be a
-            DataFrame.
-        cmp_data_source : str or dict
-            The source from where to load the component model data. If
-            it's a string, it should be the prefix for three files:
-            one for marginal distributions (`<prefix>_marginals.csv`),
-            one for empirical data (`<prefix>_empirical.csv`), and one
-            for correlation data (`<prefix>_correlation.csv`). If it's
-            a dictionary, it should have keys 'marginals',
-            'empirical', and 'correlation', with each key associated
-            with a DataFrame containing the corresponding data.
-        damage_data_paths: list of (string | DataFrame)
-            List of paths to data or files with damage model
-            information. Default XY datasets can be accessed as
-            PelicunDefault/XY. Order matters. Parameters defined in
-            prior elements in the list take precedence over the same
-            parameters in subsequent data paths. I.e., place the
-            Default datasets in the back.
-        dmg_process: dict, optional
-            Allows simulating damage processes, where damage to some
-            component can alter the damage state of other components.
-        scaling_specification: dict, optional
-            A dictionary defining the shift in median.
-            Example: {'CMP-1-1': '*1.2', 'CMP-1-2': '/1.4'}
-            The keys are individual components that should be present
-            in the `capacity_sample`.  The values should be strings
-            containing an operation followed by the value formatted as
-            a float.  The operation can be '+' for addition, '-' for
-            subtraction, '*' for multiplication, and '/' for division.
-        yield_drift_configuration: dict
-            Dictionary containing the following keys-values:
-            - params : dict
-            A dictionary containing parameters required for the
-            estimation method, such as 'yield_drift', which is the
-            drift at which yielding is expected to occur.
-            - method : str, optional
-            The method used to estimate the RID values. Currently,
-            only 'FEMA P58' is implemented. Defaults to 'FEMA P58'.
-        collapse_fragility_configuration: dict
-            Dictionary containing the following keys-values:
-            - label: str
-            Label to use to extend the MultiIndex of the demand
-            sample.
-            - value: float
-            Values to add to the rows of the additional column.
-            - unit: str
-            Unit that corresponds to the additional column.
-            - location: str, optional
-            Optional location, defaults to `0`.
-            - direction: str, optional
-            Optional direction, defaults to `1`.
-        block_batch_size: int
-            Maximum number of components in each batch.
-
-        """
-        # TODO: when we build the API docs, ensure the above is
-        # properly rendered.
-
-        self.demand.load_model(demand_data_source)
-        self.demand.generate_sample(demand_config)
-
-        if yield_drift_configuration:
-            self.demand.estimate_RID_and_adjust_sample(
-                yield_drift_configuration['parameters'],
-                yield_drift_configuration['method'],
-            )
-
-        if collapse_fragility_configuration:
-            self.demand.expand_sample(
-                collapse_fragility_configuration['label'],
-                collapse_fragility_configuration['value'],
-                collapse_fragility_configuration['unit'],
-            )
-
-        self.stories = num_stories
-        self.asset.load_cmp_model(cmp_data_source)
-        self.asset.generate_cmp_sample()
-
-        self.damage.load_model_parameters(
-            damage_data_paths, set(self.asset.list_unique_component_ids())
-        )
-        self.damage.calculate(dmg_process, block_batch_size, scaling_specification)
-
-    def calculate_loss(
-        self,
-        decision_variables: tuple[str, ...],
-        loss_model_data_paths: list[str | pd.DataFrame],
-        loss_map_path: str | pd.DataFrame | None = None,
-        loss_map_policy: str | None = None,
-    ):
-        """
-        Calculates loss.
-
-        Parameters
-        ----------
-        decision_variables: tuple
-            Defines the decision variables to be included in the loss
-            calculations. Defaults to those supported, but fewer can be
-            used if desired. When fewer are used, the loss parameters for
-            those not used will not be required.
-        loss_model_data_paths: list of (string | DataFrame)
-            List of paths to data or files with loss model
-            information. Default XY datasets can be accessed as
-            PelicunDefault/XY. Order matters. Parameters defined in
-            prior elements in the list take precedence over the same
-            parameters in subsequent data paths. I.e., place the
-            Default datasets in the back.
-        loss_map_path: str or pd.DataFrame or None
-            Path to a csv file or DataFrame object that maps
-            components IDs to their loss parameter definitions.
-        loss_map_policy: str or None
-            If None, does not modify the loss map.
-            If set to `fill`, each component ID that is present in
-            the asset model but not in the loss map is mapped to
-            itself, but `excessiveRID` is excluded.
-            If set to `fill_all`, each component ID that is present in
-            the asset model but not in the loss map is mapped to
-            itself without exceptions.
-
-        """
-        self.loss.decision_variables = decision_variables
-        self.loss.add_loss_map(loss_map_path, loss_map_policy)
-        self.loss.load_model_parameters(loss_model_data_paths)
-        self.loss.calculate()
-
-    def aggregate_loss(
-        self,
-        replacement_configuration: (
-            tuple[uq.RandomVariableRegistry, dict[str, float]] | None
-        ) = None,
-        loss_combination: dict | None = None,
-    ):
-        """
-        Aggregates losses.
-
-        Parameters
-        ----------
-        replacement_configuration: Tuple, optional
-            Tuple containing a RandomVariableRegistry and a
-            dictionary. The RandomVariableRegistry is defining
-            building replacement consequence RVs for the active
-            decision variables. The dictionary defines exceedance
-            thresholds. If the aggregated value for a decision
-            variable (conditioned on no replacement) exceeds the
-            threshold, then replacement is triggered. This can happen
-            for multuple decision variables at the same
-            realization. The consequence keyword `replacement` is
-            reserved to represent exclusive triggering of the
-            replacement consequences, and other consequences are
-            ignored for those realizations where replacement is
-            triggered. When assigned to None, then `replacement` is
-            still treated as an exclusive consequence (other
-            consequences are set to zero when replacement is nonzero)
-            but it is not being additinally triggered by the
-            exceedance of any thresholds. The aggregated loss sample
-            conains an additional column with information on whether
-            replacement was already present or triggered by a
-            threshold exceedance for each realization.
-        loss_combination: dict, optional
-            Dictionary defining how losses for specific components
-            should be aggregated for a given decision variable. It has
-            the following structure: {`dv`: {(`c1`, `c2`): `arr`,
-            ...}, ...}, where `dv` is some decision variable, (`c1`,
-            `c2`) is a tuple defining a component pair, `arr` is a NxN
-            numpy array defining a combination table, and `...` means
-            that more key-value pairs with the same schema can exist
-            in the dictionaries.  The loss sample is expected to
-            contain columns that include both `c1` and `c2` listed as
-            the component. The combination is applied to all pairs of
-            columns where the components are `c1` and `c2`, and all of
-            the rest of the multiindex levels match (`loc`, `dir`,
-            `uid`). This means, for example, that when combining wind
-            and flood losses, the asset model should contain both a
-            wind and a flood component defined at the same
-            location-direction.  `arr` can also be an M-dimensional
-            numpy array where each dimension has length N (NxNx...xN).
-            This structure allows for the loss combination of M
-            components.  In this case the (`c1`, `c2`) tuple should
-            contain M elements instead of two.
-
-        Note
-        ----
-        Regardless of the value of the arguments, this method does not
-        alter the state of the loss model, i.e., it does not modify
-        the values of the `.sample` attributes.
-
-        Returns
-        -------
-        tuple
-            Dataframe with the aggregated loss of each realization,
-            and another boolean dataframe with information on which DV
-            thresholds were exceeded in each realization, triggering
-            replacement. If no thresholds are specified it only
-            contains False values.
-
-        Raises
-        ------
-        ValueError
-            When inputs are invalid.
-
-        """
-
-        return self.loss.aggregate_losses(
-            replacement_configuration, loss_combination, future=True
-        )
-
-
-class DLCalculationAssessment(AssessmentBase):
+class GeneralAssessment(Assessment):
     """
     Base class for the assessment objects used in `DL_calculation.py`
 
@@ -917,7 +665,6 @@ class DLCalculationAssessment(AssessmentBase):
         component_database: str,
         component_database_path: str | None = None,
         collapse_fragility: dict | None = None,
-        is_for_water_network_assessment: bool = False,
         irreparable_damage: dict | None = None,
         damage_process_approach: str | None = None,
         damage_process_file_path: str | None = None,
@@ -937,8 +684,6 @@ class DLCalculationAssessment(AssessmentBase):
             Optional path to a component database file.
         collapse_fragility : dict or None
             Collapse fragility information.
-        is_for_water_network_assessment : bool
-            Whether the assessment is for a water network.
         irreparable_damage : dict or None
             Information for irreparable damage.
         damage_process_approach : str or None
@@ -1060,7 +805,8 @@ class DLCalculationAssessment(AssessmentBase):
                 adf.loc['collapse', ('LS1', 'Theta_0')] = 1e10
                 adf.loc['collapse', 'Incomplete'] = 0
 
-        elif not is_for_water_network_assessment:
+        else:
+
             # add a placeholder collapse fragility that will never trigger
             # collapse, but allow damage processes to work with collapse
 
@@ -1100,20 +846,6 @@ class DLCalculationAssessment(AssessmentBase):
             adf.loc['irreparable', ('Demand', 'Unit')] = 'unitless'
             adf.loc['irreparable', ('LS1', 'Theta_0')] = 1e10
             adf.loc['irreparable', 'Incomplete'] = 0
-
-        # TODO: we can improve this by creating a water
-        # network-specific assessment class
-        if is_for_water_network_assessment:
-            # add a placeholder aggregate fragility that will never trigger
-            # damage, but allow damage processes to aggregate the
-            # various pipeline damages
-            adf.loc['aggregate', ('Demand', 'Directional')] = 1
-            adf.loc['aggregate', ('Demand', 'Offset')] = 0
-            adf.loc['aggregate', ('Demand', 'Type')] = 'Peak Ground Velocity'
-            adf.loc['aggregate', ('Demand', 'Unit')] = 'mps'
-            adf.loc['aggregate', ('LS1', 'Theta_0')] = 1e10
-            adf.loc['aggregate', ('LS2', 'Theta_0')] = 1e10
-            adf.loc['aggregate', 'Incomplete'] = 0
 
         self.damage.load_model_parameters(
             component_db + [adf],
@@ -1367,6 +1099,323 @@ class DLCalculationAssessment(AssessmentBase):
         assert isinstance(df_agg, pd.DataFrame)
         assert isinstance(exceedance_bool_df, pd.DataFrame)
         return df_agg, exceedance_bool_df
+
+
+class WaterNetworkAssessment(GeneralAssessment):
+    """
+    Water network assessment class.
+
+    """
+
+    __slots__: list[str] = []
+
+    def calculate_damage(
+        self,
+        length_unit: float,
+        component_database: str,
+        component_database_path: str | None = None,
+        collapse_fragility: dict | None = None,
+        irreparable_damage: dict | None = None,
+        damage_process_approach: str | None = None,
+        damage_process_file_path: str | None = None,
+        custom_model_dir: str | None = None,
+    ) -> None:
+        """
+        Calculates damage.
+
+        Parameters
+        ----------
+        length_unit : str
+            Unit of length to be used to add units to the demand data
+            if needed.
+        component_database : str
+            Name of the component database.
+        component_database_path : str or None
+            Optional path to a component database file.
+        collapse_fragility : dict or None
+            Collapse fragility information.
+        irreparable_damage : dict or None
+            Information for irreparable damage.
+        damage_process_approach : str or None
+            Approach for the damage process.
+        damage_process_file_path : str or None
+            Optional path to a damage process file.
+        custom_model_dir : str or None
+            Optional directory for custom models.
+
+        Raises
+        ------
+        ValueError
+            With invalid combinations of arguments.
+
+        """
+
+        # load the fragility information
+        if component_database in default_DBs['fragility']:
+            component_db = [
+                'PelicunDefault/' + default_DBs['fragility'][component_database],
+            ]
+        else:
+            component_db = []
+
+        if component_database_path is not None:
+
+            if custom_model_dir is None:
+                raise ValueError(
+                    '`custom_model_dir` needs to be specified '
+                    'when `component_database_path` is not None.'
+                )
+
+            if 'CustomDLDataFolder' in component_database_path:
+                component_database_path = component_database_path.replace(
+                    'CustomDLDataFolder', custom_model_dir
+                )
+
+            component_db += [component_database_path]
+
+        component_db = component_db[::-1]
+
+        # prepare additional fragility data
+
+        # get the database header from the default P58 db
+        P58_data = self.get_default_data('damage_DB_FEMA_P58_2nd')
+
+        adf = pd.DataFrame(columns=P58_data.columns)
+
+        if collapse_fragility:
+
+            assert self.asset.cmp_marginal_params is not None
+
+            if (
+                'excessive.coll.DEM'
+                in self.asset.cmp_marginal_params.index.get_level_values('cmp')
+            ):
+                # if there is story-specific evaluation
+                coll_CMP_name = 'excessive.coll.DEM'
+            else:
+                # otherwise, for global collapse evaluation
+                coll_CMP_name = 'collapse'
+
+            adf.loc[coll_CMP_name, ('Demand', 'Directional')] = 1
+            adf.loc[coll_CMP_name, ('Demand', 'Offset')] = 0
+
+            coll_DEM = collapse_fragility['DemandType']
+
+            if '_' in coll_DEM:
+                coll_DEM, coll_DEM_spec = coll_DEM.split('_')
+            else:
+                coll_DEM_spec = None
+
+            coll_DEM_name = None
+            for demand_name, demand_short in EDP_to_demand_type.items():
+                if demand_short == coll_DEM:
+                    coll_DEM_name = demand_name
+                    break
+
+            if coll_DEM_name is None:
+                raise ValueError('`coll_DEM_name` cannot be None.')
+
+            if coll_DEM_spec is None:
+                adf.loc[coll_CMP_name, ('Demand', 'Type')] = coll_DEM_name
+
+            else:
+                adf.loc[coll_CMP_name, ('Demand', 'Type')] = (
+                    f'{coll_DEM_name}|{coll_DEM_spec}'
+                )
+
+            coll_DEM_unit = _add_units(
+                pd.DataFrame(
+                    columns=[
+                        f'{coll_DEM}-1-1',
+                    ]
+                ),
+                length_unit,
+            ).iloc[0, 0]
+
+            adf.loc[coll_CMP_name, ('Demand', 'Unit')] = coll_DEM_unit
+            adf.loc[coll_CMP_name, ('LS1', 'Family')] = collapse_fragility[
+                'CapacityDistribution'
+            ]
+            adf.loc[coll_CMP_name, ('LS1', 'Theta_0')] = collapse_fragility[
+                'CapacityMedian'
+            ]
+            adf.loc[coll_CMP_name, ('LS1', 'Theta_1')] = collapse_fragility[
+                'Theta_1'
+            ]
+            adf.loc[coll_CMP_name, 'Incomplete'] = 0
+
+            if coll_CMP_name != 'collapse':
+                # for story-specific evaluation, we need to add a placeholder
+                # fragility that will never trigger, but helps us aggregate
+                # results in the end
+                adf.loc['collapse', ('Demand', 'Directional')] = 1
+                adf.loc['collapse', ('Demand', 'Offset')] = 0
+                adf.loc['collapse', ('Demand', 'Type')] = 'One'
+                adf.loc['collapse', ('Demand', 'Unit')] = 'unitless'
+                adf.loc['collapse', ('LS1', 'Theta_0')] = 1e10
+                adf.loc['collapse', 'Incomplete'] = 0
+
+        if irreparable_damage:
+
+            # add excessive RID fragility according to settings provided in the
+            # input file
+            adf.loc['excessiveRID', ('Demand', 'Directional')] = 1
+            adf.loc['excessiveRID', ('Demand', 'Offset')] = 0
+            adf.loc['excessiveRID', ('Demand', 'Type')] = (
+                'Residual Interstory Drift Ratio'
+            )
+
+            adf.loc['excessiveRID', ('Demand', 'Unit')] = 'unitless'
+            adf.loc['excessiveRID', ('LS1', 'Theta_0')] = irreparable_damage[
+                'DriftCapacityMedian'
+            ]
+            adf.loc['excessiveRID', ('LS1', 'Family')] = "lognormal"
+            adf.loc['excessiveRID', ('LS1', 'Theta_1')] = irreparable_damage[
+                'DriftCapacityLogStd'
+            ]
+
+            adf.loc['excessiveRID', 'Incomplete'] = 0
+
+            # add a placeholder irreparable fragility that will never trigger
+            # damage, but allow damage processes to aggregate excessiveRID here
+            adf.loc['irreparable', ('Demand', 'Directional')] = 1
+            adf.loc['irreparable', ('Demand', 'Offset')] = 0
+            adf.loc['irreparable', ('Demand', 'Type')] = 'One'
+            adf.loc['irreparable', ('Demand', 'Unit')] = 'unitless'
+            adf.loc['irreparable', ('LS1', 'Theta_0')] = 1e10
+            adf.loc['irreparable', 'Incomplete'] = 0
+
+        # add a placeholder aggregate fragility that will never trigger
+        # damage, but allow damage processes to aggregate the
+        # various pipeline damages
+        adf.loc['aggregate', ('Demand', 'Directional')] = 1
+        adf.loc['aggregate', ('Demand', 'Offset')] = 0
+        adf.loc['aggregate', ('Demand', 'Type')] = 'Peak Ground Velocity'
+        adf.loc['aggregate', ('Demand', 'Unit')] = 'mps'
+        adf.loc['aggregate', ('LS1', 'Theta_0')] = 1e10
+        adf.loc['aggregate', ('LS2', 'Theta_0')] = 1e10
+        adf.loc['aggregate', 'Incomplete'] = 0
+
+        self.damage.load_model_parameters(
+            component_db + [adf],
+            set(self.asset.list_unique_component_ids()),
+        )
+
+        # load the damage process if needed
+        dmg_process = None
+        if damage_process_approach is not None:
+
+            if damage_process_approach in damage_process_approaches:
+                dmg_process = damage_process_approaches[damage_process_approach]
+
+                # For Hazus Earthquake, we need to specify the component ids
+                if damage_process_approach == 'Hazus Earthquake':
+
+                    cmp_sample = self.asset.save_cmp_sample()
+                    assert isinstance(cmp_sample, pd.DataFrame)
+
+                    cmp_list = cmp_sample.columns.unique(level=0)
+
+                    cmp_map = {'STR': '', 'LF': '', 'NSA': ''}
+
+                    for cmp in cmp_list:
+                        for cmp_type in cmp_map:
+                            if cmp_type + '.' in cmp:
+                                cmp_map[cmp_type] = cmp
+
+                    new_dmg_process = dmg_process.copy()
+                    for source_cmp, action in dmg_process.items():
+                        # first, look at the source component id
+                        new_source = None
+                        for cmp_type, cmp_id in cmp_map.items():
+                            if (cmp_type in source_cmp) and (cmp_id != ''):
+                                new_source = source_cmp.replace(cmp_type, cmp_id)
+                                break
+
+                        if new_source is not None:
+                            new_dmg_process[new_source] = action
+                            del new_dmg_process[source_cmp]
+                        else:
+                            new_source = source_cmp
+
+                        # then, look at the target component ids
+                        for ds_i, target_vals in action.items():
+                            if isinstance(target_vals, str):
+                                for cmp_type, cmp_id in cmp_map.items():
+                                    if (cmp_type in target_vals) and (cmp_id != ''):
+                                        target_vals = target_vals.replace(
+                                            cmp_type, cmp_id
+                                        )
+
+                                new_target_vals = target_vals
+
+                            else:
+                                # we assume that target_vals is a list of str
+                                new_target_vals = []
+
+                                for target_val in target_vals:
+                                    for cmp_type, cmp_id in cmp_map.items():
+                                        if (cmp_type in target_val) and (
+                                            cmp_id != ''
+                                        ):
+                                            target_val = target_val.replace(
+                                                cmp_type, cmp_id
+                                            )
+
+                                    new_target_vals.append(target_val)
+
+                            new_dmg_process[new_source][ds_i] = new_target_vals
+
+                    dmg_process = new_dmg_process
+
+            elif damage_process_approach == "User Defined":
+
+                if damage_process_file_path is None:
+                    raise ValueError(
+                        'When `damage_process_approach` is set to '
+                        '`User Defined`, a `damage_process_file_path` '
+                        'needs to be provided.'
+                    )
+
+                # load the damage process from a file
+                with open(damage_process_file_path, 'r', encoding='utf-8') as f:
+                    dmg_process = json.load(f)
+
+            elif damage_process_approach == "None":
+                # no damage process applied for the calculation
+                dmg_process = None
+
+            else:
+                self.log.msg(
+                    f"Prescribed Damage Process not recognized: "
+                    f"`{damage_process_approach}`."
+                )
+
+        # calculate damages
+        self.damage.calculate(dmg_process=dmg_process)
+
+
+class TimeBasedAssessment:
+    """
+    Implements a time-based assessment.
+
+    A time-based assessment evaluates the performance of an asset
+    considering all potential instances of a type of hazard that could
+    occur over a specified period of time, producing annualized loss
+    performance metrics.
+
+    """
+
+    def __init__(self, assessments: list[Assessment], scenario_info: pd.DataFrame):
+        """
+        Initializes a time-based assessment object.
+
+        Parameters
+        ----------
+
+
+        """
+        pass
 
 
 def load_consequence_info(
@@ -1763,10 +1812,3 @@ def _loss__map_auto(assessment, conseq_df, DL_method, occupancy_type=None):
     loss_map = pd.DataFrame(loss_models, columns=['Repair'], index=drivers)
 
     return loss_map
-
-
-class TimeBasedAssessment:
-    """
-    Time-based assessment.
-
-    """
