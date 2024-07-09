@@ -61,7 +61,7 @@ from pelicun import uq
 from pelicun import file_io
 
 if TYPE_CHECKING:
-    from pelicun.assessment import AssessmentBase
+    from pelicun.assessment import Assessment
 
 idx = base.idx
 
@@ -79,7 +79,7 @@ class LossModel(PelicunModel):
 
     def __init__(
         self,
-        assessment: AssessmentBase,
+        assessment: Assessment,
         decision_variables: tuple[str, ...] = ('Carbon', 'Cost', 'Energy', 'Time'),
     ):
         """
@@ -87,7 +87,7 @@ class LossModel(PelicunModel):
 
         Parameters
         ----------
-        assessment: pelicun.AssessmentBase
+        assessment: pelicun.Assessment
             Parent assessment
         decision_variables: tuple
             Defines the decision variables to be included in the loss
@@ -1488,13 +1488,13 @@ class RepairModel_Base(PelicunModel):
         '_missing',
     ]
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: Assessment):
         """
         Initializes RepairModel_Base objects.
 
         Parameters
         ----------
-        assessment: pelicun.AssessmentBase
+        assessment: pelicun.Assessment
             Parent assessment
 
         """

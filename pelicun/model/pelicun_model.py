@@ -52,7 +52,7 @@ from pelicun import base
 from pelicun import uq
 
 if TYPE_CHECKING:
-    from pelicun.assessment import AssessmentBase
+    from pelicun.assessment import Assessment
 
 idx = base.idx
 
@@ -65,9 +65,9 @@ class PelicunModel:
 
     __slots__ = ['_asmnt', 'log']
 
-    def __init__(self, assessment: AssessmentBase):
-        # link the PelicunModel object to its AssessmentBase object
-        self._asmnt: AssessmentBase = assessment
+    def __init__(self, assessment: Assessment):
+        # link the PelicunModel object to its Assessment object
+        self._asmnt: Assessment = assessment
 
         # link logging methods as attributes enabling more
         # concise syntax

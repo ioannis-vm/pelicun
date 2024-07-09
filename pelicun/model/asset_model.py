@@ -55,7 +55,7 @@ from pelicun import uq
 from pelicun import file_io
 
 if TYPE_CHECKING:
-    from pelicun.assessment import AssessmentBase
+    from pelicun.assessment import Assessment
 
 idx = base.idx
 
@@ -71,7 +71,7 @@ class AssetModel(PelicunModel):
 
     __slots__ = ['cmp_marginal_params', 'cmp_units', 'cmp_sample', '_cmp_RVs']
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: Assessment):
         super().__init__(assessment)
 
         self.cmp_marginal_params: pd.DataFrame | None = None

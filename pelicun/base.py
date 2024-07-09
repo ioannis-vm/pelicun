@@ -64,7 +64,7 @@ from colorama import Style
 from pelicun.warnings import PelicunWarning
 
 if TYPE_CHECKING:
-    from pelicun.assessment import AssessmentBase
+    from pelicun.assessment import Assessment
 
 
 colorama.init()
@@ -164,7 +164,7 @@ class Options:
     def __init__(
         self,
         user_config_options: dict[str, Any] | None,
-        assessment: AssessmentBase | None = None,
+        assessment: Assessment | None = None,
     ):
         """
         Initializes an Options object.
@@ -174,7 +174,7 @@ class Options:
         user_config_options: dict, Optional
             User-specified configuration dictionary. Any provided
             user_config_options override the defaults.
-        assessment: AssessmentBase, Optional
+        assessment: Assessment, Optional
             Assessment object that will be using this Options
             object. If it is not intended to use this Options object
             for an Assessment (e.g. defining an Options object for UQ

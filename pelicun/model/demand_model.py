@@ -57,7 +57,7 @@ from pelicun import uq
 from pelicun import file_io
 
 if TYPE_CHECKING:
-    from pelicun.assessment import AssessmentBase
+    from pelicun.assessment import Assessment
 
 idx = base.idx
 
@@ -105,7 +105,7 @@ class DemandModel(PelicunModel):
         'sample',
     ]
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: Assessment):
         super().__init__(assessment)
 
         self.marginal_params: pd.DataFrame | None = None

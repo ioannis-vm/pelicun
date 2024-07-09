@@ -56,7 +56,7 @@ from pelicun import uq
 from pelicun import file_io
 
 if TYPE_CHECKING:
-    from pelicun.assessment import AssessmentBase
+    from pelicun.assessment import Assessment
 
 idx = base.idx
 
@@ -69,7 +69,7 @@ class DamageModel(PelicunModel):
 
     __slots__ = ['ds_model', 'missing_components']
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: Assessment):
         super().__init__(assessment)
 
         self.ds_model: DamageModel_DS = DamageModel_DS(assessment)
@@ -489,7 +489,7 @@ class DamageModel_Base(PelicunModel):
 
     __slots__ = ['damage_params', 'sample']
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: Assessment):
         super().__init__(assessment)
 
         self.damage_params: pd.DataFrame | None = None
@@ -707,7 +707,7 @@ class DamageModel_DS(DamageModel_Base):
 
     __slots__ = ['ds_sample']
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: Assessment):
         super().__init__(assessment)
         self.ds_sample: pd.DataFrame | None = None
 

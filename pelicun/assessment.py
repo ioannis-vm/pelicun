@@ -388,11 +388,34 @@ class GeneralAssessment(Assessment):
 
         """
 
+        # Prepare the demand sample input
+        demands = self._preprocess_demand(demand_path, collapse_limits, length_unit)
+
+        # Generate demand realizations
+        self.demand.load_sample(demands)
+        if demand_calibration:
+            self.demand.calibrate_model(demand_calibration)
+        else:
+            self.demand.calibrate_model({"ALL": {"DistributionFamily": "empirical"}})
+        self.demand.generate_sample(
+            {
+                "SampleSize": sample_size,
+                'PreserveRawOrder': coupled_demands,
+                'DemandCloning': demand_cloning,
+            }
+        )
+
+        # Add extra information to the demand sample realizations
+        self._postprocess_demand(residual_drift_inference)
+
+    def _preprocess_demand(
+        self, demand_path: str, collapse_limits: dict | None, length_unit: str
+    ) -> pd.DataFrame:
         idx = pd.IndexSlice
         raw_demands = pd.read_csv(demand_path, index_col=0)
 
         # remove excessive demands that are considered collapses, if needed
-        if collapse_limits:
+        if collapse_limits is not None:
             raw_demands_m = base.convert_to_MultiIndex(raw_demands, axis=1)
             assert isinstance(raw_demands_m, pd.DataFrame)
             raw_demands = raw_demands_m
@@ -440,28 +463,11 @@ class GeneralAssessment(Assessment):
 
         else:
             demands = raw_demands
+        return demands
 
-        # load the available demand sample
-        self.demand.load_sample(demands)
+    def _postprocess_demand(self, residual_drift_inference: dict | None) -> None:
 
-        # get the calibration information
-        if demand_calibration:
-            # then use it to calibrate the demand model
-            self.demand.calibrate_model(demand_calibration)
-
-        else:
-            # if no calibration is requested,
-            # set all demands to use empirical distribution
-            self.demand.calibrate_model({"ALL": {"DistributionFamily": "empirical"}})
-
-        # and generate a new demand sample
-        self.demand.generate_sample(
-            {
-                "SampleSize": sample_size,
-                'PreserveRawOrder': coupled_demands,
-                'DemandCloning': demand_cloning,
-            }
-        )
+        idx = pd.IndexSlice
 
         # get the generated demand sample
         demand_sample_tuple = self.demand.save_sample(save_units=True)
@@ -473,7 +479,7 @@ class GeneralAssessment(Assessment):
         demand_sample = pd.concat([demand_sample, demand_units.to_frame().T])
 
         # get residual drift estimates, if needed
-        if residual_drift_inference:
+        if residual_drift_inference is not None:
 
             # `method` is guaranteed to exist because it is confirmed when
             # parsing the configuration file.
@@ -577,91 +583,103 @@ class GeneralAssessment(Assessment):
                 encoding_errors='replace',
             )
 
-            DEM_types = demand_sample.columns.unique(level=0)
+            self._add_extra_cmp_marginals(
+                cmp_marginals,
+                demand_sample,
+                collapse_fragility_demand_type,
+                add_irreparable_damage_columns,
+            )
 
-            # add component(s) to support collapse calculation
-            if collapse_fragility_demand_type is not None:
-                if not collapse_fragility_demand_type.startswith('SA'):
-                    # we need story-specific collapse assessment
-                    # (otherwise we have a global demand and evaluate
-                    # collapse directly, so this code should be skipped)
-
-                    if collapse_fragility_demand_type in DEM_types:
-                        # excessive coll_DEM is added on every floor
-                        # to detect large RIDs
-                        cmp_marginals.loc['excessive.coll.DEM', 'Units'] = 'ea'
-
-                        locs = demand_sample[
-                            collapse_fragility_demand_type  # type: ignore
-                        ].columns.unique(level=0)
-                        cmp_marginals.loc['excessive.coll.DEM', 'Location'] = (
-                            ','.join(locs)
-                        )
-
-                        dirs = demand_sample[
-                            collapse_fragility_demand_type  # type: ignore
-                        ].columns.unique(level=1)
-                        cmp_marginals.loc['excessive.coll.DEM', 'Direction'] = (
-                            ','.join(dirs)
-                        )
-
-                        cmp_marginals.loc['excessive.coll.DEM', 'Theta_0'] = 1.0
-
-                    else:
-
-                        self.log.msg(
-                            f'WARNING: No {collapse_fragility_demand_type} '
-                            f'among available demands. Collapse cannot '
-                            f'be evaluated.'
-                        )
-
-            # always add a component to support basic collapse calculation
-            cmp_marginals.loc['collapse', 'Units'] = 'ea'
-            cmp_marginals.loc['collapse', 'Location'] = 0
-            cmp_marginals.loc['collapse', 'Direction'] = 1
-            cmp_marginals.loc['collapse', 'Theta_0'] = 1.0
-
-            # add components to support irreparable damage calculation
-            if add_irreparable_damage_columns:
-                if 'RID' in DEM_types:
-                    # excessive RID is added on every floor to detect large RIDs
-                    cmp_marginals.loc['excessiveRID', 'Units'] = 'ea'
-
-                    locs = demand_sample['RID'].columns.unique(level=0)
-                    cmp_marginals.loc['excessiveRID', 'Location'] = ','.join(locs)
-
-                    dirs = demand_sample['RID'].columns.unique(level=1)
-                    cmp_marginals.loc['excessiveRID', 'Direction'] = ','.join(dirs)
-
-                    cmp_marginals.loc['excessiveRID', 'Theta_0'] = 1.0
-
-                    # irreparable is a global component to recognize is any of the
-                    # excessive RIDs were triggered
-                    cmp_marginals.loc['irreparable', 'Units'] = 'ea'
-                    cmp_marginals.loc['irreparable', 'Location'] = 0
-                    cmp_marginals.loc['irreparable', 'Direction'] = 1
-                    cmp_marginals.loc['irreparable', 'Theta_0'] = 1.0
-
-                else:
-                    self.log.msg(
-                        'WARNING: No residual interstory drift ratio among '
-                        'available demands. Irreparable damage cannot be '
-                        'evaluated.'
-                    )
-
-            # load component model
+            # load component model and generate sample
             self.asset.load_cmp_model({'marginals': cmp_marginals})
-
-            # generate component quantity sample
             self.asset.generate_cmp_sample()
 
-        # if requested, load the quantity sample from a file
+        # alternatively, load an existing quantity sample from a file
         if component_sample_file is not None:
             self.asset.load_cmp_sample(component_sample_file)
 
+    def _add_extra_cmp_marginals(
+        self,
+        cmp_marginals: pd.DataFrame,
+        demand_sample: pd.DataFrame,
+        collapse_fragility_demand_type: str | None,
+        add_irreparable_damage_columns: bool,
+    ) -> None:
+        DEM_types = demand_sample.columns.unique(level=0)
+
+        # add component(s) to support collapse calculation
+        if collapse_fragility_demand_type is not None:
+            if not collapse_fragility_demand_type.startswith('SA'):
+                # we need story-specific collapse assessment
+                # (otherwise we have a global demand and evaluate
+                # collapse directly, so this code should be skipped)
+
+                if collapse_fragility_demand_type in DEM_types:
+                    # excessive coll_DEM is added on every floor
+                    # to detect large RIDs
+                    cmp_marginals.loc['excessive.coll.DEM', 'Units'] = 'ea'
+
+                    locs = demand_sample[
+                        collapse_fragility_demand_type  # type: ignore
+                    ].columns.unique(level=0)
+                    cmp_marginals.loc['excessive.coll.DEM', 'Location'] = ','.join(
+                        locs
+                    )
+
+                    dirs = demand_sample[
+                        collapse_fragility_demand_type  # type: ignore
+                    ].columns.unique(level=1)
+                    cmp_marginals.loc['excessive.coll.DEM', 'Direction'] = ','.join(
+                        dirs
+                    )
+
+                    cmp_marginals.loc['excessive.coll.DEM', 'Theta_0'] = 1.0
+
+                else:
+
+                    self.log.warn(
+                        f'No {collapse_fragility_demand_type} '
+                        f'among available demands. Collapse cannot '
+                        f'be evaluated.'
+                    )
+
+        # always add a component to support basic collapse calculation
+        cmp_marginals.loc['collapse', 'Units'] = 'ea'
+        cmp_marginals.loc['collapse', 'Location'] = 0
+        cmp_marginals.loc['collapse', 'Direction'] = 1
+        cmp_marginals.loc['collapse', 'Theta_0'] = 1.0
+
+        # add components to support irreparable damage calculation
+        if add_irreparable_damage_columns:
+            if 'RID' in DEM_types:
+                # excessive RID is added on every floor to detect large RIDs
+                cmp_marginals.loc['excessiveRID', 'Units'] = 'ea'
+
+                locs = demand_sample['RID'].columns.unique(level=0)
+                cmp_marginals.loc['excessiveRID', 'Location'] = ','.join(locs)
+
+                dirs = demand_sample['RID'].columns.unique(level=1)
+                cmp_marginals.loc['excessiveRID', 'Direction'] = ','.join(dirs)
+
+                cmp_marginals.loc['excessiveRID', 'Theta_0'] = 1.0
+
+                # irreparable is a global component to recognize is any of the
+                # excessive RIDs were triggered
+                cmp_marginals.loc['irreparable', 'Units'] = 'ea'
+                cmp_marginals.loc['irreparable', 'Location'] = 0
+                cmp_marginals.loc['irreparable', 'Direction'] = 1
+                cmp_marginals.loc['irreparable', 'Theta_0'] = 1.0
+
+            else:
+                self.log.warn(
+                    'No residual interstory drift ratio among '
+                    'available demands. Irreparable damage cannot be '
+                    'evaluated.'
+                )
+
     def calculate_damage(
         self,
-        length_unit: float,
+        length_unit: str,
         component_database: str,
         component_database_path: str | None = None,
         collapse_fragility: dict | None = None,
@@ -700,6 +718,37 @@ class GeneralAssessment(Assessment):
 
         """
 
+        component_db = self._get_component_db(
+            component_database, component_database_path, custom_model_dir
+        )
+
+        # prepare additional fragility data
+        additional_fragility_df = self._additional_fragility_data(
+            collapse_fragility, length_unit, irreparable_damage
+        )
+
+        self.damage.load_model_parameters(
+            component_db + [additional_fragility_df],
+            set(self.asset.list_unique_component_ids()),
+        )
+
+        # load the damage process if needed
+        if damage_process_approach is not None:
+            dmg_process = self._get_dmg_process(
+                damage_process_approach, damage_process_file_path
+            )
+        else:
+            dmg_process = None
+
+        # calculate damages
+        self.damage.calculate(dmg_process=dmg_process)
+
+    def _get_component_db(
+        self,
+        component_database: str,
+        component_database_path: str | None,
+        custom_model_dir: str | None,
+    ) -> list[str]:
         # load the fragility information
         if component_database in default_DBs['fragility']:
             component_db = [
@@ -724,13 +773,127 @@ class GeneralAssessment(Assessment):
             component_db += [component_database_path]
 
         component_db = component_db[::-1]
+        return component_db
 
-        # prepare additional fragility data
+    def _get_dmg_process(
+        self, damage_process_approach: str, damage_process_file_path: str | None
+    ) -> dict | None:
+        if damage_process_approach in damage_process_approaches:
+            dmg_process = damage_process_approaches[damage_process_approach]
 
-        # get the database header from the default P58 db
-        P58_data = self.get_default_data('damage_DB_FEMA_P58_2nd')
+            # For Hazus Earthquake, we need to specify the component ids
+            if damage_process_approach == 'Hazus Earthquake':
 
-        adf = pd.DataFrame(columns=P58_data.columns)
+                cmp_sample = self.asset.save_cmp_sample()
+                assert isinstance(cmp_sample, pd.DataFrame)
+
+                cmp_list = cmp_sample.columns.unique(level=0)
+
+                cmp_map = {'STR': '', 'LF': '', 'NSA': ''}
+
+                for cmp in cmp_list:
+                    for cmp_type in cmp_map:
+                        if cmp_type + '.' in cmp:
+                            cmp_map[cmp_type] = cmp
+
+                new_dmg_process = dmg_process.copy()
+                for source_cmp, action in dmg_process.items():
+                    # first, look at the source component id
+                    new_source = None
+                    for cmp_type, cmp_id in cmp_map.items():
+                        if (cmp_type in source_cmp) and (cmp_id != ''):
+                            new_source = source_cmp.replace(cmp_type, cmp_id)
+                            break
+
+                    if new_source is not None:
+                        new_dmg_process[new_source] = action
+                        del new_dmg_process[source_cmp]
+                    else:
+                        new_source = source_cmp
+
+                    # then, look at the target component ids
+                    for ds_i, target_vals in action.items():
+                        if isinstance(target_vals, str):
+                            for cmp_type, cmp_id in cmp_map.items():
+                                if (cmp_type in target_vals) and (cmp_id != ''):
+                                    target_vals = target_vals.replace(
+                                        cmp_type, cmp_id
+                                    )
+
+                            new_target_vals = target_vals
+
+                        else:
+                            # we assume that target_vals is a list of str
+                            new_target_vals = []
+
+                            for target_val in target_vals:
+                                for cmp_type, cmp_id in cmp_map.items():
+                                    if (cmp_type in target_val) and (cmp_id != ''):
+                                        target_val = target_val.replace(
+                                            cmp_type, cmp_id
+                                        )
+
+                                new_target_vals.append(target_val)
+
+                        new_dmg_process[new_source][ds_i] = new_target_vals
+
+                dmg_process = new_dmg_process
+
+        elif damage_process_approach == "User Defined":
+
+            if damage_process_file_path is None:
+                raise ValueError(
+                    'When `damage_process_approach` is set to '
+                    '`User Defined`, a `damage_process_file_path` '
+                    'needs to be provided.'
+                )
+
+            # load the damage process from a file
+            with open(damage_process_file_path, 'r', encoding='utf-8') as f:
+                dmg_process = json.load(f)
+
+        elif damage_process_approach == "None":
+            # no damage process applied for the calculation
+            dmg_process = None
+
+        else:
+            raise ValueError(
+                f"Unknown damage process approach: " f"`{damage_process_approach}`."
+            )
+        return dmg_process
+
+    def _additional_fragility_data(
+        self,
+        collapse_fragility: dict | None,
+        length_unit: str,
+        irreparable_damage: dict | None,
+    ) -> pd.DataFrame:
+        columns = pd.MultiIndex.from_tuples(
+            [
+                ('Demand', 'Directional'),
+                ('Demand', 'Offset'),
+                ('Demand', 'Type'),
+                ('Demand', 'Unit'),
+                ('Incomplete', ''),
+                ('LS1', 'DamageStateWeights'),
+                ('LS1', 'Family'),
+                ('LS1', 'Theta_0'),
+                ('LS1', 'Theta_1'),
+                ('LS2', 'DamageStateWeights'),
+                ('LS2', 'Family'),
+                ('LS2', 'Theta_0'),
+                ('LS2', 'Theta_1'),
+                ('LS3', 'DamageStateWeights'),
+                ('LS3', 'Family'),
+                ('LS3', 'Theta_0'),
+                ('LS3', 'Theta_1'),
+                ('LS4', 'DamageStateWeights'),
+                ('LS4', 'Family'),
+                ('LS4', 'Theta_0'),
+                ('LS4', 'Theta_1'),
+            ],
+        )
+        adf = pd.DataFrame(columns=columns)
 
         if collapse_fragility:
 
@@ -847,103 +1010,7 @@ class GeneralAssessment(Assessment):
             adf.loc['irreparable', ('LS1', 'Theta_0')] = 1e10
             adf.loc['irreparable', 'Incomplete'] = 0
 
-        self.damage.load_model_parameters(
-            component_db + [adf],
-            set(self.asset.list_unique_component_ids()),
-        )
-
-        # load the damage process if needed
-        dmg_process = None
-        if damage_process_approach is not None:
-
-            if damage_process_approach in damage_process_approaches:
-                dmg_process = damage_process_approaches[damage_process_approach]
-
-                # For Hazus Earthquake, we need to specify the component ids
-                if damage_process_approach == 'Hazus Earthquake':
-
-                    cmp_sample = self.asset.save_cmp_sample()
-                    assert isinstance(cmp_sample, pd.DataFrame)
-
-                    cmp_list = cmp_sample.columns.unique(level=0)
-
-                    cmp_map = {'STR': '', 'LF': '', 'NSA': ''}
-
-                    for cmp in cmp_list:
-                        for cmp_type in cmp_map:
-                            if cmp_type + '.' in cmp:
-                                cmp_map[cmp_type] = cmp
-
-                    new_dmg_process = dmg_process.copy()
-                    for source_cmp, action in dmg_process.items():
-                        # first, look at the source component id
-                        new_source = None
-                        for cmp_type, cmp_id in cmp_map.items():
-                            if (cmp_type in source_cmp) and (cmp_id != ''):
-                                new_source = source_cmp.replace(cmp_type, cmp_id)
-                                break
-
-                        if new_source is not None:
-                            new_dmg_process[new_source] = action
-                            del new_dmg_process[source_cmp]
-                        else:
-                            new_source = source_cmp
-
-                        # then, look at the target component ids
-                        for ds_i, target_vals in action.items():
-                            if isinstance(target_vals, str):
-                                for cmp_type, cmp_id in cmp_map.items():
-                                    if (cmp_type in target_vals) and (cmp_id != ''):
-                                        target_vals = target_vals.replace(
-                                            cmp_type, cmp_id
-                                        )
-
-                                new_target_vals = target_vals
-
-                            else:
-                                # we assume that target_vals is a list of str
-                                new_target_vals = []
-
-                                for target_val in target_vals:
-                                    for cmp_type, cmp_id in cmp_map.items():
-                                        if (cmp_type in target_val) and (
-                                            cmp_id != ''
-                                        ):
-                                            target_val = target_val.replace(
-                                                cmp_type, cmp_id
-                                            )
-
-                                    new_target_vals.append(target_val)
-
-                            new_dmg_process[new_source][ds_i] = new_target_vals
-
-                    dmg_process = new_dmg_process
-
-            elif damage_process_approach == "User Defined":
-
-                if damage_process_file_path is None:
-                    raise ValueError(
-                        'When `damage_process_approach` is set to '
-                        '`User Defined`, a `damage_process_file_path` '
-                        'needs to be provided.'
-                    )
-
-                # load the damage process from a file
-                with open(damage_process_file_path, 'r', encoding='utf-8') as f:
-                    dmg_process = json.load(f)
-
-            elif damage_process_approach == "None":
-                # no damage process applied for the calculation
-                dmg_process = None
-
-            else:
-                self.log.msg(
-                    f"Prescribed Damage Process not recognized: "
-                    f"`{damage_process_approach}`."
-                )
-
-        # calculate damages
-        self.damage.calculate(dmg_process=dmg_process)
+        return adf
 
     def calculate_loss(
         self,
@@ -1109,78 +1176,38 @@ class WaterNetworkAssessment(GeneralAssessment):
 
     __slots__: list[str] = []
 
-    def calculate_damage(
+    def _additional_fragility_data(
         self,
-        length_unit: float,
-        component_database: str,
-        component_database_path: str | None = None,
-        collapse_fragility: dict | None = None,
-        irreparable_damage: dict | None = None,
-        damage_process_approach: str | None = None,
-        damage_process_file_path: str | None = None,
-        custom_model_dir: str | None = None,
-    ) -> None:
-        """
-        Calculates damage.
-
-        Parameters
-        ----------
-        length_unit : str
-            Unit of length to be used to add units to the demand data
-            if needed.
-        component_database : str
-            Name of the component database.
-        component_database_path : str or None
-            Optional path to a component database file.
-        collapse_fragility : dict or None
-            Collapse fragility information.
-        irreparable_damage : dict or None
-            Information for irreparable damage.
-        damage_process_approach : str or None
-            Approach for the damage process.
-        damage_process_file_path : str or None
-            Optional path to a damage process file.
-        custom_model_dir : str or None
-            Optional directory for custom models.
-
-        Raises
-        ------
-        ValueError
-            With invalid combinations of arguments.
-
-        """
-
-        # load the fragility information
-        if component_database in default_DBs['fragility']:
-            component_db = [
-                'PelicunDefault/' + default_DBs['fragility'][component_database],
-            ]
-        else:
-            component_db = []
-
-        if component_database_path is not None:
-
-            if custom_model_dir is None:
-                raise ValueError(
-                    '`custom_model_dir` needs to be specified '
-                    'when `component_database_path` is not None.'
-                )
-
-            if 'CustomDLDataFolder' in component_database_path:
-                component_database_path = component_database_path.replace(
-                    'CustomDLDataFolder', custom_model_dir
-                )
-
-            component_db += [component_database_path]
-
-        component_db = component_db[::-1]
-
-        # prepare additional fragility data
-
-        # get the database header from the default P58 db
-        P58_data = self.get_default_data('damage_DB_FEMA_P58_2nd')
-
-        adf = pd.DataFrame(columns=P58_data.columns)
+        collapse_fragility: dict | None,
+        length_unit: str,
+        irreparable_damage: dict | None,
+    ) -> pd.DataFrame:
+        columns = pd.MultiIndex.from_tuples(
+            [
+                ('Demand', 'Directional'),
+                ('Demand', 'Offset'),
+                ('Demand', 'Type'),
+                ('Demand', 'Unit'),
+                ('Incomplete', ''),
+                ('LS1', 'DamageStateWeights'),
+                ('LS1', 'Family'),
+                ('LS1', 'Theta_0'),
+                ('LS1', 'Theta_1'),
+                ('LS2', 'DamageStateWeights'),
+                ('LS2', 'Family'),
+                ('LS2', 'Theta_0'),
+                ('LS2', 'Theta_1'),
+                ('LS3', 'DamageStateWeights'),
+                ('LS3', 'Family'),
+                ('LS3', 'Theta_0'),
+                ('LS3', 'Theta_1'),
+                ('LS4', 'DamageStateWeights'),
+                ('LS4', 'Family'),
+                ('LS4', 'Theta_0'),
+                ('LS4', 'Theta_1'),
+            ],
+        )
+        adf = pd.DataFrame(columns=columns)
 
         if collapse_fragility:
 
@@ -1295,104 +1322,7 @@ class WaterNetworkAssessment(GeneralAssessment):
         adf.loc['aggregate', ('LS1', 'Theta_0')] = 1e10
         adf.loc['aggregate', ('LS2', 'Theta_0')] = 1e10
         adf.loc['aggregate', 'Incomplete'] = 0
-
-        self.damage.load_model_parameters(
-            component_db + [adf],
-            set(self.asset.list_unique_component_ids()),
-        )
-
-        # load the damage process if needed
-        dmg_process = None
-        if damage_process_approach is not None:
-
-            if damage_process_approach in damage_process_approaches:
-                dmg_process = damage_process_approaches[damage_process_approach]
-
-                # For Hazus Earthquake, we need to specify the component ids
-                if damage_process_approach == 'Hazus Earthquake':
-
-                    cmp_sample = self.asset.save_cmp_sample()
-                    assert isinstance(cmp_sample, pd.DataFrame)
-
-                    cmp_list = cmp_sample.columns.unique(level=0)
-
-                    cmp_map = {'STR': '', 'LF': '', 'NSA': ''}
-
-                    for cmp in cmp_list:
-                        for cmp_type in cmp_map:
-                            if cmp_type + '.' in cmp:
-                                cmp_map[cmp_type] = cmp
-
-                    new_dmg_process = dmg_process.copy()
-                    for source_cmp, action in dmg_process.items():
-                        # first, look at the source component id
-                        new_source = None
-                        for cmp_type, cmp_id in cmp_map.items():
-                            if (cmp_type in source_cmp) and (cmp_id != ''):
-                                new_source = source_cmp.replace(cmp_type, cmp_id)
-                                break
-
-                        if new_source is not None:
-                            new_dmg_process[new_source] = action
-                            del new_dmg_process[source_cmp]
-                        else:
-                            new_source = source_cmp
-
-                        # then, look at the target component ids
-                        for ds_i, target_vals in action.items():
-                            if isinstance(target_vals, str):
-                                for cmp_type, cmp_id in cmp_map.items():
-                                    if (cmp_type in target_vals) and (cmp_id != ''):
-                                        target_vals = target_vals.replace(
-                                            cmp_type, cmp_id
-                                        )
-
-                                new_target_vals = target_vals
-
-                            else:
-                                # we assume that target_vals is a list of str
-                                new_target_vals = []
-
-                                for target_val in target_vals:
-                                    for cmp_type, cmp_id in cmp_map.items():
-                                        if (cmp_type in target_val) and (
-                                            cmp_id != ''
-                                        ):
-                                            target_val = target_val.replace(
-                                                cmp_type, cmp_id
-                                            )
-
-                                    new_target_vals.append(target_val)
-
-                            new_dmg_process[new_source][ds_i] = new_target_vals
-
-                    dmg_process = new_dmg_process
-
-            elif damage_process_approach == "User Defined":
-
-                if damage_process_file_path is None:
-                    raise ValueError(
-                        'When `damage_process_approach` is set to '
-                        '`User Defined`, a `damage_process_file_path` '
-                        'needs to be provided.'
-                    )
-
-                # load the damage process from a file
-                with open(damage_process_file_path, 'r', encoding='utf-8') as f:
-                    dmg_process = json.load(f)
-
-            elif damage_process_approach == "None":
-                # no damage process applied for the calculation
-                dmg_process = None
-
-            else:
-                self.log.msg(
-                    f"Prescribed Damage Process not recognized: "
-                    f"`{damage_process_approach}`."
-                )
-
-        # calculate damages
-        self.damage.calculate(dmg_process=dmg_process)
+        return adf
 
 
 class TimeBasedAssessment:
@@ -1415,7 +1345,6 @@ class TimeBasedAssessment:
 
 
         """
-        pass
 
 
 def load_consequence_info(
@@ -1495,7 +1424,7 @@ def load_consequence_info(
     return conseq_df, consequence_db
 
 
-def _add_units(raw_demands, length_unit):
+def _add_units(raw_demands: pd.DataFrame, length_unit: str) -> pd.DataFrame:
     """
     Add units to demand columns in a DataFrame.
 
@@ -1519,7 +1448,9 @@ def _add_units(raw_demands, length_unit):
     if length_unit == 'in':
         length_unit = 'inch'
 
-    demands = base.convert_to_MultiIndex(demands, axis=0).sort_index(axis=0).T
+    demands_mi = base.convert_to_MultiIndex(demands, axis=0).sort_index(axis=0).T
+    assert isinstance(demands_mi, pd.DataFrame)
+    demands = demands_mi
 
     if demands.columns.nlevels == 4:
         DEM_level = 1
@@ -1537,48 +1468,48 @@ def _add_units(raw_demands, length_unit):
     demand_cols = demands.columns.get_level_values(DEM_level)
 
     # remove additional info from demand names
-    demand_cols = [d.split('_')[0] for d in demand_cols]
+    demand_cols = pd.Index([d.split('_')[0] for d in demand_cols])
 
     # acceleration
     acc_EDPs = ['PFA', 'PGA', 'SA']
     EDP_mask = np.isin(demand_cols, acc_EDPs)
 
     if np.any(EDP_mask):
-        demands.iloc[0, EDP_mask] = length_unit + 'ps2'
+        demands.iloc[0, EDP_mask] = length_unit + 'ps2'  # type: ignore
 
     # speed
     speed_EDPs = ['PFV', 'PWS', 'PGV', 'SV']
     EDP_mask = np.isin(demand_cols, speed_EDPs)
 
     if np.any(EDP_mask):
-        demands.iloc[0, EDP_mask] = length_unit + 'ps'
+        demands.iloc[0, EDP_mask] = length_unit + 'ps'  # type: ignore
 
     # displacement
     disp_EDPs = ['PFD', 'PIH', 'SD', 'PGD']
     EDP_mask = np.isin(demand_cols, disp_EDPs)
 
     if np.any(EDP_mask):
-        demands.iloc[0, EDP_mask] = length_unit
+        demands.iloc[0, EDP_mask] = length_unit  # type: ignore
 
     # drift ratio
     rot_EDPs = ['PID', 'PRD', 'DWD', 'RDR', 'PMD', 'RID']
     EDP_mask = np.isin(demand_cols, rot_EDPs)
 
     if np.any(EDP_mask):
-        demands.iloc[0, EDP_mask] = 'unitless'
+        demands.iloc[0, EDP_mask] = 'unitless'  # type: ignore
 
     # convert back to simple header and return the DF
     return base.convert_to_SimpleIndex(demands, axis=1)
 
 
 def _loss__add_replacement_energy(
-    adf,
-    DL_method,
-    unit=None,
-    median=None,
-    distribution=None,
-    theta_1=None,
-):
+    adf: pd.DataFrame,
+    damage_process_approach: str,
+    unit: str | None = None,
+    median: float | None = None,
+    distribution: str | None = None,
+    theta_1: float | None = None,
+) -> None:
     ren = ('replacement', 'Energy')
     if median is not None:
 
@@ -1599,7 +1530,7 @@ def _loss__add_replacement_energy(
         # the default value depends on the consequence database
 
         # for FEMA P-58, use 0 kg
-        if DL_method == 'FEMA P-58':
+        if damage_process_approach == 'FEMA P-58':
             adf.loc[ren, ('Quantity', 'Unit')] = '1 EA'
             adf.loc[ren, ('DV', 'Unit')] = 'MJ'
             adf.loc[ren, ('DS1', 'Theta_0')] = 0
@@ -1610,13 +1541,13 @@ def _loss__add_replacement_energy(
 
 
 def _loss__add_replacement_carbon(
-    adf,
-    damage_process_approach,
-    unit=None,
-    median=None,
-    distribution=None,
-    theta_1=None,
-):
+    adf: pd.DataFrame,
+    damage_process_approach: str,
+    unit: str | None = None,
+    median: float | None = None,
+    distribution: str | None = None,
+    theta_1: float | None = None,
+) -> None:
     rcarb = ('replacement', 'Carbon')
     if median is not None:
 
@@ -1649,14 +1580,14 @@ def _loss__add_replacement_carbon(
 
 
 def _loss__add_replacement_time(
-    adf,
-    damage_process_approach,
-    conseq_df,
-    occupancy_type=None,
-    unit=None,
-    median=None,
-    distribution=None,
-    theta_1=None,
+    adf: pd.DataFrame,
+    damage_process_approach: str,
+    conseq_df: pd.DataFrame,
+    occupancy_type: str | None = None,
+    unit: str | None = None,
+    median: float | None = None,
+    distribution: str | None = None,
+    theta_1: float | None = None,
 ):
     rt = ('replacement', 'Time')
     if median is not None:
@@ -1702,12 +1633,12 @@ def _loss__add_replacement_time(
 
 
 def _loss__add_replacement_cost(
-    adf,
-    DL_method,
-    unit=None,
-    median=None,
-    distribution=None,
-    theta_1=None,
+    adf: pd.DataFrame,
+    damage_process_approach: str,
+    unit: str | None = None,
+    median: float | None = None,
+    distribution: str | None = None,
+    theta_1: float | None = None,
 ):
 
     rc = ('replacement', 'Cost')
@@ -1732,13 +1663,13 @@ def _loss__add_replacement_cost(
         # the default value depends on the consequence database
 
         # for FEMA P-58, use 0 USD
-        if DL_method == 'FEMA P-58':
+        if damage_process_approach == 'FEMA P-58':
             adf.loc[rc, ('Quantity', 'Unit')] = '1 EA'
             adf.loc[rc, ('DV', 'Unit')] = 'USD_2011'
             adf.loc[rc, ('DS1', 'Theta_0')] = 0
 
         # for Hazus EQ and HU, use 1.0 as a loss_ratio
-        elif DL_method in {'Hazus Earthquake', 'Hazus Hurricane'}:
+        elif damage_process_approach in {'Hazus Earthquake', 'Hazus Hurricane'}:
             adf.loc[rc, ('Quantity', 'Unit')] = '1 EA'
             adf.loc[rc, ('DV', 'Unit')] = 'loss_ratio'
 
@@ -1752,9 +1683,12 @@ def _loss__add_replacement_cost(
             adf.loc[rc, ('DS1', 'Theta_0')] = 1
 
 
-def _loss__map_user(custom_model_dir, loss_map_path=None):
+def _loss__map_user(
+    custom_model_dir: str | None, loss_map_path: str | None = None
+) -> pd.DataFrame:
     if loss_map_path is not None:
 
+        assert custom_model_dir is not None
         loss_map_path = loss_map_path.replace('CustomDLDataFolder', custom_model_dir)
 
     else:
@@ -1765,19 +1699,24 @@ def _loss__map_user(custom_model_dir, loss_map_path=None):
     return loss_map
 
 
-def _loss__map_auto(assessment, conseq_df, DL_method, occupancy_type=None):
+def _loss__map_auto(
+    assessment: Assessment,
+    conseq_df: pd.DataFrame,
+    damage_process_approach: str,
+    occupancy_type: str | None = None,
+) -> pd.DataFrame:
     # get the damage sample
     dmg_sample = assessment.damage.save_sample()
 
     # create a mapping for all components that are also in
     # the prescribed consequence database
-    dmg_cmps = dmg_sample.columns.unique(level='cmp')
+    dmg_cmps = dmg_sample.columns.unique(level='cmp')  # type: ignore
     loss_cmps = conseq_df.index.unique(level=0)
 
     drivers = []
     loss_models = []
 
-    if DL_method in {'FEMA P-58', 'Hazus Hurricane'}:
+    if damage_process_approach in {'FEMA P-58', 'Hazus Hurricane'}:
         # with these methods, we assume fragility and consequence data
         # have the same IDs
 
@@ -1789,7 +1728,7 @@ def _loss__map_auto(assessment, conseq_df, DL_method, occupancy_type=None):
                 drivers.append(f'DMG-{dmg_cmp}')
                 loss_models.append(dmg_cmp)
 
-    elif DL_method in {
+    elif damage_process_approach in {
         'Hazus Earthquake',
         'Hazus Earthquake Transportation',
     }:
