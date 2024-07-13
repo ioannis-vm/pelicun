@@ -400,11 +400,9 @@ def run_pelicun(
             custom_model_dir=custom_model_dir,
         )
 
-    if is_unspecified(config, 'DL/Losses/Repair'):
-        agg_repair = None
-    else:
+    if is_specified(config, 'DL/Losses/Repair'):
 
-        agg_repair, _ = assessment.calculate_loss(
+        assessment.calculate_loss(
             loss_map_approach=get(config, 'DL/Losses/Repair/MapApproach'),
             occupancy_type=get(config, 'DL/Asset/OccupancyType'),
             consequence_database=get(config, 'DL/Losses/Repair/ConsequenceDatabase'),
@@ -430,8 +428,6 @@ def run_pelicun(
             loss_map_path=get(config, 'DL/Losses/Repair/MapFilePath'),
             decision_variables=_parse_decision_variables(config),
         )
-
-    summary, summary_stats = _result_summary(assessment, agg_repair)
 
     # Save the results into files
 
@@ -479,14 +475,13 @@ def run_pelicun(
             assessment,
             output_path,
             out_files,
-            agg_repair,
             aggregate_collocated=get(
                 config,
                 'DL/Outputs/Settings/AggregateCollocatedComponentResults',
                 default=False,
             ),
         )
-    _summary_save(summary, summary_stats, output_path, out_files)
+    _summary_save(config, assessment, output_path, out_files)
     _create_json_files_if_requested(config, out_files, output_path)
     _remove_csv_files_if_not_requested(config, out_files, output_path)
 
@@ -515,17 +510,21 @@ def _remove_csv_files_if_not_requested(config, out_files, output_path):
         os.remove(output_path / filename)
 
 
-def _summary_save(summary, summary_stats, output_path, out_files):
+def _summary_save(config, assessment, output_path, out_files):
 
-    # save summary sample
-    if summary is not None:
-        summary.to_csv(output_path / "DL_summary.csv", index_label='#')
-        out_files.append('DL_summary.csv')
+    if get(config, 'DL/Outputs/Loss/Repair/Summary', default=True) is True:
 
-    # save summary statistics
-    if summary_stats is not None:
-        summary_stats.to_csv(output_path / "DL_summary_stats.csv")
-        out_files.append('DL_summary_stats.csv')
+        summary, summary_stats = _result_summary(assessment)
+
+        # save summary sample
+        if summary is not None:
+            summary.to_csv(output_path / "DL_summary.csv", index_label='#')
+            out_files.append('DL_summary.csv')
+
+        # save summary statistics
+        if summary_stats is not None:
+            summary_stats.to_csv(output_path / "DL_summary_stats.csv")
+            out_files.append('DL_summary_stats.csv')
 
 
 def _parse_config_file(
@@ -829,7 +828,9 @@ def _create_json_files_if_requested(config, out_files, output_path):
             json.dump(out_dict, f, indent=2)
 
 
-def _result_summary(assessment, agg_repair):
+def _result_summary(assessment):
+
+    agg_repair, _ = assessment.aggregate_loss()
 
     damage_sample = assessment.damage.save_sample()
     if damage_sample is None or agg_repair is None:
@@ -1061,14 +1062,23 @@ def _loss_save(
     assessment,
     output_path,
     out_files,
-    agg_repair,
     aggregate_collocated=False,
 ):
 
-    repair_sample, repair_units = assessment.loss.ds_model.save_sample(
-        save_units=True
-    )
-    repair_units = repair_units.to_frame().T
+    if assessment.loss.ds_model.sample is not None:
+        repair_sample, repair_units = assessment.loss.ds_model.save_sample(
+            save_units=True
+        )
+        repair_units = repair_units.to_frame().T
+    else:
+        # Sat Jul 13 06:22:44 AM PDT 2024
+        # JVM:
+        # This is a temporary solution. We are working on an approach that will
+        # result in a combined sample.
+        repair_sample, repair_units = assessment.loss.lf_model.save_sample(
+            save_units=True
+        )
+        repair_units = repair_units.to_frame().T
 
     if aggregate_collocated:
 
@@ -1140,6 +1150,7 @@ def _loss_save(
     if out_reqs.intersection({'AggregateSample', 'AggregateStatistics'}):
 
         if 'AggregateSample' in out_reqs:
+            agg_repair, _ = assessment.aggregate_loss()
             agg_repair_s = convert_to_SimpleIndex(agg_repair, axis=1)
             agg_repair_s.to_csv(
                 output_path / "DV_repair_agg.zip",
@@ -1152,6 +1163,7 @@ def _loss_save(
             out_files.append('DV_repair_agg.zip')
 
         if 'AggregateStatistics' in out_reqs:
+            agg_repair, _ = assessment.aggregate_loss()
             agg_stats = convert_to_SimpleIndex(describe(agg_repair), axis=1)
             agg_stats.to_csv(
                 output_path / "DV_repair_agg_stats.csv",

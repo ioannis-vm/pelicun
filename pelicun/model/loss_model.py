@@ -1608,16 +1608,6 @@ class RepairModel_Base(PelicunModel):
             return set(cmp_list)
         return set()
 
-
-class RepairModel_DS(RepairModel_Base):
-    """
-    Manages repair consequences driven by components that are modeled
-    with discrete Damage States (DS)
-
-    """
-
-    __slots__ = ['RV_reg']
-
     def save_sample(
         self, filepath: str | None = None, save_units: bool = False
     ) -> None | pd.DataFrame | tuple[pd.DataFrame, pd.Series]:
@@ -1702,6 +1692,16 @@ class RepairModel_DS(RepairModel_Base):
             return res, units
 
         return res
+
+
+class RepairModel_DS(RepairModel_Base):
+    """
+    Manages repair consequences driven by components that are modeled
+    with discrete Damage States (DS)
+
+    """
+
+    __slots__ = ['RV_reg']
 
     def load_sample(self, filepath: str | pd.DataFrame) -> None:
         """
@@ -1882,9 +1882,7 @@ class RepairModel_DS(RepairModel_Base):
                     for loc_id, loc in enumerate(
                         dmg_quantities.loc[
                             :, (component, ds)  # type: ignore
-                        ].columns.unique(
-                            level=0
-                        )
+                        ].columns.unique(level=0)
                     ):
                         if (
                             self._asmnt.options.eco_scale["AcrossFloors"] is True

@@ -1026,7 +1026,7 @@ class GeneralAssessment(Assessment):
         replacement_energy_parameters: dict[str, float | str] | None = None,
         loss_map_path: str | None = None,
         decision_variables: list[str] | None = None,
-    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    ):
         """
         Calculates losses.
 
@@ -1057,15 +1057,6 @@ class GeneralAssessment(Assessment):
             Optional path to a loss map file.
         decision_variables : list[str] or None
             Optional decision variables for the assessment.
-
-        Returns
-        -------
-        tuple
-            Dataframe with the aggregated loss of each realization,
-            and another boolean dataframe with information on which DV
-            thresholds were exceeded in each realization, triggering
-            replacement. If no thresholds are specified it only
-            contains False values.
 
         Raises
         ------
@@ -1150,9 +1141,9 @@ class GeneralAssessment(Assessment):
             raise ValueError(f'Invalid MapApproach value: `{loss_map_approach}`.')
 
         # prepare additional loss map entries, if needed
-        if 'DMG-collapse' not in loss_map.index:
-            loss_map.loc['DMG-collapse', 'Repair'] = 'replacement'
-            loss_map.loc['DMG-irreparable', 'Repair'] = 'replacement'
+        if 'collapse' not in loss_map.index:
+            loss_map.loc['collapse', 'Repair'] = 'replacement'
+            loss_map.loc['irreparable', 'Repair'] = 'replacement'
 
         if decision_variables:
             self.loss.decision_variables = decision_variables
@@ -1161,6 +1152,21 @@ class GeneralAssessment(Assessment):
         self.loss.load_model_parameters(consequence_db + [adf])
 
         self.loss.calculate()
+
+    def aggregate_loss(self) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Aggregates losses.
+
+        Returns
+        -------
+        tuple
+            Dataframe with the aggregated loss of each realization,
+            and another boolean dataframe with information on which DV
+            thresholds were exceeded in each realization, triggering
+            replacement. If no thresholds are specified it only
+            contains False values.
+
+        """
 
         df_agg, exceedance_bool_df = self.loss.aggregate_losses(future=True)
         assert isinstance(df_agg, pd.DataFrame)
@@ -1725,7 +1731,7 @@ def _loss__map_auto(
                 continue
 
             if dmg_cmp in loss_cmps:
-                drivers.append(f'DMG-{dmg_cmp}')
+                drivers.append(dmg_cmp)
                 loss_models.append(dmg_cmp)
 
     elif damage_process_approach in {
@@ -1745,7 +1751,7 @@ def _loss__map_auto(
                 loss_cmp = cmp_class
 
             if loss_cmp in loss_cmps:
-                drivers.append(f'DMG-{dmg_cmp}')
+                drivers.append(dmg_cmp)
                 loss_models.append(loss_cmp)
 
     loss_map = pd.DataFrame(loss_models, columns=['Repair'], index=drivers)

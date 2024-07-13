@@ -1,0 +1,58 @@
+{
+  "GeneralInformation": {
+    "units": {
+      "length": "in"
+    }
+  },
+  "DL": {
+    "Demands": {
+      "DemandFilePath": "demand_data.csv",
+      "SampleSize": 100,
+      "Calibration": {
+        "ALL": {
+          "DistributionFamily": "lognormal"
+        }
+      }
+    },
+    "Asset": {
+      "ComponentAssignmentFile": "cmp_marginals.csv",
+      "ComponentDatabase": "Hazus Earthquake - Transportation"
+    },
+    "Losses": {
+      "Repair": {
+        "ConsequenceDatabase": "",
+        "ConsequenceDatabasePath": "additional_loss_functions.csv",
+        "MapApproach": "User Defined",
+        "MapFilePath": "loss_map.csv",
+        "DecisionVariables": {
+          "Velocity": true
+        }
+      }
+    },
+    "Outputs": {
+      "Format": {
+        "CSV": true,
+        "JSON": false
+      },
+      "Demand": {
+        "Sample": true,
+        "Statistics": true
+      },
+      "Asset": {
+        "Sample": true,
+        "Statistics": true
+      },
+      "Loss": {
+        "Repair": {
+          "AggregateSample": false,
+          "AggregateStatistics": false,
+          "GroupedSample": false,
+          "GroupedStatistics": false,
+          "Sample": true,
+          "Statistics": false,
+          "Summary": false
+        }
+      }
+    }
+  }
+}
