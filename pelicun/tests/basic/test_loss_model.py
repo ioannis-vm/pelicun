@@ -58,6 +58,7 @@ from pelicun.model.loss_model import RepairModel_LF
 from pelicun.model.loss_model import _is_for_ds_model
 from pelicun.model.loss_model import _is_for_lf_model
 from pelicun.warnings import PelicunWarning
+from pelicun.warnings import PelicunInputDomainError
 
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
@@ -973,7 +974,7 @@ class TestRepairModel_LF(TestRepairModel_Base):
         )
         # test small interpolation domain warning
         demand_dict = {'PFA-1-1': np.array((1.00, 2.00, 1e3))}
-        with pytest.raises(ValueError) as record:
+        with pytest.raises(PelicunInputDomainError) as record:
             lf_model._calc_median_consequence(
                 performance_group, loss_map, required_edps, demand_dict, cmp_sample
             )

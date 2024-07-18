@@ -63,6 +63,7 @@ from pelicun.model.demand_model import _verify_edps_available
 from pelicun import base
 from pelicun import uq
 from pelicun import file_io
+from pelicun.warnings import PelicunInputDomainError
 
 if TYPE_CHECKING:
     from pelicun.assessment import Assessment
@@ -2509,7 +2510,7 @@ class RepairModel_LF(RepairModel_Base):
             try:
                 median_loss = base.stringterpolation(loss_function_str)(edp_values)
             except ValueError as exc:
-                raise ValueError(
+                raise PelicunInputDomainError(
                     f'Loss function interpolation for consequence '
                     f'`{consequence}-{decision_variable}` has failed. '
                     f'Ensure a sufficient interpolation domain  '
