@@ -45,8 +45,36 @@ setup(
         'numpy>=1.22.0, <2.0',
         'scipy>=1.7.0, <2.0',
         'pandas>=1.4.0, <3.0',
-        'tables>=3.7.0',
+        'colorama>=0.4.0, <0.5.0',
+        'numexpr>=2.8, <3.0',
+        'jsonschema>=4.22.0, <5.0'
+        # 'tables>=3.7.0',
     ],
+    extras_require={
+        'development': [
+            'flake8',
+            'flake8-bugbear',
+            'flake8-rst',
+            'flake8-rst-docstrings',
+            'pylint',
+            'pylint-pytest',
+            'pydocstyle',
+            'mypy',
+            'black',
+            'pytest',
+            'pytest-cov',
+            'glob2',
+            'jupyter',
+            'jupytext',
+            'sphinx',
+            'sphinx-autoapi',
+            'nbsphinx',
+            'flake8-rst',
+            'flake8-rst-docstrings',
+            'pandas-stubs',
+            'types-colorama',
+        ],
+    },
     classifiers=[
         'Programming Language :: Python',
         'Development Status :: 5 - Production/Stable',
@@ -65,9 +93,6 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering',
     ],
-    extras_require={
-        'testing': ['pytest'],
-    },
     entry_points={
         'console_scripts': [
             'pelicun = pelicun.tools.DL_calculation:main',

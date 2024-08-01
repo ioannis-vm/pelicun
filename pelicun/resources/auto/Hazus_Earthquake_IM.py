@@ -36,6 +36,7 @@
 #
 # Contributors:
 # Adam Zsarnóczay
+from __future__ import annotations
 import json
 import pandas as pd
 import pelicun
@@ -213,7 +214,7 @@ def convertTunnelToHAZUSclass(AIM):
     elif ("Cut" in AIM["ConstructType"]) or ("Cover" in AIM["ConstructType"]):
         return "HTU2"
     else:
-        # Select HTU2 for unclassfied tunnels because it is more conservative.
+        # Select HTU2 for unclassified tunnels because it is more conservative.
         return "HTU2"
 
 
@@ -408,6 +409,9 @@ def auto_populate(AIM):
                     "MapApproach": "Automatic",
                 }
             },
+            "Options": {
+                "NonDirectionalMultipliers": {"ALL": 1.0},
+            },
         }
 
     elif assetType == "TransportationNetwork":
@@ -441,6 +445,9 @@ def auto_populate(AIM):
                         "MapApproach": "Automatic",
                     }
                 },
+                "Options": {
+                    "NonDirectionalMultipliers": {"ALL": 1.0},
+                },
             }
 
         elif inf_type == "HwyTunnel":
@@ -471,6 +478,9 @@ def auto_populate(AIM):
                         "MapApproach": "Automatic",
                     }
                 },
+                "Options": {
+                    "NonDirectionalMultipliers": {"ALL": 1.0},
+                },
             }
         elif inf_type == "Roadway":
             # get the road class
@@ -499,12 +509,14 @@ def auto_populate(AIM):
                         "MapApproach": "Automatic",
                     }
                 },
+                "Options": {
+                    "NonDirectionalMultipliers": {"ALL": 1.0},
+                },
             }
         else:
             print("subtype not supported in HWY")
 
     elif assetType == "WaterDistributionNetwork":
-
         pipe_material_map = {
             "CI": "B",
             "AC": "B",
@@ -650,7 +662,7 @@ def auto_populate(AIM):
 
                     demand_cloning_config['-'.join(edp)] = [
                         f'{tag}-{x}-{direction}'
-                        for x in [f'{i+1}' for i in range(num_segments)]
+                        for x in [f'{i + 1}' for i in range(num_segments)]
                     ]
                 demand_config = {'DemandCloning': demand_cloning_config}
 
@@ -683,7 +695,6 @@ def auto_populate(AIM):
             }
 
         elif wdn_element_type == "Tank":
-
             tank_cmp_lines = {
                 ("OG", "C", 1): {'PST.G.C.A.GS': ['ea', 1, 1, 1, 'N/A']},
                 ("OG", "C", 0): {'PST.G.C.U.GS': ['ea', 1, 1, 1, 'N/A']},

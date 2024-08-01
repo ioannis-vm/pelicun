@@ -43,17 +43,9 @@
 """
 This module has classes and methods that handle file input and output.
 
-.. rubric:: Contents
-
-.. autosummary::
-
-    get_required_resources
-    save_to_csv
-    load_data
-    load_from_file
-
 """
 
+from __future__ import annotations
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -71,178 +63,195 @@ convert_dv_name = {
 }
 
 dependency_to_acronym = {
-    'btw. Fragility Groups':   'FG',
+    'btw. Fragility Groups': 'FG',
     'btw. Performance Groups': 'PG',
-    'btw. Floors':             'LOC',
-    'btw. Directions':         'DIR',
-    'btw. Component Groups':   'CSG',
-    'btw. Damage States':      'DS',
-    'Independent':             'IND',
-    'per ATC recommendation':  'ATC',
+    'btw. Floors': 'LOC',
+    'btw. Directions': 'DIR',
+    'btw. Component Groups': 'CSG',
+    'btw. Damage States': 'DS',
+    'Independent': 'IND',
+    'per ATC recommendation': 'ATC',
 }
 
 HAZUS_occ_converter = {
-    'RES':  'Residential',
-    'COM':  'Commercial',
-    'REL':  'Commercial',
-    'EDU':  'Educational',
-    'IND':  'Industrial',
-    'AGR':  'Industrial'
+    'RES': 'Residential',
+    'COM': 'Commercial',
+    'REL': 'Commercial',
+    'EDU': 'Educational',
+    'IND': 'Industrial',
+    'AGR': 'Industrial',
 }
 
 
-def save_to_csv(data, filepath, units=None, unit_conversion_factors=None,
-                orientation=0, use_simpleindex=True, log=None):
+def save_to_csv(
+    data: pd.DataFrame | None,
+    filepath: str | None,
+    units: pd.Series | None = None,
+    unit_conversion_factors: dict | None = None,
+    orientation: int = 0,
+    use_simpleindex: bool = True,
+    log: base.Logger | None = None,
+) -> pd.DataFrame | None:
     """
-    Saves data to a CSV file following standard SimCenter schema.
+    Saves data to a CSV file following the standard SimCenter schema.
 
-    The produced CSV files have a single header line and an index column. The
-    second line may start with 'Units' in the index or the first column may be
-    'Units' to provide the units for the data in the file.
-
-    The following data types in pelicun can be saved with this function:
-
-    Demand Data: Each column in a table corresponds to a demand type; each
-    row corresponds to a simulation/sample. The header identifies each demand
-    type. The user guide section of the documentation provides more
-    information about the header format. Target need to be specified in the
-    second row of the DataFrame.
+    The produced CSV files have a single header line and an index
+    column. The second line may start with 'Units' in the index or the
+    first column may be 'Units' to provide the units for the data in
+    the file.
 
     Parameters
     ----------
-    data: DataFrame
-        The data to save
-    filepath: string
-        The location of the destination file. If None, the data is not saved,
-        but returned in the end.
-    units: Series, optional
+    data : DataFrame
+        The data to save.
+    filepath : str
+        The location of the destination file. If None, the data is not
+        saved, but returned in the end.
+    units : Series, optional
         Provides a Series with variables and corresponding units.
-    unit_conversion_factors: dict
+    unit_conversion_factors : dict, optional
         Dictionary containing key-value pairs of unit names and their
-        corresponding factors. Conversion factors are defined as the number of
-        times a base unit fits in the alternative unit.
-    orientation: int, {0, 1}, default: 0
-        If 0, variables are organized along columns; otherwise they are along
-        the rows. This is important when converting values to follow the
-        prescribed units.
-    use_simpleindex: bool, default: True
-        If True, MultiIndex columns and indexes are converted to SimpleIndex
-        before saving
-    log: Logger
-        Logger object to be used. If no object is specified, no logging
-        is performed.
+        corresponding factors. Conversion factors are defined as the
+        number of times a base unit fits in the alternative unit.
+    orientation : int, {0, 1}, default 0
+        If 0, variables are organized along columns; otherwise, they
+        are along the rows. This is important when converting values
+        to follow the prescribed units.
+    use_simpleindex : bool, default True
+        If True, MultiIndex columns and indexes are converted to
+        SimpleIndex before saving.
+    log : Logger, optional
+        Logger object to be used. If no object is specified, no
+        logging is performed.
 
     Raises
     ------
     ValueError
-        If units is not None but unit_conversion_factors is None
+        If units is not None but unit_conversion_factors is None.
     ValueError
         If writing to a file fails.
     ValueError
         If the provided file name does not have the `.csv` suffix.
+
+    Returns
+    -------
+    DataFrame or None
+        If `filepath` is None, returns the DataFrame with potential
+        unit conversions and reformatting applied. Otherwise, returns
+        None after saving the data to a CSV file.
     """
 
     if filepath is None:
-        if log: log.msg('Preparing data ...', prepend_timestamp=False)
+        if log:
+            log.msg('Preparing data ...', prepend_timestamp=False)
 
-    elif log: log.msg(f'Saving data to {filepath}...', prepend_timestamp=False)
+    elif log:
+        log.msg(f'Saving data to `{filepath}`...', prepend_timestamp=False)
 
-    if data is not None:
+    if data is None:
+        if log:
+            log.warn('Data was empty, no file saved.')
+        return None
 
-        # make sure we do not modify the original data
-        data = data.copy()
+    # make sure we do not modify the original data
+    data = data.copy()
 
-        # convert units and add unit information, if needed
-        if units is not None:
+    # convert units and add unit information, if needed
+    if units is not None:
 
-            if unit_conversion_factors is None:
-                raise ValueError(
-                    'When units is not None, '
-                    'unit_conversion_factors must be provided')
+        if unit_conversion_factors is None:
+            raise ValueError(
+                'When `units` is not None, '
+                '`unit_conversion_factors` must be provided.'
+            )
 
-            if log: log.msg('Converting units...', prepend_timestamp=False)
+        if log:
+            log.msg('Converting units...', prepend_timestamp=False)
 
-            # if the orientation is 1, we might not need to scale all columns
-            if orientation == 1:
-                cols_to_scale = [dt in [float, int] for dt in data.dtypes]
-                cols_to_scale = data.columns[cols_to_scale]
+        # if the orientation is 1, we might not need to scale all columns
+        if orientation == 1:
+            cols_to_scale_bool = [dt in [float, int] for dt in data.dtypes]
+            cols_to_scale = data.columns[cols_to_scale_bool]
 
-            labels_to_keep = []
+        labels_to_keep = []
 
-            for unit_name in units.unique():
+        for unit_name in units.unique():
 
-                labels = units.loc[units == unit_name].index.values
+            labels = units.loc[units == unit_name].index.values
 
-                unit_factor = 1. / unit_conversion_factors[unit_name]
+            unit_factor = 1.0 / unit_conversion_factors[unit_name]
 
-                active_labels = []
-
-                if orientation == 0:
-                    for label in labels:
-                        if label in data.columns:
-                            active_labels.append(label)
-
-                    if len(active_labels) > 0:
-                        data.loc[:, active_labels] *= unit_factor
-
-                else:  # elif orientation == 1:
-                    for label in labels:
-                        if label in data.index:
-                            active_labels.append(label)
-
-                    if len(active_labels) > 0:
-                        data.loc[active_labels, cols_to_scale] *= unit_factor
-
-                labels_to_keep += active_labels
-
-            units = units.loc[labels_to_keep].to_frame()
+            active_labels = []
 
             if orientation == 0:
-                data = pd.concat([units.T, data], axis=0)
-                data.sort_index(axis=1, inplace=True)
-            else:
-                data = pd.concat([units, data], axis=1)
-                data.sort_index(inplace=True)
+                for label in labels:
+                    if label in data.columns:
+                        active_labels.append(label)
 
-            if log: log.msg('Unit conversion successful.', prepend_timestamp=False)
+                if len(active_labels) > 0:
+                    data.loc[:, active_labels] *= unit_factor
 
-        if use_simpleindex:
-            # convert MultiIndex to regular index with '-' separators
-            if isinstance(data.index, pd.MultiIndex):
-                data = base.convert_to_SimpleIndex(data)
+            else:  # elif orientation == 1:
+                for label in labels:
+                    if label in data.index:
+                        active_labels.append(label)
 
-            # same thing for the columns
-            if isinstance(data.columns, pd.MultiIndex):
-                data = base.convert_to_SimpleIndex(data, axis=1)
+                if len(active_labels) > 0:
+                    # pylint: disable=possibly-used-before-assignment
+                    data.loc[
+                        np.array(active_labels), np.array(cols_to_scale)
+                    ] *= unit_factor
+                    # pylint: enable=possibly-used-before-assignment
 
-        if filepath is not None:
+            labels_to_keep += active_labels
 
-            filepath = Path(filepath).resolve()
-            if filepath.suffix == '.csv':
+        units_df = units.loc[labels_to_keep].to_frame()
 
-                # save the contents of the DataFrame into a csv
-                data.to_csv(filepath)
+        if orientation == 0:
+            data = pd.concat([units_df.T, data], axis=0)
+            data.sort_index(axis=1, inplace=True)
+        else:
+            data = pd.concat([units_df, data], axis=1)
+            data.sort_index(inplace=True)
 
-                if log: log.msg('Data successfully saved to file.',
-                                prepend_timestamp=False)
+        if log:
+            log.msg('Unit conversion successful.', prepend_timestamp=False)
 
-            else:
-                raise ValueError(
-                    f'ERROR: Unexpected file type received when trying '
-                    f'to save to csv: {filepath}')
+    if use_simpleindex:
+        # convert MultiIndex to regular index with '-' separators
+        if isinstance(data.index, pd.MultiIndex):
+            data = base.convert_to_SimpleIndex(data)
 
-            return None
+        # same thing for the columns
+        if isinstance(data.columns, pd.MultiIndex):
+            data = base.convert_to_SimpleIndex(data, axis=1)
 
-        # at this line, filepath is None
-        return data
+    if filepath is not None:
 
-    # at this line, data is None
-    if log: log.msg('WARNING: Data was empty, no file saved.',
-                    prepend_timestamp=False)
-    return None
+        filepath_path = Path(filepath).resolve()
+        if filepath_path.suffix == '.csv':
+
+            # save the contents of the DataFrame into a csv
+            data.to_csv(filepath_path)
+
+            if log:
+                log.msg('Data successfully saved to file.', prepend_timestamp=False)
+
+        else:
+            raise ValueError(
+                f'ERROR: Please use the `.csv` file extension. '
+                f'Received file name is `{filepath_path}`'
+            )
+
+        return None
+
+    # at this line, filepath is None
+    return data
 
 
-def substitute_default_path(data_paths):
+def substitute_default_path(
+    data_paths: list[str | pd.DataFrame],
+) -> list[str | pd.DataFrame]:
     """
     Substitutes the default directory path in a list of data paths
     with a specified path.
@@ -287,9 +296,9 @@ def substitute_default_path(data_paths):
     'data/file2.txt']
 
     """
-    updated_paths = []
+    updated_paths: list[str | pd.DataFrame] = []
     for data_path in data_paths:
-        if 'PelicunDefault/' in data_path:
+        if isinstance(data_path, str) and 'PelicunDefault/' in data_path:
             path = data_path.replace(
                 'PelicunDefault/',
                 f'{base.pelicun_path}/resources/SimCenterDBDL/',
@@ -301,13 +310,13 @@ def substitute_default_path(data_paths):
 
 
 def load_data(
-    data_source,
-    unit_conversion_factors,
-    orientation=0,
-    reindex=True,
-    return_units=False,
-    log=None,
-):
+    data_source: str | pd.DataFrame,
+    unit_conversion_factors: dict | None,
+    orientation: int = 0,
+    reindex: bool = True,
+    return_units: bool = False,
+    log: base.Logger | None = None,
+) -> tuple[pd.DataFrame, pd.Series] | pd.DataFrame:
     """
     Loads data assuming it follows standard SimCenter tabular schema.
 
@@ -342,17 +351,28 @@ def load_data(
 
     Returns
     -------
-    data: DataFrame
-        Parsed data.
-    units: Series
-        Labels from the data and corresponding units specified in the
-        data. Units are only returned if return_units is set to True.
+    tuple
+        data: DataFrame
+            Parsed data.
+        units: Series
+            Labels from the data and corresponding units specified in the
+            data. Units are only returned if return_units is set to True.
+
+    Raises
+    ------
+    TypeError
+        If `data_source` is neither a string nor a DataFrame, a
+        TypeError is raised.
+    ValueError
+        If `unit_conversion_factors` contains keys that do not
+        correspond to any units in the data, a ValueError may be
+        raised during processing.
     """
 
     if isinstance(data_source, pd.DataFrame):
         # store it at proceed (copying is needed to avoid changing the
         # original)
-        data = data_source.copy()
+        data = base.with_parsed_str_na_values(data_source.copy())
     elif isinstance(data_source, str):
         # otherwise, load the data from a file
         data = load_from_file(data_source)
@@ -366,35 +386,42 @@ def load_data(
     # if there is information about units, separate that information
     # and optionally apply conversions to all numeric values
     if 'Units' in the_index:
-
         units = data['Units'] if orientation == 1 else data.loc['Units']
-        data.drop('Units', axis=orientation, inplace=True)
+        data.drop(['Units'], axis=orientation, inplace=True)  # type: ignore
         data = base.convert_dtypes(data)
 
         if unit_conversion_factors is not None:
             numeric_elements = (
-                (data.select_dtypes(include=[np.number]).index)
+                (data.select_dtypes(include=[np.number]).index)  # type: ignore
                 if orientation == 0
-                else (data.select_dtypes(include=[np.number]).columns)
+                else (
+                    data.select_dtypes(include=[np.number]).columns  # type: ignore
+                )
             )
 
             if log:
                 log.msg('Converting units...', prepend_timestamp=False)
 
             conversion_factors = units.map(
-                lambda unit: 1.00
-                if pd.isna(unit)
-                else unit_conversion_factors.get(unit, 1.00)
+                lambda unit: (
+                    1.00
+                    if pd.isna(unit)
+                    else unit_conversion_factors.get(unit, 1.00)
+                )
             )
 
             if orientation == 1:
                 data.loc[:, numeric_elements] = data.loc[
-                    :, numeric_elements
-                ].multiply(conversion_factors, axis=axis[orientation])
+                    :, numeric_elements  # type: ignore
+                ].multiply(
+                    conversion_factors, axis=axis[orientation]  # type: ignore
+                )  # type: ignore
             else:
                 data.loc[numeric_elements, :] = data.loc[
                     numeric_elements, :
-                ].multiply(conversion_factors, axis=axis[orientation])
+                ].multiply(
+                    conversion_factors, axis=axis[orientation]  # type: ignore
+                )  # type: ignore
 
         if log:
             log.msg('Unit conversion successful.', prepend_timestamp=False)
@@ -404,33 +431,30 @@ def load_data(
         data = base.convert_dtypes(data)
 
     # convert columns or index to MultiIndex if needed
-    data = base.convert_to_MultiIndex(data, axis=1)
+    data = base.convert_to_MultiIndex(data, axis=1)  # type: ignore
     data.sort_index(axis=1, inplace=True)
 
     # reindex the data, if needed
     if reindex:
-        data.index = np.arange(data.shape[0])
+        data.index = pd.RangeIndex(start=0, stop=data.shape[0], step=1)
     else:
         # convert index to MultiIndex if needed
-        data = base.convert_to_MultiIndex(data, axis=0)
+        data = base.convert_to_MultiIndex(data, axis=0)  # type: ignore
         data.sort_index(inplace=True)
-
-    if log:
-        log.msg('Data successfully loaded from file.', prepend_timestamp=False)
 
     if return_units:
         if units is not None:
             # convert index in units Series to MultiIndex if needed
-            units = base.convert_to_MultiIndex(units, axis=0).dropna()
+            units = base.convert_to_MultiIndex(units, axis=0).dropna()  # type: ignore # noqa
             units.sort_index(inplace=True)
         output = data, units
     else:
-        output = data
+        output = data  # type: ignore
 
-    return output
+    return output  # type: ignore
 
 
-def load_from_file(filepath, log=None):
+def load_from_file(filepath: str, log: base.Logger | None = None) -> pd.DataFrame:
     """
     Loads data from a file and stores it in a DataFrame.
 
@@ -444,11 +468,12 @@ def load_from_file(filepath, log=None):
 
     Returns
     -------
-    data: DataFrame
-        Data loaded from the file.
-    log: Logger
-        Logger object to be used. If no object is specified, no logging
-        is performed.
+    tuple
+        data: DataFrame
+            Data loaded from the file.
+        log: Logger
+            Logger object to be used. If no object is specified, no logging
+            is performed.
 
     Raises
     ------
@@ -458,27 +483,36 @@ def load_from_file(filepath, log=None):
         If the file is not a CSV.
     """
 
-    if log: log.msg(f'Loading data from {filepath}...')
+    if log:
+        log.msg(f'Loading data from {filepath}...')
 
     # check if the filepath is valid
-    filepath = Path(filepath).resolve()
+    filepath_path = Path(filepath).resolve()
 
-    if not filepath.is_file():
+    if not filepath_path.is_file():
         raise FileNotFoundError(
             f"The filepath provided does not point to an existing "
-            f"file: {filepath}")
+            f"file: {filepath_path}"
+        )
 
-    if filepath.suffix == '.csv':
-
+    if filepath_path.suffix == '.csv':
         # load the contents of the csv into a DataFrame
 
-        data = pd.read_csv(filepath, header=0, index_col=0, low_memory=False,
-                           encoding_errors='replace')
+        data = pd.read_csv(
+            filepath_path,
+            header=0,
+            index_col=0,
+            low_memory=False,
+            encoding_errors='replace',
+        )
 
-        if log: log.msg('File successfully opened.', prepend_timestamp=False)
+        if log:
+            log.msg('File successfully opened.', prepend_timestamp=False)
 
     else:
-        raise ValueError(f'ERROR: Unexpected file type received when trying '
-                         f'to load from csv: {filepath}')
+        raise ValueError(
+            f'ERROR: Unexpected file type received when trying '
+            f'to load from csv: {filepath_path}'
+        )
 
     return data

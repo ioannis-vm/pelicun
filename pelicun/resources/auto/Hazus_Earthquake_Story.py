@@ -37,6 +37,7 @@
 # Contributors:
 # Adam Zsarnóczay
 
+from __future__ import annotations
 import pandas as pd
 
 ap_DesignLevel = {1940: 'LC', 1975: 'MC', 2100: 'HC'}
@@ -199,21 +200,21 @@ def auto_populate(AIM):
                     'ea',
                     'all',
                     '1, 2',
-                    f"{story_scale(stories, 'S')/stories/2.}",
+                    f"{story_scale(stories, 'S') / stories / 2.}",
                     'N/A',
                 ],
                 f'{FG_NSA}': [
                     'ea',
                     'all',
                     0,
-                    f"{story_scale(stories, 'NSA')/stories}",
+                    f"{story_scale(stories, 'NSA') / stories}",
                     'N/A',
                 ],
                 f'{FG_NSD}': [
                     'ea',
                     'all',
                     '1, 2',
-                    f"{story_scale(stories, 'NSD')/stories/2.}",
+                    f"{story_scale(stories, 'NSD') / stories / 2.}",
                     'N/A',
                 ],
             },
@@ -224,6 +225,7 @@ def auto_populate(AIM):
         if ground_failure:
             foundation_type = 'S'
 
+            # fmt: off
             FG_GF_H = f'GF.H.{foundation_type}'                                        # noqa
             FG_GF_V = f'GF.V.{foundation_type}'                                        # noqa
             CMP_GF = pd.DataFrame(                                                     # noqa
@@ -231,6 +233,7 @@ def auto_populate(AIM):
                  f'{FG_GF_V}':[  'ea',         1,          3,        1,   'N/A']},     # noqa
                 index = [     'Units','Location','Direction','Theta_0','Family']       # noqa
             ).T                                                                        # noqa
+            # fmt: on
 
             CMP = pd.concat([CMP, CMP_GF], axis=0)
 
@@ -264,6 +267,9 @@ def auto_populate(AIM):
             "Damage": {"DamageProcess": "Hazus Earthquake"},
             "Demands": {},
             "Losses": {"Repair": repair_config},
+            "Options": {
+                "NonDirectionalMultipliers": {"ALL": 1.0},
+            },
         }
 
     else:

@@ -41,32 +41,12 @@
 """
 This module defines constants, basic classes and methods for pelicun.
 
-.. rubric:: Contents
-
-.. autosummary::
-
-    load_default_options
-    update_vals
-    merge_default_config
-    convert_to_SimpleIndex
-    convert_to_MultiIndex
-    show_matrix
-    describe
-    str2bool
-    float_or_None
-    int_or_None
-    process_loc
-    dedupe_index
-    dict_raise_on_duplicates
-    parse_units
-    convert_units
-
-    Options
-    Logger
-
 """
 
 from __future__ import annotations
+from typing import Any
+from typing import TYPE_CHECKING
+from collections.abc import Callable
 import os
 import sys
 from datetime import datetime
@@ -76,14 +56,23 @@ from pathlib import Path
 import argparse
 import pprint
 import numpy as np
+from scipy.interpolate import interp1d  # type: ignore
 import pandas as pd
+import colorama
+from colorama import Fore
+from colorama import Style
+from pelicun.warnings import PelicunWarning
+
+if TYPE_CHECKING:
+    from pelicun.assessment import AssessmentBase
 
 
+colorama.init()
 # set printing options
 pp = pprint.PrettyPrinter(indent=2, width=80 - 24)
 
 pd.options.display.max_rows = 20
-pd.options.display.max_columns = None
+pd.options.display.max_columns = None  # type: ignore
 pd.options.display.expand_frame_repr = True
 pd.options.display.width = 300
 
@@ -91,7 +80,6 @@ idx = pd.IndexSlice
 
 
 class Options:
-
     """
     Options objects store analysis options and the logging
     configuration.
@@ -158,7 +146,26 @@ class Options:
 
     """
 
-    def __init__(self, user_config_options, assessment=None):
+    __slots__ = [
+        '_asmnt',
+        'defaults',
+        'sampling_method',
+        'list_all_ds',
+        '_seed',
+        '_rng',
+        'units_file',
+        'demand_offset',
+        'nondir_multi_dict',
+        'rho_cost_time',
+        'eco_scale',
+        'log',
+    ]
+
+    def __init__(
+        self,
+        user_config_options: dict[str, Any] | None,
+        assessment: AssessmentBase | None = None,
+    ):
         """
         Initializes an Options object.
 
@@ -167,7 +174,7 @@ class Options:
         user_config_options: dict, Optional
             User-specified configuration dictionary. Any provided
             user_config_options override the defaults.
-        assessment: Assessment, Optional
+        assessment: AssessmentBase, Optional
             Assessment object that will be using this Options
             object. If it is not intended to use this Options object
             for an Assessment (e.g. defining an Options object for UQ
@@ -176,18 +183,17 @@ class Options:
 
         self._asmnt = assessment
 
-        self.defaults = None
-        self.sampling_method = None
-        self.list_all_ds = None
+        self.defaults: dict[str, Any] | None = None
+        self.sampling_method: str | None = None
+        self.list_all_ds: bool | None = None
 
-        self._seed = None
+        self._seed: float | None = None
 
         self._rng = np.random.default_rng()
-        merged_config_options = merge_default_config(
-            user_config_options)
+        merged_config_options = merge_default_config(user_config_options)
 
         self._seed = merged_config_options['Seed']
-        self.sampling_method = merged_config_options['SamplingMethod']
+        self.sampling_method = merged_config_options['Sampling']['SamplingMethod']
         self.list_all_ds = merged_config_options['ListAllDamageStates']
 
         self.units_file = merged_config_options['UnitsFile']
@@ -200,84 +206,45 @@ class Options:
         # instantiate a Logger object with the finalized configuration
         self.log = Logger(
             merged_config_options['Verbose'],
-            merged_config_options['ShowWarnings'],
             merged_config_options['LogShowMS'],
             merged_config_options['LogFile'],
-            merged_config_options['PrintLog'])
-
-    def nondir_multi(self, EDP_type):
-        """
-        Returns the multiplicative factor used in nondirectional
-        component demand generation. Read the description of the
-        nondir_multi_dict attribute of the Options class.
-
-        Parameters
-        ----------
-        EDP_type: str
-            EDP type (e.g. "PFA", "PFV", ..., "ALL")
-
-        Raises
-        ------
-        ValueError
-            If the specified EDP type is not present in the
-            dictionary.  If this is the case, a value for that type
-            needs to be specified in the user's configuration
-            dictionary, under ['Options']['NonDirectionalMultipliers']
-            = {"edp_type": value, ...}
-        """
-
-        if EDP_type in self.nondir_multi_dict:
-            return self.nondir_multi_dict[EDP_type]
-
-        if 'ALL' in self.nondir_multi_dict:
-            return self.nondir_multi_dict['ALL']
-
-        raise ValueError(
-            f"Peak orthogonal EDP multiplier for non-directional demand "
-            f"calculation of {EDP_type} not specified.\n"
-            f"Please add {EDP_type} in the configuration dictionary "
-            f"under ['Options']['NonDirectionalMultipliers']"
-            " = {{'edp_type': value, ...}}")
+            merged_config_options['PrintLog'],
+        )
 
     @property
-    def seed(self):
+    def seed(self) -> float | None:
         """
-        seed property
+        Seed property
+
+        Returns
+        -------
+        float
+            Seed value
         """
         return self._seed
 
     @seed.setter
-    def seed(self, value):
+    def seed(self, value: float) -> None:
         """
         seed property setter
         """
         self._seed = value
-        self._rng = np.random.default_rng(self._seed)
+        self._rng = np.random.default_rng(self._seed)  # type: ignore
 
     @property
-    def rng(self):
+    def rng(self) -> np.random.Generator:
         """
         rng property
+
+        Returns
+        -------
+        Generator
+            Random generator
         """
         return self._rng
 
-    @property
-    def units_file(self):
-        """
-        units file property
-        """
-        return self._units_file
-
-    @units_file.setter
-    def units_file(self, value):
-        """
-        units file property setter
-        """
-        self._units_file = value
-
 
 class Logger:
-
     """
     Logger objects are used to generate log files documenting
     execution events and related messages.
@@ -290,12 +257,6 @@ class Logger:
         value is specified in the user's configuration dictionary,
         otherwise left as provided in the default configuration file
         (see settings/default_config.json in the pelicun source code).
-    show_warnings: bool
-        If True, future, deprecation, and performance warnings from python
-        packages such as numpy and pandas are printed to the log file
-        (and also to the standard output). Otherwise, they are
-        suppressed. This setting does not affect warnings defined within
-        pelicun that are specific to the damage and loss calculation.
     log_show_ms: bool
         If True, the timestamps in the log file are in microsecond
         precision. The value is specified in the user's configuration
@@ -314,9 +275,23 @@ class Logger:
         (see settings/default_config.json in the pelicun source code).
 
     """
-    # TODO: finalize docstring
 
-    def __init__(self, verbose, show_warnings, log_show_ms, log_file, print_log):
+    __slots__ = [
+        'verbose',
+        'log_show_ms',
+        'log_file',
+        'warning_file',
+        'print_log',
+        'warning_stack',
+        'emitted',
+        'log_time_format',
+        'spaces',
+        'log_div',
+    ]
+
+    def __init__(
+        self, verbose: bool, log_show_ms: bool, log_file: str | None, print_log: bool
+    ):
         """
         Initializes a Logger object.
 
@@ -326,144 +301,60 @@ class Logger:
 
         """
         self.verbose = verbose
-        self.show_warnings = show_warnings
-        self.log_show_ms = log_show_ms
-        self.log_file = log_file
-        self.print_log = print_log
-        self.reset_log_strings()
+        self.log_show_ms = bool(log_show_ms)
 
-    @property
-    def verbose(self):
-        """
-        verbose property
-        """
-        return self._verbose
-
-    @verbose.setter
-    def verbose(self, value):
-        """
-        verbose property setter
-        """
-        self._verbose = bool(value)
-
-    @property
-    def show_warnings(self):
-        """
-        show_warnings property
-        """
-        return self._show_warnings
-
-    @show_warnings.setter
-    def show_warnings(self, value):
-        """
-        show_warnings property setter
-        """
-        self._show_warnings = bool(value)
-        # control warnings according to the desired setting
-        control_warnings(show=self._show_warnings)
-
-    @property
-    def log_show_ms(self):
-        """
-        log_show_ms property
-        """
-        return self._log_show_ms
-
-    @log_show_ms.setter
-    def log_show_ms(self, value):
-        """
-        log_show_ms property setter
-        """
-        self._log_show_ms = bool(value)
-
-        self.reset_log_strings()
-
-    @property
-    def log_pref(self):
-        """
-        log_pref property
-        """
-        return self._log_pref
-
-    @property
-    def log_div(self):
-        """
-        log_div property
-        """
-        return self._log_div
-
-    @property
-    def log_time_format(self):
-        """
-        log_time_format property
-        """
-        return self._log_time_format
-
-    @property
-    def log_file(self):
-        """
-        log_file property
-        """
-        return self._log_file
-
-    @log_file.setter
-    def log_file(self, value):
-        """
-        log_file property setter
-        """
-
-        if value is None:
-            self._log_file = None
-
+        if log_file is None:
+            self.log_file = None
+            self.warning_file = None
         else:
-
             try:
-
-                filepath = Path(value).resolve()
-
-                self._log_file = str(filepath)
-
-                with open(filepath, 'w', encoding='utf-8') as f:
+                path = Path(log_file)
+                self.log_file = str(path.resolve())
+                name, extension = split_file_name(self.log_file)
+                self.warning_file = (
+                    path.parent / (name + '_warnings' + extension)
+                ).resolve()
+                with open(self.log_file, 'w', encoding='utf-8') as f:
                     f.write('')
-
+                with open(self.warning_file, 'w', encoding='utf-8') as f:
+                    f.write('')
             except BaseException as err:
-                print(f"WARNING: The filepath provided for the log file does "
-                      f"not point to a valid location: {value}. \nPelicun "
-                      f"cannot print the log to a file.\n"
-                      f"The error was: '{err}'")
+                print(
+                    f"{Fore.RED}WARNING: The filepath provided for the log file "
+                    f"does not point to a valid location: {log_file}. \nPelicun "
+                    f"cannot print the log to a file.\n"
+                    f"The error was: '{err}'{Style.RESET_ALL}"
+                )
                 raise
 
-    @property
-    def print_log(self):
-        """
-        print_log property
-        """
-        return self._print_log
+        self.print_log = str2bool(print_log)
+        self.warning_stack: list[str] = []
+        self.emitted: set[str] = set()
+        self.reset_log_strings()
+        control_warnings()
 
-    @print_log.setter
-    def print_log(self, value):
-        """
-        print_log property setter
-        """
-        self._print_log = str2bool(value)
-
-    def reset_log_strings(self):
+    def reset_log_strings(self) -> None:
         """
         Populates the string-related attributes of the logger
         """
 
-        if self._log_show_ms:
-            self._log_time_format = '%H:%M:%S:%f'
+        if self.log_show_ms:
+            self.log_time_format = '%H:%M:%S:%f'
             # the length of the time string in the log file
-            self._log_pref = ' ' * 16
+            self.spaces = ' ' * 16
             # to have a total length of 80 with the time added
-            self._log_div = '-' * (80 - 17)
+            self.log_div = '-' * (80 - 17)
         else:
-            self._log_time_format = '%H:%M:%S'
-            self._log_pref = ' ' * 9
-            self._log_div = '-' * (80 - 10)
+            self.log_time_format = '%H:%M:%S'
+            self.spaces = ' ' * 9
+            self.log_div = '-' * (80 - 10)
 
-    def msg(self, msg='', prepend_timestamp=True, prepend_blank_space=True):
+    def msg(
+        self,
+        msg: str = '',
+        prepend_timestamp: bool = True,
+        prepend_blank_space: bool = True,
+    ) -> None:
         """
         Writes a message in the log file with the current time as prefix
 
@@ -484,14 +375,14 @@ class Logger:
         msg_lines = msg.split('\n')
 
         for msg_i, msg_line in enumerate(msg_lines):
-
-            if (prepend_timestamp and (msg_i == 0)):
+            if prepend_timestamp and (msg_i == 0):
                 formatted_msg = '{} {}'.format(
-                    datetime.now().strftime(self.log_time_format), msg_line)
+                    datetime.now().strftime(self.log_time_format), msg_line
+                )
             elif prepend_timestamp:
-                formatted_msg = self.log_pref + msg_line
+                formatted_msg = self.spaces + msg_line
             elif prepend_blank_space:
-                formatted_msg = self.log_pref + msg_line
+                formatted_msg = self.spaces + msg_line
             else:
                 formatted_msg = msg_line
 
@@ -502,7 +393,62 @@ class Logger:
                 with open(self.log_file, 'a', encoding='utf-8') as f:
                     f.write('\n' + formatted_msg)
 
-    def div(self, prepend_timestamp=False):
+    def add_warning(self, msg: str) -> None:
+        """
+        Adds a warning to the warning stack.
+
+        Note
+        ----
+        Warnings are only emitted when `emit_warnings` is called.
+
+        Parameters
+        ----------
+        msg: str
+            The warning message.
+
+        """
+        msg_lines = msg.split('\n')
+        formatted_msg = '\n'
+        for msg_line in msg_lines:
+            formatted_msg += (
+                self.spaces + Fore.RED + msg_line + Style.RESET_ALL + '\n'
+            )
+        if formatted_msg not in self.warning_stack:
+            self.warning_stack.append(formatted_msg)
+
+    def emit_warnings(self) -> None:
+        """
+        Issues all warnings and clears the warning stack.
+
+        """
+        for message in self.warning_stack:
+            if message not in self.emitted:
+                warnings.warn(message, PelicunWarning, stacklevel=2)
+                if self.warning_file is not None:
+                    with open(self.warning_file, 'a', encoding='utf-8') as f:
+                        f.write(
+                            message.replace(Fore.RED, '')
+                            .replace(Style.RESET_ALL, '')
+                            .replace(self.spaces, '')
+                        )
+
+        self.emitted = self.emitted.union(set(self.warning_stack))
+        self.warning_stack = []
+
+    def warn(self, msg: str) -> None:
+        """
+        Add an emit a warning immediately.
+
+        Parameters
+        ----------
+        msg: str
+            Warning message
+
+        """
+        self.add_warning(msg)
+        self.emit_warnings()
+
+    def div(self, prepend_timestamp: bool = False) -> None:
         """
         Adds a divider line in the log file
         """
@@ -513,62 +459,102 @@ class Logger:
             msg = '-' * 80
         self.msg(msg, prepend_timestamp=prepend_timestamp)
 
-    def print_system_info(self):
+    def print_system_info(self) -> None:
         """
         Writes system information in the log.
         """
 
         self.msg(
-            'System Information:',
-            prepend_timestamp=False, prepend_blank_space=False)
+            'System Information:', prepend_timestamp=False, prepend_blank_space=False
+        )
         self.msg(
             f'local time zone: {datetime.utcnow().astimezone().tzinfo}\n'
             f'start time: {datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}\n'
             f'python: {sys.version}\n'
             f'numpy: {np.__version__}\n'
             f'pandas: {pd.__version__}\n',
-            prepend_timestamp=False)
+            prepend_timestamp=False,
+        )
 
 
 # get the absolute path of the pelicun directory
 pelicun_path = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
-def control_warnings(show):
-
+def split_file_name(file_path: str) -> tuple[str, str]:
     """
-    Convenience function to turn warnings on/off
+    Separates a file name from the extension accounting for the case
+    where the file name itself contains periods.
 
     Parameters
     ----------
-    show: bool
-        If True, warnings are set to the default level. If False,
-        warnings are ignored.
+    file_path: str
+        Original file path.
+
+    Returns
+    -------
+    tuple
+        name: str
+            Name of the file.
+        extension: str
+            File extension.
 
     """
-    if show:
-        action = 'default'
-    else:
-        action = 'ignore'
+    path = Path(file_path)
+    name = path.stem
+    extension = path.suffix
+    return name, extension
 
+
+def control_warnings() -> None:
+    """
+    Convenience function to turn warnings on/off
+
+        See also: `pelicun/pytest.ini`. Devs: make sure to update that
+        file when addressing & eliminating warnings.
+
+    """
     if not sys.warnoptions:
-        warnings.filterwarnings(
-            category=FutureWarning, action=action)
+
+        # Here we specify *specific* warnings to ignore.
+        # 'message' -- a regex that the warning message must match
+
+        # Note: we ignore known warnings emitted from our dependencies
+        # and plan to address them soon.
 
         warnings.filterwarnings(
-            category=DeprecationWarning, action=action)
-
+            action='ignore', message=".*Use to_numeric without passing `errors`.*"
+        )
         warnings.filterwarnings(
-            category=pd.errors.PerformanceWarning, action=action)
+            action='ignore', message=".*errors='ignore' is deprecated.*"
+        )
+        warnings.filterwarnings(
+            action='ignore',
+            message=".*The previous implementation of stack is deprecated.*",
+        )
+        warnings.filterwarnings(
+            action='ignore',
+            message=".*Setting an item of incompatible dtype is deprecated.*",
+        )
+        warnings.filterwarnings(
+            action='ignore',
+            message=".*DataFrame.groupby with axis=1 is deprecated.*",
+        )
 
 
-def load_default_options():
+def load_default_options() -> dict:
     """
     Load the default_config.json file to set options to default values
+
+    Returns
+    -------
+    dict
+        Default options
     """
 
-    with open(pelicun_path / "settings/default_config.json",
-              'r', encoding='utf-8') as f:
+    with open(
+        pelicun_path / "settings/default_config.json", 'r', encoding='utf-8'
+    ) as f:
         default_config = json.load(f)
 
     default_options = default_config['Options']
@@ -576,9 +562,8 @@ def load_default_options():
 
 
 def update_vals(
-        update, primary,
-        update_path, primary_path
-):
+    update_value: dict, primary: dict, update_path: str, primary_path: str
+) -> None:
     """
     Updates the values of the `update` nested dictionary with
     those provided in the `primary` nested dictionary. If a key
@@ -587,7 +572,7 @@ def update_vals(
 
     Parameters
     ----------
-    update: dict
+    update_value: dict
         Dictionary -which can contain nested dictionaries- to be
         updated based on the values of `primary`. New keys existing
         in `primary` are added to `update`. Values of which keys
@@ -610,48 +595,48 @@ def update_vals(
       If update[key] is dict but primary[key] is not.
     """
 
-    # pylint: disable=else-if-used
-    # (`consider using elif`)
-
     # we go over the keys of `primary`
     for key in primary:
         # if `primary[key]` is a dictionary:
         if isinstance(primary[key], dict):
             # if the same `key` does not exist in update,
             # we associate it with an empty dictionary.
-            if key not in update:
-                update[key] = {}
+            if key not in update_value:
+                update_value[key] = {}
             # if it exists already, it should map to
             # a dictionary.
-            elif not isinstance(update[key], dict):
+            elif not isinstance(update_value[key], dict):
                 raise ValueError(
                     f'{update_path}["{key}"] '
                     'should map to a dictionary. '
                     'The specified value is '
-                    f'{update_path}["{key}"] = {update[key]}, but '
+                    f'{update_path}["{key}"] = {update_value[key]}, but '
                     f'the default value is '
                     f'{primary_path}["{key}"] = {primary[key]}. '
                     f'Please revise {update_path}["{key}"].'
                 )
-            # With both being dictionaries, we recurse.
+            # With both being dictionaries, we use recursion.
             update_vals(
-                update[key], primary[key],
-                f'{update_path}["{key}"]', f'{primary_path}["{key}"]')
+                update_value[key],
+                primary[key],
+                f'{update_path}["{key}"]',
+                f'{primary_path}["{key}"]',
+            )
         # if `primary[key]` is NOT a dictionary:
         else:
             # if `key` does not exist in `update`, we add it, with
             # its corresponding value.
-            if key not in update:
-                update[key] = primary[key]
+            if key not in update_value:
+                update_value[key] = primary[key]
             else:
                 # key exists in update and should be left alone,
                 # but we must check that it's not a dict here:
-                if isinstance(update[key], dict):
+                if isinstance(update_value[key], dict):
                     raise ValueError(
                         f'{update_path}["{key}"] '
                         'should not map to a dictionary. '
                         f'The specified value is '
-                        f'{update_path}["{key}"] = {update[key]}, but '
+                        f'{update_path}["{key}"] = {update_value[key]}, but '
                         f'the default value is '
                         f'{primary_path}["{key}"] = {primary[key]}. '
                         f'Please revise {update_path}["{key}"].'
@@ -659,21 +644,21 @@ def update_vals(
     # pylint: enable=else-if-used
 
 
-def merge_default_config(user_config):
+def merge_default_config(user_config: dict | None) -> dict:
     """
     Merge the user-specified config with the configuration defined in
     the default_config.json file. If the user-specified config does
     not include some option available in the default options, then the
     default option is used in the merged config.
 
-    Parameters.
+    Parameters
     ----------
     user_config: dict
         User-specified configuration dictionary
 
     Returns
     -------
-    user_config: dict
+    dict
         Merged configuration dictionary
     """
 
@@ -686,14 +671,14 @@ def merge_default_config(user_config):
     # We fill out the user's config with the values available in the
     # default config that were not set.
     # We use a recursive function to handle nesting.
-    update_vals(
-        config, default_config,
-        'user_settings', 'default_settings')
+    update_vals(config, default_config, 'user_settings', 'default_settings')
 
     return config
 
 
-def convert_to_SimpleIndex(data, axis=0, inplace=False):
+def convert_to_SimpleIndex(
+    data: pd.DataFrame, axis: int = 0, inplace: bool = False
+) -> pd.DataFrame:
     """
     Converts the index of a DataFrame to a simple, one-level index
 
@@ -714,7 +699,7 @@ def convert_to_SimpleIndex(data, axis=0, inplace=False):
 
     Returns
     -------
-    data: DataFrame
+    DataFrame
         The modified DataFrame
 
     Raises
@@ -724,17 +709,14 @@ def convert_to_SimpleIndex(data, axis=0, inplace=False):
     """
 
     if axis in {0, 1}:
-
         if inplace:
             data_mod = data
         else:
             data_mod = data.copy()
 
         if axis == 0:
-
             # only perform this if there are multiple levels
             if data.index.nlevels > 1:
-
                 simple_name = '-'.join(
                     [n if n is not None else "" for n in data.index.names]
                 )
@@ -742,14 +724,12 @@ def convert_to_SimpleIndex(data, axis=0, inplace=False):
                     '-'.join([str(id_i) for id_i in id]) for id in data.index
                 ]
 
-                data_mod.index = simple_index
+                data_mod.index = pd.Index(simple_index, name=simple_name)
                 data_mod.index.name = simple_name
 
         elif axis == 1:
-
             # only perform this if there are multiple levels
             if data.columns.nlevels > 1:
-
                 simple_name = '-'.join(
                     [n if n is not None else "" for n in data.columns.names]
                 )
@@ -757,7 +737,7 @@ def convert_to_SimpleIndex(data, axis=0, inplace=False):
                     '-'.join([str(id_i) for id_i in id]) for id in data.columns
                 ]
 
-                data_mod.columns = simple_index
+                data_mod.columns = pd.Index(simple_index, name=simple_name)
                 data_mod.columns.name = simple_name
 
     else:
@@ -766,7 +746,9 @@ def convert_to_SimpleIndex(data, axis=0, inplace=False):
     return data_mod
 
 
-def convert_to_MultiIndex(data, axis=0, inplace=False):
+def convert_to_MultiIndex(
+    data: pd.DataFrame, axis: int = 0, inplace: bool = False
+) -> pd.DataFrame | pd.Series:
     """
     Converts the index of a DataFrame to a MultiIndex
 
@@ -787,7 +769,7 @@ def convert_to_MultiIndex(data, axis=0, inplace=False):
 
     Returns
     -------
-    data: DataFrame
+    DataFrame
         The modified DataFrame.
 
     Raises
@@ -800,7 +782,6 @@ def convert_to_MultiIndex(data, axis=0, inplace=False):
     if ((axis == 0) and (isinstance(data.index, pd.MultiIndex))) or (
         (axis == 1) and (isinstance(data.columns, pd.MultiIndex))
     ):
-
         # if yes, return the data unchanged
         return data
 
@@ -816,34 +797,32 @@ def convert_to_MultiIndex(data, axis=0, inplace=False):
     max_lbl_len = np.max([len(labels) for labels in index_labels])
 
     for l_i, labels in enumerate(index_labels):
-
         if len(labels) != max_lbl_len:
             labels += [
                 '',
             ] * (max_lbl_len - len(labels))
             index_labels[l_i] = labels
 
-    index_labels = np.array(index_labels)
+    index_labels_np = np.array(index_labels)
 
-    if index_labels.shape[1] > 1:
-
+    if index_labels_np.shape[1] > 1:
         if inplace:
             data_mod = data
         else:
             data_mod = data.copy()
 
         if axis == 0:
-            data_mod.index = pd.MultiIndex.from_arrays(index_labels.T)
+            data_mod.index = pd.MultiIndex.from_arrays(index_labels_np.T)
 
         else:
-            data_mod.columns = pd.MultiIndex.from_arrays(index_labels.T)
+            data_mod.columns = pd.MultiIndex.from_arrays(index_labels_np.T)
 
         return data_mod
 
     return data
 
 
-def convert_dtypes(dataframe):
+def convert_dtypes(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
     Convert columns to a numeric datatype whenever possible. The
     function replaces None with NA otherwise columns containing None
@@ -869,12 +848,25 @@ def convert_dtypes(dataframe):
     # `errors='ignore'` does.
     # See:
     # https://pandas.pydata.org/docs/reference/api/pandas.to_numeric.html
-    return dataframe.apply(lambda x: pd.to_numeric(x, errors='ignore'), axis=0)
+    return dataframe.apply(
+        lambda x: pd.to_numeric(x, errors='ignore'), axis=0  # type:ignore
+    )
 
 
 def show_matrix(data, use_describe=False):
     """
-    Print a matrix in a nice way using a DataFrame
+    Print a matrix in a nice way using a DataFrame.
+
+    Parameters
+    ----------
+    data : array-like
+        The matrix data to display. Can be any array-like structure
+        that pandas can convert to a DataFrame.
+    use_describe : bool, default: False
+        If True, provides a descriptive statistical summary of the
+        matrix including specified percentiles.
+        If False, simply prints the matrix as is.
+
     """
     if use_describe:
         pp.pprint(
@@ -884,33 +876,163 @@ def show_matrix(data, use_describe=False):
         pp.pprint(pd.DataFrame(data))
 
 
-def _warning(message, category, filename, lineno, file=None, line=None):
+def multiply_factor_multiple_levels(
+    df: pd.DataFrame,
+    conditions: dict,
+    factor: float,
+    axis: int = 0,
+    raise_missing: bool = True,
+) -> None:
     """
-    Monkeypatch warnings to get prettier messages
+    Multiply a value to selected rows of a DataFrame that is indexed
+    with a hierarchical index (pd.MultiIndex). The change is done in
+    place.
+
+    Parameters
+    ----------
+    df: pd.DataFrame
+        The DataFrame to be modified.
+    conditions: dict
+        A dictionary mapping level names with a single value. Only the
+        rows where the index levels have the provided values will be
+        affected. The dictionary can be empty, in which case all rows
+        will be affected, or contain only some levels and values, in
+        which case only the matching rows will be affected.
+    factor: float
+        Scaling factor to use.
+    axis: int
+        With 0 the condition is checked against the DataFrame's index,
+        otherwise with 1 it is checked against the DataFrame's
+        columns.
+    raise_missing: bool
+        Raise an error if no rows are matching the given conditions.
+
+    Raises
+    ------
+    ValueError
+        If the provided `axis` values is not either 0 or 1.
+    ValueError
+        If there are no rows matching the conditions and raise_missing
+        is True.
+
+    """
+
+    if axis == 0:
+        idx_to_use = df.index
+    elif axis == 1:
+        idx_to_use = df.columns
+    else:
+        raise ValueError(f'Invalid axis: `{axis}`')
+
+    mask = pd.Series(True, index=idx_to_use)
+
+    # Apply each condition to update the mask
+    for level, value in conditions.items():
+        mask &= idx_to_use.get_level_values(level) == value
+
+    # pylint: disable=singleton-comparison
+    if np.all(mask == False) and raise_missing:  # noqa
+        raise ValueError(f'No rows found matching the conditions: `{conditions}`')
+
+    if axis == 0:
+        df.iloc[mask.to_numpy()] *= factor
+    else:
+        df.iloc[:, mask.to_numpy()] *= factor
+
+
+def _warning(
+    message: str,
+    category: type[Warning],
+    filename: str,
+    lineno: int,
+    file: Any = None,
+    line: Any = None,
+) -> None:
+    """
+    Custom warning function to format and print warnings more
+    attractively. This function modifies how warning messages are
+    displayed, emphasizing the file path and line number from where
+    the warning originated.
+
+    Parameters
+    ----------
+    message : str
+        The warning message to be displayed.
+    category : Warning
+        The category of the warning (unused, but required for
+        compatibility with standard warning signature).
+    filename : str
+        The path of the file from which the warning is issued. The
+        function simplifies the path for display.
+    lineno : int
+        The line number in the file at which the warning is issued.
+    file : file-like object, optional
+        The target file object to write the warning to (unused, but
+        required for compatibility with standard warning signature).
+    line : str, optional
+        Line of code causing the warning (unused, but required for
+        compatibility with standard warning signature).
     """
     # pylint:disable = unused-argument
-    if '\\' in filename:
-        file_path = filename.split('\\')
-    elif '/' in filename:
-        file_path = filename.split('/')
+    if category != PelicunWarning:
+        if '\\' in filename:
+            file_path = filename.split('\\')
+        elif '/' in filename:
+            file_path = filename.split('/')
+        else:
+            file_path = None
+
+        if file_path is not None:
+            python_file = '/'.join(file_path[-3:])
+        else:
+            python_file = filename
+        print(f'WARNING in {python_file} at line {lineno}\n{message}\n')
     else:
-        file_path = None
-
-    if file_path is not None:
-        python_file = '/'.join(file_path[-3:])
-    else:
-        python_file = filename
-
-    print(f'WARNING in {python_file} at line {lineno}\n{message}\n')
+        print(message)
 
 
-warnings.showwarning = _warning
+warnings.showwarning = _warning  # type: ignore
 
 
-def describe(df, percentiles=(0.001, 0.023, 0.10, 0.159, 0.5, 0.841, 0.90,
-                              0.977, 0.999)):
+def describe(
+    df,
+    percentiles=(
+        0.001,
+        0.023,
+        0.10,
+        0.159,
+        0.5,
+        0.841,
+        0.90,
+        0.977,
+        0.999,
+    ),
+):
     """
-    Provide descriptive statistics.
+    Provides extended descriptive statistics for given data, including
+    percentiles and log standard deviation for applicable columns.
+
+    This function accepts both pandas Series and DataFrame objects
+    directly, or any array-like structure which can be converted to
+    them. It calculates common descriptive statistics and optionally
+    adds log standard deviation for columns where all values are
+    positive.
+
+    Parameters
+    ----------
+    df : pd.Series, pd.DataFrame, or array-like
+        The data to describe. If array-like, it is converted to a
+        DataFrame or Series before analysis.
+    percentiles : tuple of float, optional
+        Specific percentiles to include in the output. Default
+        includes an extensive range tailored to provide a detailed
+        summary.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the descriptive statistics of the input
+        data, transposed so that each descriptive statistic is a row.
     """
     if not isinstance(df, (pd.Series, pd.DataFrame)):
         vals = df
@@ -921,11 +1043,11 @@ def describe(df, percentiles=(0.001, 0.023, 0.10, 0.159, 0.5, 0.841, 0.90,
         else:
             df = pd.DataFrame(vals, columns=cols)
 
-    # cast Series into a DataFrame
+    # convert Series into a DataFrame
     if isinstance(df, pd.Series):
         df = pd.DataFrame(df)
 
-    desc = df.describe(percentiles).T
+    desc = df.describe(list(percentiles)).T
 
     # add log standard deviation to the stats
     desc.insert(3, "log_std", np.nan)
@@ -938,11 +1060,36 @@ def describe(df, percentiles=(0.001, 0.023, 0.10, 0.159, 0.5, 0.841, 0.90,
     return desc
 
 
-def str2bool(v):
+def str2bool(v: str | bool) -> bool:
     """
-    Converts various bool-like forms of string to actual booleans
+    Converts a string representation of truth to boolean True or
+    False.
+
+    This function is designed to convert string inputs that represent
+    boolean values into actual Python boolean types. It handles
+    typical representations of truthiness and falsiness, and is case
+    insensitive.
+
+    Parameters
+    ----------
+    v : str or bool
+        The value to convert into a boolean. This can be a boolean
+        itself (in which case it is simply returned) or a string that
+        is expected to represent a boolean value.
+
+    Returns
+    -------
+    bool
+        The boolean value corresponding to the input.
+
+    Raises
+    ------
+    argparse.ArgumentTypeError
+        If `v` is a string that does not correspond to a boolean
+        value, an error is raised indicating that a boolean value was
+        expected.
     """
-    # courtesy of Maxim @ stackoverflow
+    # courtesy of Maxim @ Stackoverflow
 
     if isinstance(v, bool):
         return v
@@ -953,7 +1100,7 @@ def str2bool(v):
     raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def float_or_None(string):
+def float_or_None(string: str) -> float | None:
     """
     This is a convenience function for converting strings to float or
     None
@@ -965,7 +1112,7 @@ def float_or_None(string):
 
     Returns
     -------
-    res: float, optional
+    float or None
         A float, if the given string can be converted to a
         float. Otherwise, it returns None
     """
@@ -976,7 +1123,7 @@ def float_or_None(string):
         return None
 
 
-def int_or_None(string):
+def int_or_None(string: str) -> int | None:
     """
     This is a convenience function for converting strings to int or
     None
@@ -988,7 +1135,7 @@ def int_or_None(string):
 
     Returns
     -------
-    res: int, optional
+    int or None
         An int, if the given string can be converted to an
         int. Otherwise, it returns None
     """
@@ -999,40 +1146,80 @@ def int_or_None(string):
         return None
 
 
-def process_loc(string, stories):
+def with_parsed_str_na_values(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Parses the location parameter.
-    """
-    try:
-        res = int(string)
-        return [res, ]
-    except ValueError:
-        if "-" in string:
-            s_low, s_high = string.split('-')
-            s_low = process_loc(s_low, stories)
-            s_high = process_loc(s_high, stories)
-            return list(range(s_low[0], s_high[0] + 1))
-        if string == "all":
-            return list(range(1, stories + 1))
-        if string == "top":
-            return [stories, ]
-        if string == "roof":
-            return [stories, ]
-        return None
+    Given a dataframe, this function identifies values that have
+    string type and can be interpreted as N/A, and replaces them with
+    actual NA's.
 
+    Parameters
+    ----------
+    df: pd.DataFrame
+        Dataframe to process
 
-def dedupe_index(dataframe, dtype=str):
-    """
-    Adds an extra level to the index of a dataframe so that all
-    resulting index elements are unique. Assumes that the original
-    index is a MultiIndex with specified names.
+    Returns
+    -------
+    pd.DataFrame
+        The dataframe with proper N/A values.
 
     """
+    na_vals = {
+        '',
+        'N/A',
+        '-1.#QNAN',
+        'null',
+        'None',
+        '<NA>',
+        'nan',
+        '-NaN',
+        '1.#IND',
+        'NaN',
+        '#NA',
+        '1.#QNAN',
+        'NULL',
+        '-nan',
+        '#N/A',
+        '#N/A N/A',
+        'n/a',
+        '-1.#IND',
+        'NA',
+    }
+    # obtained from Pandas' internal STR_NA_VALUES variable.
 
+    # Replace string NA values with actual NaNs
+    return df.apply(
+        lambda col: col.map(
+            lambda x: np.nan if isinstance(x, str) and x in na_vals else x
+        )
+    )
+
+
+def dedupe_index(dataframe: pd.DataFrame, dtype: type = str) -> None:
+    """
+    Modifies the index of a DataFrame to ensure all index elements are
+    unique by adding an extra level.  Assumes that the DataFrame's
+    original index is a MultiIndex with specified names. A unique
+    identifier ('uid') is added as an additional index level based on
+    the cumulative count of occurrences of the original index
+    combinations.
+
+    Parameters
+    ----------
+    dataframe : pd.DataFrame
+        The DataFrame whose index is to be modified. It must have a
+        MultiIndex.
+    dtype : type, optional
+        The data type for the new index level 'uid'. Defaults to str.
+
+    Notes
+    -----
+    This function changes the DataFrame in place, hence it does not
+    return the DataFrame but modifies the original one provided.
+
+    """
     inames = dataframe.index.names
     dataframe.reset_index(inplace=True)
-    dataframe['uid'] = (
-        dataframe.groupby([*inames]).cumcount()).astype(dtype)
+    dataframe['uid'] = (dataframe.groupby([*inames]).cumcount()).astype(dtype)
     dataframe.set_index([*inames] + ['uid'], inplace=True)
     dataframe.sort_index(inplace=True)
 
@@ -1041,57 +1228,82 @@ def dedupe_index(dataframe, dtype=str):
 
 EDP_to_demand_type = {
     # Drifts
-    'Story Drift Ratio':               'PID',
-    'Peak Interstory Drift Ratio':     'PID',
-    'Roof Drift Ratio':                'PRD',
-    'Peak Roof Drift Ratio':           'PRD',
-    'Damageable Wall Drift':           'DWD',
-    'Racking Drift Ratio':             'RDR',
-    'Mega Drift Ratio':                'PMD',
-    'Residual Drift Ratio':            'RID',
+    'Story Drift Ratio': 'PID',
+    'Peak Interstory Drift Ratio': 'PID',
+    'Roof Drift Ratio': 'PRD',
+    'Peak Roof Drift Ratio': 'PRD',
+    'Damageable Wall Drift': 'DWD',
+    'Racking Drift Ratio': 'RDR',
+    'Mega Drift Ratio': 'PMD',
+    'Residual Drift Ratio': 'RID',
     'Residual Interstory Drift Ratio': 'RID',
-    'Peak Effective Drift Ratio':      'EDR',
-
+    'Peak Effective Drift Ratio': 'EDR',
     # Floor response
-    'Peak Floor Acceleration':        'PFA',
-    'Peak Floor Velocity':            'PFV',
-    'Peak Floor Displacement':        'PFD',
-
+    'Peak Floor Acceleration': 'PFA',
+    'Peak Floor Velocity': 'PFV',
+    'Peak Floor Displacement': 'PFD',
     # Component response
-    'Peak Link Rotation Angle':       'LR',
-    'Peak Link Beam Chord Rotation':  'LBR',
-
+    'Peak Link Rotation Angle': 'LR',
+    'Peak Link Beam Chord Rotation': 'LBR',
     # Wind Intensity
-    'Peak Gust Wind Speed':           'PWS',
-
+    'Peak Gust Wind Speed': 'PWS',
     # Inundation Intensity
-    'Peak Inundation Height':         'PIH',
-
+    'Peak Inundation Height': 'PIH',
     # Shaking Intensity
-    'Peak Ground Acceleration':       'PGA',
-    'Peak Ground Velocity':           'PGV',
-    'Spectral Acceleration':          'SA',
-    'Spectral Velocity':              'SV',
-    'Spectral Displacement':          'SD',
-    'Peak Spectral Acceleration':     'SA',
-    'Peak Spectral Velocity':         'SV',
-    'Peak Spectral Displacement':     'SD',
-    'Permanent Ground Deformation':   'PGD',
-
+    'Peak Ground Acceleration': 'PGA',
+    'Peak Ground Velocity': 'PGV',
+    'Spectral Acceleration': 'SA',
+    'Spectral Velocity': 'SV',
+    'Spectral Displacement': 'SD',
+    'Peak Spectral Acceleration': 'SA',
+    'Peak Spectral Velocity': 'SV',
+    'Peak Spectral Displacement': 'SD',
+    'Permanent Ground Deformation': 'PGD',
     # Placeholder for advanced calculations
-    'One':                            'ONE'
+    'One': 'ONE',
 }
 
 
-def dict_raise_on_duplicates(ordered_pairs):
+def dict_raise_on_duplicates(ordered_pairs: list[tuple]) -> dict:
     """
-    Reject duplicate keys.
+    Constructs a dictionary from a list of key-value pairs, raising an
+    exception if duplicate keys are found.
 
-    https://stackoverflow.com/questions/14902299/
-    json-loads-allows-duplicate-keys-
-    in-a-dictionary-overwriting-the-first-value
+    This function ensures that no two pairs have the same key. It is
+    particularly useful when parsing JSON-like data where unique keys
+    are expected but not enforced by standard parsing methods.
 
+    Parameters
+    ----------
+    ordered_pairs : list of tuples
+        A list of tuples, each containing a key and a value. Keys are
+        expected to be unique across the list.
+
+    Returns
+    -------
+    dict
+        A dictionary constructed from the ordered_pairs without any
+        duplicates.
+
+    Raises
+    ------
+    ValueError
+        If a duplicate key is found in the input list, a ValueError is
+        raised with a message indicating the duplicate key.
+
+    Examples
+    --------
+    >>> dict_raise_on_duplicates(
+    ...     [("key1", "value1"), ("key2", "value2"), ("key1", "value3")]
+    ... )
+    ValueError: duplicate key: key1
+
+    Notes
+    -----
+    This implementation is useful for contexts in which data integrity
+    is crucial and key uniqueness must be ensured.
     """
+
     d = {}
     for k, v in ordered_pairs:
         if k in d:
@@ -1100,7 +1312,9 @@ def dict_raise_on_duplicates(ordered_pairs):
     return d
 
 
-def parse_units(custom_file=None, preserve_categories=False):
+def parse_units(
+    custom_file: str | None = None, preserve_categories: bool = False
+) -> dict:
     """
     Parse the unit conversion factor JSON file and return a dictionary.
 
@@ -1109,6 +1323,16 @@ def parse_units(custom_file=None, preserve_categories=False):
     custom_file: str, optional
         If a custom file is provided, only the units specified in the
         custom file are used.
+
+    Returns
+    -------
+    dict
+        A dictionary where keys are unit names and values are
+        their corresponding conversion factors. If
+        `preserve_categories` is True, the dictionary may maintain
+        its original nested structure based on the JSON file. If
+        `preserve_categories` is False, the dictionary is flattened
+        to have globally unique unit names.
 
     Raises
     ------
@@ -1123,6 +1347,57 @@ def parse_units(custom_file=None, preserve_categories=False):
     """
 
     def get_contents(file_path, preserve_categories=False):
+        """
+        Parses a unit conversion factors JSON file and returns a
+        dictionary mapping unit names to conversion factors.
+
+        This function allows the use of a custom JSON file for
+        defining unit conversion factors or defaults to a predefined
+        file. It ensures that each unit name is unique and that all
+        conversion factors are float values. Additionally, it supports
+        the option to preserve the original data types of category
+        values from the JSON.
+
+        Parameters
+        ----------
+        file_path : str
+            The file path to a JSON file containing unit conversion
+            factors. If not provided, a default file is used.
+        preserve_categories : bool, optional
+            If True, maintains the original data types of category
+            values from the JSON file. If False, converts all values
+            to floats and flattens the dictionary structure, ensuring
+            that each unit name is globally unique across categories.
+
+        Returns
+        -------
+        dict
+            A dictionary where keys are unit names and values are
+            their corresponding conversion factors. If
+            `preserve_categories` is True, the dictionary may maintain
+            its original nested structure based on the JSON file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the specified file does not exist.
+        ValueError
+            If a unit name is duplicated, a conversion factor is not a
+            float, or other JSON structure issues are present.
+        json.decoder.JSONDecodeError
+            If the file is not a valid JSON file.
+        TypeError
+            If any value that needs to be converted to float cannot be
+            converted.
+
+        Examples
+        --------
+        >>> parse_units('custom_units.json')
+        { 'm': 1.0, 'cm': 0.01, 'mm': 0.001 }
+
+        >>> parse_units('custom_units.json', preserve_categories=True)
+        { 'Length': {'m': 1.0, 'cm': 0.01, 'mm': 0.001} }
+        """
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 dictionary = json.load(f, object_pairs_hook=dict_raise_on_duplicates)
@@ -1168,11 +1443,11 @@ def parse_units(custom_file=None, preserve_categories=False):
 
 
 def convert_units(
-    values: (float | list[float] | np.ndarray),
+    values: float | list[float] | np.ndarray,
     unit: str,
     to_unit: str,
-    category: (str | None) = None
-) -> (float | list[float] | np.ndarray):
+    category: str | None = None,
+) -> float | list[float] | np.ndarray:
     """
     Converts numeric values between different units.
 
@@ -1195,16 +1470,16 @@ def convert_units(
 
     Returns
     -------
-    (float | list[float] | np.ndarray):
+    float or list[float] or np.ndarray
       The converted value(s) in the target unit, in the same data type
       as the input values.
 
     Raises
     ------
-    TypeError:
+    TypeError
       If the input `values` are not of type float, list, or
       np.ndarray.
-    ValueError:
+    ValueError
       If the `unit`, `to_unit`, or `category` is unknown or if `unit`
       and `to_unit` are not in the same category.
 
@@ -1227,11 +1502,9 @@ def convert_units(
         units = all_units[category]
         for unt in unit, to_unit:
             if unt not in units:
-                raise ValueError(
-                    f'Unknown unit: `{unt}`'
-                )
+                raise ValueError(f'Unknown unit: `{unt}`')
     else:
-        unit_category: (str | None) = None
+        unit_category: str | None = None
         for key in all_units:
             units = all_units[key]
             if unit in units:
@@ -1249,7 +1522,7 @@ def convert_units(
     # convert units
     from_factor = units[unit]
     to_factor = units[to_unit]
-    new_values = vals * from_factor / to_factor
+    new_values = vals * float(from_factor) / float(to_factor)
 
     # return the results in the same type as that of the provided
     # values
@@ -1258,3 +1531,234 @@ def convert_units(
     if isinstance(values, list):
         return new_values.tolist()
     return new_values
+
+
+def stringterpolation(
+    arguments: str,
+) -> Callable[[np.ndarray], np.ndarray]:
+    """
+    Turns a string of specially formatted arguments into a multilinear
+    interpolating function.
+
+    Parameters
+    ----------
+    arguments: str
+        String of arguments containing Y values and X values,
+        separated by a pipe symbol (`|`). Individual values are
+        separated by commas (`,`). Example:
+        arguments = 'y1,y2,y3|x1,x2,x3'
+
+    Returns
+    -------
+    Callable
+        A callable interpolating function
+
+    """
+    split = arguments.split('|')
+    x_vals = split[1].split(',')
+    y_vals = split[0].split(',')
+    x = np.array(x_vals, dtype=float)
+    y = np.array(y_vals, dtype=float)
+
+    return interp1d(x=x, y=y, kind='linear')
+
+
+def invert_mapping(original_dict: dict) -> dict:
+    """
+    Inverts a dictionary mapping from key to list of values.
+
+    Parameters
+    ----------
+    original_dict : dict
+        Dictionary with values that are lists of hashable items.
+
+    Returns
+    -------
+    dict
+        New dictionary where each item in the original value lists
+        becomes a key and the original key becomes the corresponding
+        value.
+
+    Raises
+    ------
+    ValueError
+        If any value in the original dictionary's value lists appears
+        more than once.
+
+    """
+    inverted_dict = {}
+    for key, value_list in original_dict.items():
+        for value in value_list:
+            if value in inverted_dict:
+                raise ValueError('Cannot invert mapping with duplicate values.')
+            inverted_dict[value] = key
+    return inverted_dict
+
+
+def get(
+    d: dict | None, path: str, default: Any | None = None
+) -> Any:
+    """
+    Retrieve a value from a nested dictionary using a path with '/' as
+    the separator.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary to search.
+    path : str
+        The path to the desired value, with keys separated by '/'.
+    default : Any, optional
+        The value to return if the path is not found. Defaults to
+        None.
+
+    Returns
+    -------
+    Any
+        The value found at the specified path, or the default value if
+        the path is not found.
+
+    Examples
+    --------
+    >>> config = {
+    ...     "DL": {
+    ...         "Outputs": {
+    ...             "Format": {
+    ...                 "JSON": "desired_value"
+    ...             }
+    ...         }
+    ...     }
+    ... }
+    >>> get(config, '/DL/Outputs/Format/JSON', default='default_value')
+    'desired_value'
+    >>> get(config, '/DL/Outputs/Format/XML', default='default_value')
+    'default_value'
+
+    """
+    if d is None:
+        return default
+    keys = path.strip('/').split('/')
+    current_dict = d
+    try:
+        for key in keys:
+            current_dict = current_dict[key]
+        return current_dict
+    except (KeyError, TypeError):
+        return default
+
+
+def update(
+    d: dict[str, Any], path: str, value: Any, only_if_empty_or_none: bool = False
+) -> None:
+    """
+    Set a value in a nested dictionary using a path with '/' as the separator.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary to update.
+    path : str
+        The path to the desired value, with keys separated by '/'.
+    value : Any
+        The value to set at the specified path.
+    only_if_empty_or_none : bool, optional
+        If True, only update the value if it is None or an empty
+        dictionary. Defaults to False.
+
+    Examples
+    --------
+    >>> d = {}
+    >>> update(d, 'x/y/z', 1)
+    >>> d
+    {'x': {'y': {'z': 1}}}
+
+    >>> update(d, 'x/y/z', 2, only_if_empty_or_none=True)
+    >>> d
+    {'x': {'y': {'z': 1}}}  # value remains 1 since it is not empty or None
+
+    >>> update(d, 'x/y/z', 2)
+    >>> d
+    {'x': {'y': {'z': 2}}}  # value is updated to 2
+    """
+
+    keys = path.strip('/').split('/')
+    current_dict = d
+    for key in keys[:-1]:
+        if key not in current_dict or not isinstance(current_dict[key], dict):
+            current_dict[key] = {}
+        current_dict = current_dict[key]
+    if only_if_empty_or_none:
+        if is_unspecified(current_dict, keys[-1]):
+            current_dict[keys[-1]] = value
+    else:
+        current_dict[keys[-1]] = value
+
+
+def is_unspecified(d: dict[str, Any], path: str) -> bool:
+    """
+    Check if a value in a nested dictionary is either non-existent,
+    None, NaN, or an empty dictionary or list.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary to search.
+    path : str
+        The path to the desired value, with keys separated by '/'.
+
+    Returns
+    -------
+    bool
+        True if the value is non-existent, None, or an empty
+        dictionary or list. False otherwise.
+
+    Examples
+    --------
+    >>> config = {
+    ...     "DL": {
+    ...         "Outputs": {
+    ...             "Format": {
+    ...                 "JSON": "desired_value",
+    ...                 "EmptyDict": {}
+    ...             }
+    ...         }
+    ...     }
+    ... }
+    >>> is_unspecified(config, '/DL/Outputs/Format/JSON')
+    False
+    >>> is_unspecified(config, '/DL/Outputs/Format/XML')
+    True
+    >>> is_unspecified(config, '/DL/Outputs/Format/EmptyDict')
+    True
+
+    """
+    value = get(d, path, default=None)
+    if value is None:
+        return True
+    if pd.isna(value):
+        return True
+    if value == {}:
+        return True
+    if value == []:
+        return True
+    return False
+
+
+def is_specified(d: dict[str, Any], path: str) -> bool:
+    """
+    Opposite of `is_unspecified()`.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary to search.
+    path : str
+        The path to the desired value, with keys separated by '/'.
+
+    Returns
+    -------
+    bool
+        True if the value is specified, False otherwise.
+
+    """
+    return not is_unspecified(d, path)

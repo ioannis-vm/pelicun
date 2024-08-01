@@ -73,10 +73,7 @@ cd pelicun
 
 # Install pelicun:
 # Note: don't forget to activate the corresponding environment.
-python -m pip install -e .
-
-# Install additional development setup dependencies
-python -m pip install -r requirements_dev.txt
+python -m pip install -e .[development]
 
 ```
 
@@ -96,10 +93,12 @@ flake8 pelicun
 # Linting with pylint:
 pylint pelicun
 
+# Type checking with mypy:
+mypy pelicun --no-namespace-packages
+
 # Running the tests:
 python -m pytest pelicun/tests --cov=pelicun --cov-report html
 # Open `htmlcov/index.html`in a browser to see coverage results.
-
 
 ```
 
