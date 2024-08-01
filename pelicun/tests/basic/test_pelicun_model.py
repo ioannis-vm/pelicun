@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018 Leland Stanford Junior University
 # Copyright (c) 2018 The Regents of the University of California
@@ -33,38 +32,35 @@
 #
 # You should have received a copy of the BSD 3-Clause License along with
 # pelicun. If not, see <http://www.opensource.org/licenses/>.
-#
-# Contributors:
-# Adam Zsarnóczay
-# John Vouvakis Manousakis
 
-"""
-These are unit and integration tests on the PelicunModel class.
-"""
+"""These are unit and integration tests on the PelicunModel class."""
 
 from __future__ import annotations
+
 from copy import deepcopy
-import pytest
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pandas as pd
+import pytest
+
 from pelicun import model
 from pelicun.tests.basic.test_model import TestModelModule
 
-
-# pylint: disable=missing-function-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-return-doc,missing-return-type-doc
+if TYPE_CHECKING:
+    from pelicun.assessment import Assessment
+    from pelicun.model.pelicun_model import PelicunModel
 
 
 class TestPelicunModel(TestModelModule):
     @pytest.fixture
-    def pelicun_model(self, assessment_instance):
+    def pelicun_model(self, assessment_instance: Assessment) -> PelicunModel:
         return deepcopy(model.PelicunModel(assessment_instance))
 
-    def test_init(self, pelicun_model):
+    def test_init(self, pelicun_model: PelicunModel) -> None:
         assert pelicun_model.log
 
-    def test__convert_marginal_params(self, pelicun_model):
+    def test__convert_marginal_params(self, pelicun_model: PelicunModel) -> None:
         # one row, only Theta_0, no conversion
         marginal_params = pd.DataFrame(
             [['1.0']],

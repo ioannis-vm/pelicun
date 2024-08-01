@@ -1,4 +1,4 @@
-#
+# noqa: D104
 # Copyright (c) 2018 Leland Stanford Junior University
 # Copyright (c) 2018 The Regents of the University of California
 #
@@ -32,30 +32,3 @@
 #
 # You should have received a copy of the BSD 3-Clause License along with
 # pelicun. If not, see <http://www.opensource.org/licenses/>.
-
-"""Pelicun warning and error classes."""
-
-from __future__ import annotations
-
-
-class PelicunWarning(Warning):
-    """Custom warning for specific use in the Pelicun project."""
-
-
-class PelicunInvalidConfigError(Exception):
-    """
-    Exception raised for errors in the configuration of Pelicun.
-
-    Attributes
-    ----------
-    message: str
-        Explanation of the error.
-
-    """
-
-    def __init__(
-        self, message: str = 'Invalid options in configuration file.'
-    ) -> None:
-        """Instantiate the error."""
-        self.message = message
-        super().__init__(self.message)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018 Leland Stanford Junior University
 # Copyright (c) 2018 The Regents of the University of California
@@ -33,24 +32,19 @@
 #
 # You should have received a copy of the BSD 3-Clause License along with
 # pelicun. If not, see <http://www.opensource.org/licenses/>.
-#
-# Contributors:
-# Adam Zsarnóczay
-# John Vouvakis Manousakis
 
-"""
-This file is used to reset all expected test result data.
-"""
+"""This file is used to reset all expected test result data."""
 
 from __future__ import annotations
-import os
-import re
-import glob
+
 import ast
 import importlib
+import os
+import re
+from pathlib import Path
 
 
-def reset_all_test_data(restore=True, purge=False):
+def reset_all_test_data(*, restore: bool = True, purge: bool = False) -> None:  # noqa: C901
     """
     Update the expected result pickle files with new results, accepting
     the values obtained by executing the code as correct from now on.
@@ -78,7 +72,6 @@ def reset_all_test_data(restore=True, purge=False):
 
     Raises
     ------
-
     ValueError
       If the test directory is not found.
 
@@ -88,18 +81,19 @@ def reset_all_test_data(restore=True, purge=False):
       `pelicun` directory. Dangerous things may happen otherwise.
 
     """
-
-    cwd = os.path.basename(os.getcwd())
+    cwd = Path.cwd()
     if cwd != 'pelicun':
-        raise OSError(
+        msg = (
             'Wrong directory. '
             'See the docstring of `reset_all_test_data`. Aborting'
         )
+        raise OSError(msg)
 
     # where the test result data are stored
-    testdir = os.path.join(*('tests', 'data'))
-    if not os.path.exists(testdir):
-        raise ValueError('pelicun/tests/basic/data directory not found.')
+    testdir = Path('tests') / 'data'
+    if not testdir.exists():
+        msg = 'pelicun/tests/basic/data directory not found.'
+        raise ValueError(msg)
 
     # clean up existing test result data
     # only remove .pcl files that start with `test_`
@@ -108,18 +102,15 @@ def reset_all_test_data(restore=True, purge=False):
         for root, _, files in os.walk('.'):
             for filename in files:
                 if pattern.match(filename):
-                    full_name = os.path.join(root, filename)
-                    print(f'removing: {full_name}')
-                    file_path = full_name
-                    os.remove(file_path)
+                    (Path(root) / filename).unlink()
 
     # generate new data
     if restore:
         # get a list of all existing test files and iterate
-        test_files = glob.glob('tests/*test*.py')
+        test_files = list(Path('tests').glob('*test*.py'))
         for test_file in test_files:
             # open the file and statically parse the code looking for functions
-            with open(test_file, 'r', encoding='utf-8') as file:
+            with Path(test_file).open(encoding='utf-8') as file:
                 node = ast.parse(file.read())
             functions = [n for n in node.body if isinstance(n, ast.FunctionDef)]
             # iterate over the functions looking for test_ functions
@@ -131,7 +122,7 @@ def reset_all_test_data(restore=True, purge=False):
                     if 'reset' in arguments:
                         # we want to import it and run it with reset=True
                         # construct a module name, like 'tests.test_uq'
-                        module_name = 'tests.' + os.path.basename(test_file).replace(
+                        module_name = 'tests.' + Path(test_file).name.replace(
                             '.py', ''
                         )
                         # import the module
@@ -139,5 +130,4 @@ def reset_all_test_data(restore=True, purge=False):
                         # get the function
                         func = getattr(module, function.name)
                         # run it to reset its expected test output data
-                        print(f'running: {function.name} from {module_name}')
                         func(reset=True)

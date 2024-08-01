@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018 Leland Stanford Junior University
 # Copyright (c) 2018 The Regents of the University of California
@@ -33,34 +32,32 @@
 #
 # You should have received a copy of the BSD 3-Clause License along with
 # pelicun. If not, see <http://www.opensource.org/licenses/>.
-#
-# Contributors:
-# Adam Zsarnóczay
-# John Vouvakis Manousakis
 
-"""
-This file defines Loss model objects and their methods.
-
-"""
+"""Loss model objects and associated methods."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from typing import Any
-from collections.abc import Callable
+
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from itertools import product
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, overload
+
 import numpy as np
 import pandas as pd
 from scipy.interpolate import RegularGridInterpolator
+
+from pelicun import base, file_io, uq
+from pelicun.model.demand_model import (
+    _assemble_required_demand_data,
+    _get_required_demand_type,
+    _verify_edps_available,
+)
 from pelicun.model.pelicun_model import PelicunModel
-from pelicun.model.demand_model import _get_required_demand_type
-from pelicun.model.demand_model import _assemble_required_demand_data
-from pelicun.model.demand_model import _verify_edps_available
-from pelicun import base
-from pelicun import uq
-from pelicun import file_io
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pelicun.assessment import AssessmentBase
 
 idx = base.idx
@@ -81,9 +78,9 @@ class LossModel(PelicunModel):
         self,
         assessment: AssessmentBase,
         decision_variables: tuple[str, ...] = ('Carbon', 'Cost', 'Energy', 'Time'),
-    ):
+    ) -> None:
         """
-        Initializes LossModel objects.
+        Initialize LossModel objects.
 
         Parameters
         ----------
@@ -104,7 +101,7 @@ class LossModel(PelicunModel):
         self.decision_variables = decision_variables
 
     @property
-    def sample(self):
+    def sample(self) -> pd.DataFrame | None:
         """
         Combines the samples of the ds_model and lf_model sub-models.
 
@@ -114,7 +111,6 @@ class LossModel(PelicunModel):
             The combined loss sample.
 
         """
-
         # Handle `None` cases
 
         if self.ds_model.sample is None and self.lf_model.sample is None:
@@ -139,30 +135,27 @@ class LossModel(PelicunModel):
         new_multiindex = pd.MultiIndex.from_frame(new_index)
         self.lf_model.sample.columns = new_multiindex
 
-        combined = pd.concat((self.ds_model.sample, self.lf_model.sample), axis=1)
-
-        return combined
+        return pd.concat((self.ds_model.sample, self.lf_model.sample), axis=1)
 
     @property
-    def decision_variables(self):
+    def decision_variables(self) -> tuple[str, ...]:
         """
-        Retrieves the decision variables to be used in the loss
-        calculations.
+        Retrieve the decision variables.
 
         Returns
         -------
         tuple
             Decision variables.
+
         """
         # pick the object from one of the models
         # it's the same for the other(s).
         return self.ds_model.decision_variables
 
     @decision_variables.setter
-    def decision_variables(self, decision_variables):
+    def decision_variables(self, decision_variables: tuple[str, ...]) -> None:
         """
-        Sets the decision variables to be used in the loss
-        calculations.
+        Set the decision variables.
 
         Supported: {`Cost`, `Time`, `Energy`, `Carbon`}.
         Could also be any other string, as long as the provided loss
@@ -179,9 +172,10 @@ class LossModel(PelicunModel):
         loss_map_policy: str | None = None,
     ) -> None:
         """
-        Add a loss map to the loss model. A loss map defines what loss
-        parameter definition should be used for each component ID in
-        the asset model.
+        Add a loss map to the loss model.
+
+        A loss map defines what loss parameter definition should be
+        used for each component ID in the asset model.
 
         Parameters
         ----------
@@ -204,15 +198,13 @@ class LossModel(PelicunModel):
             If both arguments are None.
 
         """
-
         self.log.msg('Loading loss map...')
 
         # If no loss map is provided and no default is requested,
         # there is no loss map and we can't proceed.
         if loss_map_path is None and loss_map_policy is None:
-            raise ValueError(
-                'Please provide a loss map and/or a loss map extension policy.'
-            )
+            msg = 'Please provide a loss map and/or a loss map extension policy.'
+            raise ValueError(msg)
 
         # get a list of unique component IDs
         cmp_set = set(self._asmnt.asset.list_unique_component_ids())
@@ -230,7 +222,7 @@ class LossModel(PelicunModel):
             assert isinstance(loss_map, pd.DataFrame)
             # <backwards compatibility>
             if np.any(['DMG' in x for x in loss_map.index]):  # type: ignore
-                self.log.warn(
+                self.log.warning(
                     'The `DMG-` flag in the loss_map index is deprecated '
                     'and no longer necessary. '
                     'Please do not prepend `DMG-` before the component '
@@ -256,9 +248,10 @@ class LossModel(PelicunModel):
             # Don't do anything.
             pass
 
-        # TODO: add other loss map policies.
+        # TODO(AZ): add other loss map policies.
         else:
-            raise ValueError(f'Unknown loss map policy: `{loss_map_policy}`.')
+            msg = f'Unknown loss map policy: `{loss_map_policy}`.'
+            raise ValueError(msg)
 
         # Assign the loss map to the available loss models
         self._loss_map = loss_map
@@ -271,11 +264,8 @@ class LossModel(PelicunModel):
         loss_map: str | pd.DataFrame,
         decision_variables: tuple[str, ...] | None = None,
     ) -> None:
-        """
-        <backwards compatibility>
-
-        """
-        self.log.warn(
+        """<backwards compatibility>."""
+        self.log.warning(
             '`load_model` is deprecated and will be dropped in '
             'future versions of pelicun. '
             'Please use `load_model_parameters` instead.'
@@ -300,6 +290,11 @@ class LossModel(PelicunModel):
             prior elements in the list take precedence over the same
             parameters in subsequent data paths. I.e., place the
             Default datasets in the back.
+        decision_variables: tuple
+            Defines the decision variables to be included in the loss
+            calculations. Defaults to those supported, but fewer can be
+            used if desired. When fewer are used, the loss parameters for
+            those not used will not be required.
 
         Raises
         ------
@@ -308,15 +303,14 @@ class LossModel(PelicunModel):
             specified paths.
 
         """
-
         if decision_variables is not None:
             # <backwards compatibility>
-            self.decision_variables = set(decision_variables)
-            self.log.warn(
+            self.decision_variables = decision_variables
+            self.log.warning(
                 'The `decision_variables` argument has been removed. '
                 'Please set your desired decision variables like so: '
                 '{assessment object}.loss.decision_variables '
-                '= (\'dv1\', \'dv2\', ...) before calling '
+                "= ('dv1', 'dv2', ...) before calling "
                 '{assessment object}.add_loss_map().'
             )
 
@@ -332,8 +326,8 @@ class LossModel(PelicunModel):
 
         for data_path in data_paths:
             if 'bldg_repair_DB' in data_path:
-                data_path = data_path.replace('bldg_repair_DB', 'loss_repair_DB')
-                self.log.warn(
+                data_path = data_path.replace('bldg_repair_DB', 'loss_repair_DB')  # noqa: PLW2901
+                self.log.warning(
                     '`bldg_repair_DB` is deprecated and will '
                     'be dropped in future versions of pelicun. '
                     'Please use `loss_repair_DB` instead.'
@@ -345,11 +339,12 @@ class LossModel(PelicunModel):
             # determine if the loss model parameters are for damage
             # states or loss functions
             if _is_for_ds_model(data):
-                self.ds_model._load_model_parameters(data)
+                self.ds_model.load_model_parameters(data)
             elif _is_for_lf_model(data):
-                self.lf_model._load_model_parameters(data)
+                self.lf_model.load_model_parameters(data)
             else:
-                raise ValueError(f'Invalid loss model parameters: {data_path}')
+                msg = f'Invalid loss model parameters: {data_path}'
+                raise ValueError(msg)
 
         self.log.msg(
             'Loss model parameters loaded successfully.', prepend_timestamp=False
@@ -363,14 +358,15 @@ class LossModel(PelicunModel):
             'Removing unused loss model parameters.', prepend_timestamp=False
         )
 
+        assert self._loss_map is not None
         for loss_model in self._loss_models:
             # drop unused loss parameter definitions
-            loss_model._drop_unused_loss_parameters(self._loss_map)
+            loss_model.drop_unused_loss_parameters(self._loss_map)
             # remove components with incomplete loss parameters
-            loss_model._remove_incomplete_components()
+            loss_model.remove_incomplete_components()
 
         # drop unused damage state columns
-        self.ds_model._drop_unused_damage_states()
+        self.ds_model.drop_unused_damage_states()
 
         #
         # convert units
@@ -380,7 +376,7 @@ class LossModel(PelicunModel):
             'Converting loss model parameter units.', prepend_timestamp=False
         )
         for loss_model in self._loss_models:
-            loss_model._convert_loss_parameter_units()
+            loss_model.convert_loss_parameter_units()
 
         #
         # verify loss parameter availability
@@ -425,18 +421,19 @@ class LossModel(PelicunModel):
         cmp_marginal_params = self._asmnt.asset.cmp_marginal_params
         assert cmp_marginal_params is not None
         if self._asmnt.damage.ds_model.sample is not None:
-            # TODO: FIND A WAY to avoid making a copy of this.
+            # TODO(JVM): FIND A WAY to avoid making a copy of this.
             dmg_quantities = self._asmnt.damage.ds_model.sample.copy()
             if len(demand) != len(dmg_quantities):
-                raise ValueError(
+                msg = (
                     f'The demand sample contains {len(demand)} realizations, '
                     f'but the damage sample contains {len(dmg_quantities)}. '
                     f'Loss calculation cannot proceed when '
                     f'these numbers are different. '
                 )
-            self.ds_model._calculate(dmg_quantities)
+                raise ValueError(msg)
+            self.ds_model.calculate(dmg_quantities)
 
-        self.lf_model._calculate(
+        self.lf_model.calculate(
             demand,
             cmp_sample,
             cmp_marginal_params,
@@ -444,31 +441,31 @@ class LossModel(PelicunModel):
             nondirectional_multipliers,
         )
 
-        self.log.msg("Loss calculation successful.")
+        self.log.msg('Loss calculation successful.')
 
     def consequence_scaling(self, scaling_specification: str) -> None:
         """
-        Applies scale factors to the loss sample according to the
-        given scaling specification.
+        Apply scale factors to losses.
 
-        The scaling specification should be a path to a CSV file. It
-        should contain a `Decision Variable` column with a specified
-        decision variable in each row. Other optional columns are
-        `Component`, `Location`, `Direction`. Each row acts as an
-        independent scaling operation, with the scale factor defined
-        in the `Scale Factor` column, which is required. If any
-        value is missing in the optional columns, it is assumed that
-        the scale factor should be applied to all entries of the
-        loss sample where the other column values match. For example,
-        if the specification has a single row with `Decision Variable`
-        set to 'Cost', `Scale Factor` set to 2.0, and no other
-        columns, this will double the 'Cost' DV. If instead `Location`
-        was also set to `1`, it would double the Cost of all
-        components that have that location. The columns `Location` and
-        `Direction` can contain ranges, like this: `1--3` means
-        `1`, `2`, and `3`. If a range is used in both `Location` and
-        `Direction`, the factor of that row will be applied once to
-        all combinations.
+        Applies scale factors to the loss sample according to the
+        given scaling specification. The scaling specification should
+        be a path to a CSV file. It should contain a `Decision
+        Variable` column with a specified decision variable in each
+        row. Other optional columns are `Component`, `Location`,
+        `Direction`. Each row acts as an independent scaling
+        operation, with the scale factor defined in the `Scale Factor`
+        column, which is required. If any value is missing in the
+        optional columns, it is assumed that the scale factor should
+        be applied to all entries of the loss sample where the other
+        column values match. For example, if the specification has a
+        single row with `Decision Variable` set to 'Cost', `Scale
+        Factor` set to 2.0, and no other columns, this will double the
+        'Cost' DV. If instead `Location` was also set to `1`, it would
+        double the Cost of all components that have that location. The
+        columns `Location` and `Direction` can contain ranges, like
+        this: `1--3` means `1`, `2`, and `3`. If a range is used in
+        both `Location` and `Direction`, the factor of that row will
+        be applied once to all combinations.
 
         Parameters
         ----------
@@ -481,7 +478,6 @@ class LossModel(PelicunModel):
             If required columns are missing or contain NaNs.
 
         """
-
         # Specify expected dtypes from the start.
         dtypes = {
             'Decision Variable': 'str',
@@ -497,18 +493,20 @@ class LossModel(PelicunModel):
             'Decision Variable' not in scaling_specification_df.columns
             or scaling_specification_df['Decision Variable'].isna().any()
         ):
-            raise ValueError(
+            msg = (
                 'The `Decision Variable` column is missing '
                 'from the scaling specification or contains NaN values.'
             )
+            raise ValueError(msg)
         if (
             'Scale Factor' not in scaling_specification_df.columns
             or scaling_specification_df['Scale Factor'].isna().any()
         ):
-            raise ValueError(
+            msg = (
                 'The `Scale Factor` column is missing '
                 'from the scaling specification or contains NaN values.'
             )
+            raise ValueError(msg)
 
         # Add missing optional columns with NaN values
         optional_cols = ['Component', 'Location', 'Direction']
@@ -524,14 +522,14 @@ class LossModel(PelicunModel):
             'Direction': 'dir',
             'Scale Factor': 'scaling',
         }
-        scaling_specification_df.rename(columns=name_map, inplace=True)
+        scaling_specification_df = scaling_specification_df.rename(columns=name_map)
 
         # Expand ranges in 'loc' and 'dir'
-        def _expand_range(col):
+        def _expand_range(col):  # noqa: ANN001, ANN202
             if pd.isna(col):
                 return [col]
             if '--' in col:
-                start, end = [int(x) for x in col.split('--')]
+                start, end = (int(x) for x in col.split('--'))
                 return [str(x) for x in range(start, end + 1)]
             return [col]
 
@@ -560,11 +558,11 @@ class LossModel(PelicunModel):
         self,
         scaling_conditions: dict,
         scale_factor: float,
+        *,
         raise_missing: bool = True,
     ) -> None:
         """
-        Applies a scale factor to selected columns of the loss
-        samples.
+        Apply a scale factor to selected loss sample columns.
 
         The scaling conditions are passed as a dictionary mapping
         level names with their required value for the condition to be
@@ -590,6 +588,8 @@ class LossModel(PelicunModel):
             which case only the matching rows will be affected.
         scale_factor: float
             Scale factor to use.
+        raise_missing: bool
+            Raise an error if no rows are matching the given conditions.
 
         Raises
         ------
@@ -598,18 +598,17 @@ class LossModel(PelicunModel):
             `dv` key.
 
         """
-
         # make sure we won't apply the same factor to all DVs at once,
         # highly unlikely anyone would actually want to do this.
         if 'dv' not in scaling_conditions:
-            raise ValueError(
+            msg = (
                 'The index of the `scaling_conditions` dictionary '
                 'should contain a level named `dv` listing the '
                 'relevant decision variable.'
             )
+            raise ValueError(msg)
 
         for model in self._loss_models:
-
             # check if it's empty
             if model.sample is None:
                 continue
@@ -618,9 +617,10 @@ class LossModel(PelicunModel):
             # values exist yet)
             for name in scaling_conditions:
                 if name not in model.sample.columns.names:
-                    raise ValueError(
+                    msg = (
                         f'`scaling_conditions` contains an unknown level: `{name}`.'
                     )
+                    raise ValueError(msg)
 
             # apply scale factors
             base.multiply_factor_multiple_levels(
@@ -632,10 +632,10 @@ class LossModel(PelicunModel):
             )
 
     def save_sample(
-        self, filepath: str | None = None, save_units: bool = False
+        self, filepath: str | None = None, *, save_units: bool = False
     ) -> None | pd.DataFrame | tuple[pd.DataFrame, pd.Series]:
         """
-        <backwards compatibility>
+        <backwards compatibility>.
 
         Saves the sample of the `ds_model`.
 
@@ -645,7 +645,7 @@ class LossModel(PelicunModel):
             The output of {loss model}.ds_model.save_sample.
 
         """
-        self.log.warn(
+        self.log.warning(
             '`{loss model}.save_sample` is deprecated and will raise '
             'in future versions of pelicun. Please use '
             '{loss model}.ds_model.save_sample instead.'
@@ -654,28 +654,29 @@ class LossModel(PelicunModel):
 
     def load_sample(self, filepath: str | pd.DataFrame) -> None:
         """
-        <backwards compatibility>
+        <backwards compatibility>.
 
         Saves the sample of the `ds_model`.
 
         """
-        self.log.warn(
+        self.log.warning(
             '`{loss model}.load_sample` is deprecated and will raise '
             'in future versions of pelicun. Please use '
             '{loss model}.ds_model.load_sample instead.'
         )
         self.ds_model.load_sample(filepath=filepath)
 
-    def aggregate_losses(
+    def aggregate_losses(  # noqa: C901
         self,
         replacement_configuration: (
             tuple[uq.RandomVariableRegistry, dict[str, float]] | None
         ) = None,
         loss_combination: dict | None = None,
+        *,
         future: bool = False,
     ) -> pd.DataFrame | tuple[pd.DataFrame, pd.DataFrame]:
         """
-        Aggregates the losses produced by each component.
+        Aggregate the losses produced by each component.
 
         Parameters
         ----------
@@ -687,7 +688,7 @@ class LossModel(PelicunModel):
             thresholds. If the aggregated value for a decision
             variable (conditioned on no replacement) exceeds the
             threshold, then replacement is triggered. This can happen
-            for multuple decision variables at the same
+            for multiple decision variables at the same
             realization. The consequence keyword `replacement` is
             reserved to represent exclusive triggering of the
             replacement consequences, and other consequences are
@@ -695,9 +696,9 @@ class LossModel(PelicunModel):
             triggered. When assigned to None, then `replacement` is
             still treated as an exclusive consequence (other
             consequences are set to zero when replacement is nonzero)
-            but it is not being additinally triggered by the
+            but it is not being additionally triggered by the
             exceedance of any thresholds. The aggregated loss sample
-            conains an additional column with information on whether
+            contains an additional column with information on whether
             replacement was already present or triggered by a
             threshold exceedance for each realization.
         loss_combination: dict, optional
@@ -721,6 +722,9 @@ class LossModel(PelicunModel):
             This structure allows for the loss combination of M
             components.  In this case the (`c1`, `c2`) tuple should
             contain M elements instead of two.
+        future: bool, optional
+            Defaults to False. When set to True, it enables the
+            updated return type.
 
         Note
         ----
@@ -730,12 +734,13 @@ class LossModel(PelicunModel):
 
         Returns
         -------
-        tuple
+        dataframe or tuple
             Dataframe with the aggregated loss of each realization,
             and another boolean dataframe with information on which DV
             thresholds were exceeded in each realization, triggering
             replacement. If no thresholds are specified it only
-            contains False values.
+            contains False values. The second dataframe is only
+            returned with `future` set to True.
 
         Raises
         ------
@@ -743,11 +748,9 @@ class LossModel(PelicunModel):
             When inputs are invalid.
 
         """
-
-        # TODO
-        # When we start working on the documentation, simplify the
-        # docstring above and point the relevant detailed section in
-        # the documentation.
+        # TODO(JVM): When we start working on the documentation,
+        # simplify the docstring above and point the relevant detailed
+        # section in the documentation.
 
         # validate input
         if replacement_configuration is not None:
@@ -769,7 +772,7 @@ class LossModel(PelicunModel):
         else:
             lf_sample = None
 
-        def _construct_columns():
+        def _construct_columns() -> list[str]:
             columns = [
                 f'repair_{x.lower()}' for x in self.decision_variables if x != 'Time'
             ]
@@ -780,9 +783,8 @@ class LossModel(PelicunModel):
             return columns
 
         if ds_sample is None and lf_sample is None:
-            self.log.msg("There are no losses.")
-            df_agg = pd.DataFrame(0.00, index=[0], columns=_construct_columns())
-            return df_agg
+            self.log.msg('There are no losses.')
+            return pd.DataFrame(0.00, index=[0], columns=_construct_columns())
 
         #
         #  handle `replacement`, regardless of whether
@@ -801,7 +803,7 @@ class LossModel(PelicunModel):
         column_levels = ['dv', 'loss', 'dmg', 'loc', 'dir', 'uid']
         combined_sample = self.sample
         sample = (
-            combined_sample.groupby(by=column_levels, axis=1)
+            combined_sample.groupby(by=column_levels, axis=1)  # type: ignore
             .sum()
             .sort_index(axis=1)
         )
@@ -826,7 +828,7 @@ class LossModel(PelicunModel):
         df_agg = self._aggregate_sample(sample, _construct_columns())
 
         if not future:
-            self.log.warn(
+            self.log.warning(
                 '`aggregate_losses` has been expanded to support the '
                 'consideration of the exceedance of loss threshold '
                 'values leading to asset replacement '
@@ -845,28 +847,32 @@ class LossModel(PelicunModel):
     def _validate_input_loss_combination(self, loss_combination: dict) -> None:
         for dv, combinations in loss_combination.items():
             if dv not in self.decision_variables:
-                raise ValueError(
+                msg = (
                     f'`loss_combination` contains the key '
                     f'`{dv}` which is not found in the active '
                     f'decision variables. These are: '
                     f'{self.decision_variables}.'
                 )
+                raise ValueError(msg)
             for components, array in combinations.items():
                 if not isinstance(components, tuple):
-                    raise ValueError(
+                    msg = (
                         f'Invalid type for components in loss combination '
                         f'for `{dv}`: {type(components)}. It should be a tuple.'
                     )
+                    raise TypeError(msg)
                 if not all(isinstance(c, str) for c in components):
-                    raise ValueError(
+                    msg = (
                         f'All elements of the components tuple in loss '
                         f'combination for `{dv}` should be strings.'
                     )
+                    raise ValueError(msg)
                 if not isinstance(array, np.ndarray):
-                    raise ValueError(
+                    msg = (
                         f'Invalid type for array in loss combination '
                         f'for `{dv}`: {type(array)}. It should be a numpy array.'
                     )
+                    raise TypeError(msg)
 
     def _validate_input_replacement_thresholds(
         self,
@@ -874,47 +880,48 @@ class LossModel(PelicunModel):
             uq.RandomVariableRegistry, dict[str, float]
         ],
     ) -> None:
-        replacement_consequence_RV_reg, replacement_ratios = (
+        replacement_consequence_rv_reg, replacement_ratios = (
             replacement_configuration
         )
-        if not isinstance(replacement_consequence_RV_reg, uq.RandomVariableRegistry):
-            raise TypeError(
+        if not isinstance(replacement_consequence_rv_reg, uq.RandomVariableRegistry):
+            msg = (
                 f'Invalid type for replacement consequence RV registry: '
-                f'{type(replacement_consequence_RV_reg)}. It should be '
+                f'{type(replacement_consequence_rv_reg)}. It should be '
                 f'uq.RandomVariableRegistry.'
             )
-        for key in replacement_consequence_RV_reg.RV:
+            raise TypeError(msg)
+        for key in replacement_consequence_rv_reg.RV:
             if key not in self.decision_variables:
-                raise ValueError(
+                msg = (
                     f'`replacement_consequence_RV_reg` contains the key '
                     f'`{key}` which is not found in the active '
                     f'decision variables. These are: '
                     f'{self.decision_variables}.'
                 )
+                raise ValueError(msg)
         for key in replacement_ratios:
             if key not in self.decision_variables:
-                raise ValueError(
+                msg = (
                     f'`replacement_ratios` contains the key '
                     f'`{key}` which is not found in the active '
                     f'decision variables. These are: '
                     f'{self.decision_variables}.'
                 )
+                raise ValueError(msg)
         # The replacement_consequence_RV_reg should contain an RV for
         # all active DVs, regardless of whether there is a replacement
-        # threshold for that DV, becauase when replacememnt is
+        # threshold for that DV, because when replacememnt is
         # triggered, we need to assign a consequence for all DVs.
         for key in self.decision_variables:
-            if key not in replacement_consequence_RV_reg.RV:
-                raise ValueError(
-                    f'Missing replacement consequence RV ' f'for `{key}`.'
-                )
+            if key not in replacement_consequence_rv_reg.RV:
+                msg = f'Missing replacement consequence RV ' f'for `{key}`.'
+                raise ValueError(msg)
 
     def _apply_loss_combinations(
         self, loss_combination: dict, sample: pd.DataFrame
     ) -> pd.DataFrame:
         """
-        Performs non-additive loss combinations of specified
-        components.
+        Perform loss combinations of specified components.
 
         This function deconstructs the loss combination arrays,
         identifies the combinable components, and applies the
@@ -924,14 +931,14 @@ class LossModel(PelicunModel):
 
         Parameters
         ----------
-        loss_combination : dict
+        loss_combination: dict
             A dictionary containing the loss combination
             information. The structure is nested dictionaries where
             the outer keys are decision variables, inner keys are
             components to combine, and the values are array objects
             representing the combination data.
 
-        sample : pandas.DataFrame
+        sample: pandas.DataFrame
             The input DataFrame containing the sample data. The
             columns are assumed to be a MultiIndex with at least the
             levels (decision_variable, loss_id, component_id,
@@ -943,7 +950,6 @@ class LossModel(PelicunModel):
             A new DataFrame with the combined loss data.
 
         """
-
         # deconstruct combination arrays to extract the input domains
         loss_combination_converted = self._deconstruct_loss_combination_arrays(
             loss_combination
@@ -966,18 +972,17 @@ class LossModel(PelicunModel):
             dsample, loss_combination_converted, dcsample
         )
         # and the remaining
-        for col in dsample:
-            dcsample[col] = dsample[col]
+        for col, val in dsample.items():
+            dcsample[col] = val  # noqa: PERF403
 
         # turn into a dataframe
-        sample = pd.DataFrame(dcsample).rename_axis(columns=sample.columns.names)
-        return sample
+        return pd.DataFrame(dcsample).rename_axis(columns=sample.columns.names)
 
     def _loss_combination_add_combinable(
         self, dsample: dict, loss_combination_converted: dict, dcsample: dict
     ) -> None:
         """
-        Adds combinable loss data.
+        Add combinable loss data.
 
         This function identifies groups of `loc`-`dir`-`uid` that can
         be combined for each decision variable and computes the
@@ -988,20 +993,20 @@ class LossModel(PelicunModel):
 
         Parameters
         ----------
-        dsample : dict
+        dsample: dict
             A dictionary representing the loss sample data, where keys
             are tuples of the form (decision_variable, loss_id,
             component_id, location, direction, uid) and values are the
             corresponding data arrays.
 
-        loss_combination_converted : dict
+        loss_combination_converted: dict
             A dictionary containing loss combination data. The
             structure is nested dictionaries where the outer keys are
             decision variables, inner keys are components to combine,
             and the values are tuples of combination parameters
             (domains and reference values).
 
-        dcsample : dict
+        dcsample: dict
             A dictionary to store the combined loss data, where keys
             are tuples of the form (decision_variable, 'combination',
             combined_component_string, location, direction, uid) and
@@ -1069,10 +1074,9 @@ class LossModel(PelicunModel):
                     for col in cols:
                         dsample.pop(col)
 
-    def _identify_potential_groups(self, dsample: dict) -> dict:
+    def _identify_potential_groups(self, dsample: dict) -> dict:  # noqa: PLR6301
         """
-        Identifies potential groups of `loc`-`dir`-`uid` for each
-        decision variable.
+        Identify potential groups of `loc`-`dir`-`uid` for each DV.
 
         This function identifies all combinations of `loc`-`dir`-`uid`
         that can be grouped for each decision variable based on the
@@ -1080,7 +1084,7 @@ class LossModel(PelicunModel):
 
         Parameters
         ----------
-        dsample : iterable
+        dsample: iterable
             An iterable where each containing tuple contains
             information about the components and their attributes. The
             expected format of each tuple is (decision_variable,
@@ -1107,9 +1111,9 @@ class LossModel(PelicunModel):
                 inverted[c_dv][frozenset(component_set)].append(loc_dir_uid)
         return inverted
 
-    def _map_component_ids_to_loss_ids(self, dsample: dict) -> dict:
+    def _map_component_ids_to_loss_ids(self, dsample: dict) -> dict:  # noqa: PLR6301
         """
-        Maps component IDs to loss IDs.
+        Map component IDs to loss IDs.
 
         This function maps components to losses based on the loss
         sample's columns. It assumes that multiple component IDs can
@@ -1118,7 +1122,7 @@ class LossModel(PelicunModel):
 
         Parameters
         ----------
-        dsample : tuple dictionary keys
+        dsample: tuple dictionary keys
             Each tuple contains information about the components and
             corresponding losses.
 
@@ -1136,7 +1140,7 @@ class LossModel(PelicunModel):
             dmg_to_loss[c_dmg] = c_loss
         return dmg_to_loss
 
-    def _deconstruct_loss_combination_arrays(self, loss_combination: dict) -> dict:
+    def _deconstruct_loss_combination_arrays(self, loss_combination: dict) -> dict:  # noqa: PLR6301
         """
         Deconstruct loss combination arrays.
 
@@ -1147,7 +1151,7 @@ class LossModel(PelicunModel):
 
         Parameters
         ----------
-        loss_combination : dict
+        loss_combination: dict
            A dictionary where keys are decision variables and values
            are another dictionary. The inner dictionary has keys as
            components to combine and values as numpy array
@@ -1183,29 +1187,32 @@ class LossModel(PelicunModel):
         return loss_combination_converted
 
     def _aggregate_sample(self, sample: pd.DataFrame, columns: list) -> pd.DataFrame:
-        """
-        Sums up component losses.
-
-        """
+        """Sum up component losses."""
         df_agg = pd.DataFrame(index=sample.index, columns=columns)
         # group results by DV type and location
         aggregated = sample.groupby(
-            level=['dv', 'loc'], axis=1  # type: ignore
+            level=['dv', 'loc'],
+            axis=1,  # type: ignore
         ).sum()
 
         for decision_variable in self.decision_variables:
-
             # Time
-            if decision_variable == 'Time' and 'Time' in aggregated.columns:
+            if (
+                decision_variable == 'Time'
+                and 'Time' in aggregated.columns.get_level_values('dv')
+            ):
                 df_agg['repair_time-sequential'] = aggregated['Time'].sum(axis=1)
 
                 df_agg['repair_time-parallel'] = aggregated['Time'].max(axis=1)
-            elif decision_variable == 'Time' and 'Time' not in aggregated.columns:
+            elif (
+                decision_variable == 'Time'
+                and 'Time' not in aggregated.columns.get_level_values('dv')
+            ):
                 df_agg = df_agg.drop(
                     ['repair_time-parallel', 'repair_time-sequential'], axis=1
                 )
             # All other
-            elif decision_variable in aggregated.columns:
+            elif decision_variable in aggregated.columns.get_level_values('dv'):
                 df_agg[f'repair_{decision_variable.lower()}'] = aggregated[
                     decision_variable
                 ].sum(axis=1)
@@ -1217,14 +1224,14 @@ class LossModel(PelicunModel):
             cmp_units.update(
                 self.ds_model.loss_params[('DV', 'Unit')]
                 .groupby(level=[1])
-                .agg(lambda x: x.value_counts().index[0])
+                .first()
                 .to_dict()
             )
         if self.lf_model.loss_params is not None:
             cmp_units.update(
                 self.lf_model.loss_params[('DV', 'Unit')]
                 .groupby(level=[1])
-                .agg(lambda x: x.value_counts().index[0])
+                .first()
                 .to_dict()
             )
         # If the samples have been loaded to the loss model without
@@ -1257,66 +1264,67 @@ class LossModel(PelicunModel):
         )
         assert isinstance(res, pd.DataFrame)
         df_agg = res
-        df_agg.drop("Units", inplace=True)
+        df_agg = df_agg.drop('Units')
         df_agg = df_agg.astype(float)
 
         df_agg_mi = base.convert_to_MultiIndex(df_agg, axis=1)
         assert isinstance(df_agg_mi, pd.DataFrame)
         df_agg = df_agg_mi
-        df_agg.sort_index(axis=1, inplace=True)
+        df_agg = df_agg.sort_index(axis=1)
         df_agg = df_agg.reset_index(drop=True)
         assert isinstance(df_agg, pd.DataFrame)
         return df_agg
 
-    def _apply_replacement_thresholds(
+    def _apply_replacement_thresholds(  # noqa: PLR6301
         self,
         sample: pd.DataFrame,
         replacement_configuration: (
             tuple[uq.RandomVariableRegistry, dict[str, float]] | None
         ),
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
-
         # If there is no `replacement_configuration`, simply return.
         if replacement_configuration is None:
             # `exceedance_bool_df` is empty in this case.
             exceedance_bool_df = pd.DataFrame(index=sample.index, dtype=bool)
             return sample, exceedance_bool_df
 
-        replacement_consequence_RV_reg, replacement_ratios = (
+        replacement_consequence_rv_reg, replacement_ratios = (
             replacement_configuration
         )
         exceedance_bool_df = pd.DataFrame(  # type: ignore
-            False,
+            data=False,
             index=sample.index,
-            columns=replacement_consequence_RV_reg.RV.keys(),
+            columns=replacement_consequence_rv_reg.RV.keys(),
             dtype=bool,
         )
 
         # Sample replacement consequences from the registry
-        replacement_consequence_RV_reg.generate_sample(len(sample), 'MonteCarlo')
+        replacement_consequence_rv_reg.generate_sample(len(sample), 'MonteCarlo')
 
-        sample_dvs = replacement_consequence_RV_reg.RV.keys()
+        sample_dvs = replacement_consequence_rv_reg.RV.keys()
         for sample_dv in sample_dvs:
             sub_sample = sample.loc[:, sample_dv]
             if 'replacement' in sub_sample.columns.get_level_values('loss'):
                 # If `replacement` already exists as a consequence,
                 # determine the realizations where it is non-zero.
                 no_replacement_mask = (
-                    ~(sub_sample['replacement'] > 0.00).any(axis=1).values
+                    ~(sub_sample['replacement'] > 0.00).any(axis=1).to_numpy()
                 )
                 no_replacement_columns = (
                     sub_sample.columns.get_level_values('loss') != 'replacement'
                 )
             else:
                 # Otherwise there is no row where we already have replacement
-                no_replacement_mask = np.full(len(sub_sample), True)
-                no_replacement_columns = np.full(len(sub_sample.columns), True)
+                no_replacement_mask = np.full(len(sub_sample), fill_value=True)
+                no_replacement_columns = np.full(
+                    len(sub_sample.columns), fill_value=True
+                )
             # Get the sum to compare with the thresholds
             consequence_sum_given_no_replacement = sub_sample.iloc[  # type: ignore
                 no_replacement_mask, no_replacement_columns
             ].sum(axis=1)
             if not consequence_sum_given_no_replacement.empty:
-                consequence_values = replacement_consequence_RV_reg.RV[
+                consequence_values = replacement_consequence_rv_reg.RV[
                     sample_dv
                 ].sample
                 assert consequence_values is not None
@@ -1332,7 +1340,8 @@ class LossModel(PelicunModel):
                     )
             else:
                 exceedance_mask = pd.Series(
-                    np.full(len(sub_sample), False), index=sub_sample.index
+                    np.full(len(sub_sample), fill_value=False),
+                    index=sub_sample.index,
                 )
 
             # Monitor triggering of replacement
@@ -1342,7 +1351,7 @@ class LossModel(PelicunModel):
         # exceeded.
         exceedance_realizations = exceedance_bool_df.any(axis=1)
         # Assign replacement consequences: needs to include all DVs
-        for other_dv in replacement_consequence_RV_reg.RV.keys():
+        for other_dv in replacement_consequence_rv_reg.RV:
             col = (
                 other_dv,
                 'replacement',
@@ -1356,7 +1365,7 @@ class LossModel(PelicunModel):
                 sample[col] = 0.00
                 sample = sample.sort_index(axis=1)
             # Assign replacement consequences
-            other_sample = replacement_consequence_RV_reg.RV[other_dv].sample
+            other_sample = replacement_consequence_rv_reg.RV[other_dv].sample
             assert other_sample is not None
             sample.loc[exceedance_realizations, col] = other_sample[
                 exceedance_realizations
@@ -1369,16 +1378,17 @@ class LossModel(PelicunModel):
 
         return sample, exceedance_bool_df
 
-    def _make_replacement_exclusive(
+    def _make_replacement_exclusive(  # noqa: PLR6301
         self, ds_sample: pd.DataFrame, lf_sample: pd.DataFrame | None
     ) -> None:
         """
+        Make the replacement consequence exclusive.
+
         If `replacement` columns exist in `ds_sample`, this method
         treats all nonzero loss values driven by `replacement` as
         exclusive and zeroes-out the loss values of all other columns
         for the applicable rows.
         """
-
         # rows where replacement is non-zero
         replacement_rows: list = []
 
@@ -1390,7 +1400,7 @@ class LossModel(PelicunModel):
 
         if not rows_df.empty:
             replacement_rows = (
-                np.argwhere(np.any(rows_df.values > 0.0, axis=1))
+                np.argwhere(np.any(rows_df.to_numpy() > 0.0, axis=1))
                 .reshape(-1)
                 .tolist()
             )
@@ -1399,11 +1409,11 @@ class LossModel(PelicunModel):
             lf_sample.iloc[replacement_rows, :] = 0.00
 
     @property
-    def _loss_models(self):
+    def _loss_models(self) -> tuple[RepairModel_DS, RepairModel_LF]:
         return (self.ds_model, self.lf_model)
 
     @property
-    def _loss_map(self):
+    def _loss_map(self) -> pd.DataFrame | None:
         """
         Returns the loss map.
 
@@ -1415,12 +1425,12 @@ class LossModel(PelicunModel):
         """
         # Retrieve the DataFrame from one of the included loss models.
         # We use a single loss map for all.
-        return self.ds_model._loss_map
+        return self.ds_model.loss_map
 
     @_loss_map.setter
-    def _loss_map(self, loss_map):
+    def _loss_map(self, loss_map: pd.DataFrame) -> None:
         """
-        Sets the loss map.
+        Set the loss map.
 
         Parameters
         ----------
@@ -1431,10 +1441,10 @@ class LossModel(PelicunModel):
         # Add the DataFrame to the included loss models.
         # We use a single loss map for all.
         for model in self._loss_models:
-            model._loss_map = loss_map
+            model.loss_map = loss_map
 
     @property
-    def _missing(self):
+    def _missing(self) -> set[tuple[str, str]]:
         """
         Returns the missing components.
 
@@ -1445,12 +1455,12 @@ class LossModel(PelicunModel):
             definitions.
 
         """
-        return self.ds_model._missing
+        return self.ds_model.missing
 
     @_missing.setter
-    def _missing(self, missing):
+    def _missing(self, missing: set[tuple[str, str]]) -> None:
         """
-        Assigns missing parameter definitions to the loss models.
+        Assign missing parameter definitions to the loss models.
 
         Parameters
         ----------
@@ -1460,19 +1470,16 @@ class LossModel(PelicunModel):
 
         """
         for model in self._loss_models:
-            model._missing = missing
+            model.missing = missing
 
-    def _ensure_loss_parameter_availability(self):
-        """
-        Makes sure that all components have loss parameters.
-
-        """
-
+    def _ensure_loss_parameter_availability(self) -> None:
+        """Make sure that all components have loss parameters."""
         #
         # Repair Models (currently the only type supported)
         #
 
         required = []
+        assert self._loss_map is not None
         for dv in self.decision_variables:
             required.extend(
                 [(component, dv) for component in self._loss_map['Repair']]
@@ -1480,36 +1487,33 @@ class LossModel(PelicunModel):
         missing_set = set(required)
 
         for model in (self.ds_model, self.lf_model):
-            missing_set = missing_set - model._get_available()
+            missing_set -= model.get_available()
 
         if missing_set:
-            self.log.warn(
-                f"The loss model does not provide "
-                f"loss information for the following component(s) "
-                f"in the asset model: {sorted(list(missing_set))}."
+            self.log.warning(
+                f'The loss model does not provide '
+                f'loss information for the following component(s) '
+                f'in the asset model: {sorted(missing_set)}.'
             )
 
         self._missing = missing_set
 
 
 class RepairModel_Base(PelicunModel):
-    """
-    Base class for loss models
-
-    """
+    """Base class for loss models."""
 
     __slots__ = [
-        'loss_params',
-        'sample',
         'consequence',
         'decision_variables',
-        '_loss_map',
-        '_missing',
+        'loss_map',
+        'loss_params',
+        'missing',
+        'sample',
     ]
 
-    def __init__(self, assessment: AssessmentBase):
+    def __init__(self, assessment: AssessmentBase) -> None:
         """
-        Initializes RepairModel_Base objects.
+        Initialize RepairModel_Base objects.
 
         Parameters
         ----------
@@ -1522,15 +1526,16 @@ class RepairModel_Base(PelicunModel):
         self.loss_params: pd.DataFrame | None = None
         self.sample: pd.DataFrame | None = None
         self.consequence = 'Repair'
-        self.decision_variables: tuple[str, ...] = tuple()
-        self._loss_map: pd.DataFrame | None = None
-        self._missing: set = set()
+        self.decision_variables: tuple[str, ...] = ()
+        self.loss_map: pd.DataFrame | None = None
+        self.missing: set = set()
 
-    def _load_model_parameters(self, data: pd.DataFrame) -> None:
+    def load_model_parameters(self, data: pd.DataFrame) -> None:
         """
-        Load model parameters from a DataFrame, extending those
-        already available. Parameters already defined take precedence,
-        i.e. redefinitions of parameters are ignored.
+        Load model parameters from a DataFrame.
+
+        Extends those already available. Parameters already defined
+        take precedence, i.e. redefinitions of parameters are ignored.
 
         Parameters
         ----------
@@ -1538,7 +1543,6 @@ class RepairModel_Base(PelicunModel):
             Data with loss model information.
 
         """
-
         data.index.names = ['Loss Driver', 'Decision Variable']
 
         if self.loss_params is not None:
@@ -1553,14 +1557,15 @@ class RepairModel_Base(PelicunModel):
 
         self.loss_params = data
 
-    def _drop_unused_loss_parameters(self, loss_map: pd.DataFrame) -> None:
+    def drop_unused_loss_parameters(self, loss_map: pd.DataFrame) -> None:
         """
-        Removes loss parameter definitions for component IDs not
-        present in the loss map.
+        Remove loss parameter definitions.
+
+        Applicable to component IDs not present in the loss map.
 
         Parameters
         ----------
-        loss_map_path: str or pd.DataFrame or None
+        loss_map: str or pd.DataFrame or None
             Path to a csv file or DataFrame object that maps
             components IDs to their loss parameter definitions.
             Components in the asset model that are omitted from the
@@ -1568,15 +1573,14 @@ class RepairModel_Base(PelicunModel):
 
 
         """
-
         if self.loss_params is None:
             return
 
         # <backwards compatibility>
         if 'BldgRepair' in loss_map.columns:
             loss_map['Repair'] = loss_map['BldgRepair']
-            loss_map.drop('BldgRepair', axis=1, inplace=True)
-            self.log.warn(
+            loss_map = loss_map.drop('BldgRepair', axis=1)
+            self.log.warning(
                 '`BldgRepair` as a loss map column name is '
                 'deprecated and will be dropped in '
                 'future versions of pelicun. Please use `Repair` instead.'
@@ -1588,8 +1592,10 @@ class RepairModel_Base(PelicunModel):
         cmp_mask = self.loss_params.index.get_level_values(0).isin(cmp_set, level=0)
         self.loss_params = self.loss_params.iloc[cmp_mask, :]
 
-    def _remove_incomplete_components(self) -> None:
+    def remove_incomplete_components(self) -> None:
         """
+        Remove incomplete components.
+
         Removes components that have incomplete loss model
         definitions from the loss model parameters.
 
@@ -1604,45 +1610,41 @@ class RepairModel_Base(PelicunModel):
             self.loss_params[('Incomplete', '')] == 1
         ].index
 
-        self.loss_params.drop(cmp_incomplete_idx, inplace=True)
+        self.loss_params = self.loss_params.drop(cmp_incomplete_idx)
 
         if len(cmp_incomplete_idx) > 0:
             self.log.msg(
-                f"\n"
-                f"WARNING: Loss model information is incomplete for "
-                f"the following component(s) "
-                f"{cmp_incomplete_idx.to_list()}. They "
-                f"were removed from the analysis."
-                f"\n",
+                f'\n'
+                f'WARNING: Loss model information is incomplete for '
+                f'the following component(s) '
+                f'{cmp_incomplete_idx.to_list()}. They '
+                f'were removed from the analysis.'
+                f'\n',
                 prepend_timestamp=False,
             )
 
-    def _get_available(self) -> set:
-        """
-        Get a set of components for which loss parameters are
-        available.
-        """
+    def get_available(self) -> set:
+        """Get a set of components with available loss parameters."""
         if self.loss_params is not None:
             cmp_list = self.loss_params.index.to_list()
             return set(cmp_list)
         return set()
 
+    @abstractmethod
+    def convert_loss_parameter_units(self) -> None:
+        """Convert previously loaded loss parameters to base units."""
+
 
 class RepairModel_DS(RepairModel_Base):
-    """
-    Manages repair consequences driven by components that are modeled
-    with discrete Damage States (DS)
-
-    """
+    """Repair consequences for components with damage states."""
 
     __slots__ = ['RV_reg']
 
     def save_sample(
-        self, filepath: str | None = None, save_units: bool = False
+        self, filepath: str | None = None, *, save_units: bool = False
     ) -> None | pd.DataFrame | tuple[pd.DataFrame, pd.Series]:
         """
-        Saves the loss sample to a CSV file or returns it as a
-        DataFrame with optional units.
+        Save or return the loss sample.
 
         This method handles the storage of a sample of loss estimates,
         which can either be saved directly to a file or returned as a
@@ -1654,11 +1656,11 @@ class RepairModel_DS(RepairModel_Base):
 
         Parameters
         ----------
-        filepath : str, optional
+        filepath: str, optional
             The path to the file where the loss sample should be
             saved. If not provided, the sample is not saved to disk
             but returned.
-        save_units : bool, default: False
+        save_units: bool, default: False
             Indicates whether to include a row with unit information
             in the returned DataFrame. This parameter is ignored if a
             file path is provided.
@@ -1680,7 +1682,6 @@ class RepairModel_DS(RepairModel_Base):
             the specified `filepath`.
 
         """
-
         self.log.div()
         if filepath is not None:
             self.log.msg('Saving loss sample...')
@@ -1695,11 +1696,11 @@ class RepairModel_DS(RepairModel_Base):
 
         for cmp_id, dv_type in cmp_units.index:
             if (dv_type in valid_dv_types) and (cmp_id in valid_cmp_ids):
-                dv_units.loc[(dv_type, cmp_id)] = cmp_units.at[(cmp_id, dv_type)]
+                dv_units.loc[(dv_type, cmp_id)] = cmp_units.loc[(cmp_id, dv_type)]
 
         res = file_io.save_to_csv(
             self.sample,
-            filepath,
+            Path(filepath) if filepath is not None else None,
             units=dv_units,
             unit_conversion_factors=self._asmnt.unit_conversion_factors,
             use_simpleindex=(filepath is not None),
@@ -1711,8 +1712,8 @@ class RepairModel_DS(RepairModel_Base):
 
         assert isinstance(res, pd.DataFrame)
 
-        units = res.loc["Units"]
-        res.drop("Units", inplace=True)
+        units = res.loc['Units']
+        res = res.drop('Units')
         res = res.astype(float)
         assert isinstance(res, pd.DataFrame)
         assert isinstance(units, pd.Series)
@@ -1723,10 +1724,7 @@ class RepairModel_DS(RepairModel_Base):
         return res
 
     def load_sample(self, filepath: str | pd.DataFrame) -> None:
-        """
-        Load damage sample data.
-
-        """
+        """Load damage sample data."""
         self.log.div()
         self.log.msg('Loading loss sample...')
 
@@ -1739,10 +1737,9 @@ class RepairModel_DS(RepairModel_Base):
 
         self.log.msg('Loss sample successfully loaded.', prepend_timestamp=False)
 
-    def _calculate(self, dmg_quantities: pd.DataFrame) -> None:
+    def calculate(self, dmg_quantities: pd.DataFrame) -> None:  # noqa: C901
         """
-        Calculate the damage consequences of each damage state-driven
-        performance group in the asset.
+        Calculate damage consequences.
 
         Parameters
         ----------
@@ -1758,8 +1755,7 @@ class RepairModel_DS(RepairModel_Base):
             When any Loss Driver is not recognized.
 
         """
-
-        assert self._loss_map is not None
+        assert self.loss_map is not None
 
         sample_size = len(dmg_quantities)
 
@@ -1767,16 +1763,16 @@ class RepairModel_DS(RepairModel_Base):
         if set(dmg_quantities.columns.get_level_values('ds')) == {'0'}:
             self.sample = None
             self.log.msg(
-                "There is no damage---DV sample is set to None.",
+                'There is no damage---DV sample is set to None.',
                 prepend_timestamp=False,
             )
             return
 
         # calculate the quantities for economies of scale
-        self.log.msg("\nAggregating damage quantities...", prepend_timestamp=False)
+        self.log.msg('\nAggregating damage quantities...', prepend_timestamp=False)
 
-        if self._asmnt.options.eco_scale["AcrossFloors"]:
-            if self._asmnt.options.eco_scale["AcrossDamageStates"]:
+        if self._asmnt.options.eco_scale['AcrossFloors']:
+            if self._asmnt.options.eco_scale['AcrossDamageStates']:
                 eco_levels = [0]
                 eco_columns = ['cmp']
 
@@ -1784,7 +1780,7 @@ class RepairModel_DS(RepairModel_Base):
                 eco_levels = [0, 4]
                 eco_columns = ['cmp', 'ds']
 
-        elif self._asmnt.options.eco_scale["AcrossDamageStates"]:
+        elif self._asmnt.options.eco_scale['AcrossDamageStates']:
             eco_levels = [0, 1]
             eco_columns = ['cmp', 'loc']
 
@@ -1797,32 +1793,32 @@ class RepairModel_DS(RepairModel_Base):
         assert eco_qnt.columns.names == eco_columns
 
         self.log.msg(
-            "Successfully aggregated damage quantities.", prepend_timestamp=False
+            'Successfully aggregated damage quantities.', prepend_timestamp=False
         )
 
         # apply the median functions, if needed, to get median consequences for
         # each realization
         self.log.msg(
-            "\nCalculating the median repair consequences...",
+            '\nCalculating the median repair consequences...',
             prepend_timestamp=False,
         )
 
         medians = self._calc_median_consequence(eco_qnt)
 
         self.log.msg(
-            "Successfully determined median repair consequences.",
+            'Successfully determined median repair consequences.',
             prepend_timestamp=False,
         )
 
         # combine the median consequences with the samples of deviation from the
         # median to get the consequence realizations.
         self.log.msg(
-            "\nConsidering deviations from the median values to obtain "
-            "random DV sample..."
+            '\nConsidering deviations from the median values to obtain '
+            'random DV sample...'
         )
 
         self.log.msg(
-            "Preparing random variables for repair consequences...",
+            'Preparing random variables for repair consequences...',
             prepend_timestamp=False,
         )
         self.RV_reg = self._create_DV_RVs(dmg_quantities.columns)  # type: ignore
@@ -1837,33 +1833,31 @@ class RepairModel_DS(RepairModel_Base):
                 pd.DataFrame(self.RV_reg.RV_sample), axis=1
             )
             std_sample.columns.names = ['dv', 'cmp', 'ds', 'loc', 'dir', 'uid']
-            std_sample.sort_index(axis=1, inplace=True)
+            std_sample = std_sample.sort_index(axis=1)
 
         else:
             std_sample = None
 
         self.log.msg(
-            f"\nSuccessfully generated {sample_size} realizations of "
-            "deviation from the median consequences.",
+            f'\nSuccessfully generated {sample_size} realizations of '
+            'deviation from the median consequences.',
             prepend_timestamp=False,
         )
 
         res_list = []
         key_list: list[tuple[Any, ...]] = []
 
-        dmg_quantities.columns = (
-            dmg_quantities.columns.reorder_levels(  # type: ignore
-                ['cmp', 'ds', 'loc', 'dir', 'uid']
-            )
+        dmg_quantities.columns = dmg_quantities.columns.reorder_levels(  # type: ignore
+            ['cmp', 'ds', 'loc', 'dir', 'uid']
         )
-        dmg_quantities.sort_index(axis=1, inplace=True)
+        dmg_quantities = dmg_quantities.sort_index(axis=1)
 
         if std_sample is not None:
             std_dvs = std_sample.columns.unique(level=0)
         else:
             std_dvs = []
 
-        for decision_variable in self.decision_variables:
+        for decision_variable in self.decision_variables:  # noqa: PLR1702
             if decision_variable in std_dvs:
                 assert isinstance(std_sample, pd.DataFrame)
                 prob_cmp_list = std_sample[decision_variable].columns.unique(level=0)
@@ -1876,7 +1870,7 @@ class RepairModel_DS(RepairModel_Base):
                 continue
             for component in medians[decision_variable].columns.unique(level=0):
                 # check if there is damage in the component
-                consequence = self._loss_map.at[component, 'Repair']
+                consequence = self.loss_map.loc[component, 'Repair']
 
                 if component not in dmg_quantities.columns.get_level_values('cmp'):
                     continue
@@ -1896,11 +1890,11 @@ class RepairModel_DS(RepairModel_Base):
                         ].columns.unique(level=0)
                     ):
                         if (
-                            self._asmnt.options.eco_scale["AcrossFloors"] is True
+                            self._asmnt.options.eco_scale['AcrossFloors'] is True
                         ) and (loc_id > 0):
                             break
 
-                        if self._asmnt.options.eco_scale["AcrossFloors"] is True:
+                        if self._asmnt.options.eco_scale['AcrossFloors'] is True:
                             median_i = medians[decision_variable].loc[
                                 :, (component, ds)
                             ]
@@ -1950,21 +1944,21 @@ class RepairModel_DS(RepairModel_Base):
 
                         loc_list.append(loc)
 
-                    if self._asmnt.options.eco_scale["AcrossFloors"] is True:
+                    if self._asmnt.options.eco_scale['AcrossFloors'] is True:
                         ds_list += [
                             ds,
                         ]
                     else:
                         ds_list += [(ds, loc) for loc in loc_list]
 
-                if self._asmnt.options.eco_scale["AcrossFloors"] is True:
+                if self._asmnt.options.eco_scale['AcrossFloors'] is True:
                     cmp_list += [(consequence, component, ds) for ds in ds_list]
                 else:
                     cmp_list += [
                         (consequence, component, ds, loc) for ds, loc in ds_list
                     ]
 
-            if self._asmnt.options.eco_scale["AcrossFloors"] is True:
+            if self._asmnt.options.eco_scale['AcrossFloors'] is True:
                 key_list += [
                     (decision_variable, loss_cmp_i, dmg_cmp_i, ds)
                     for loss_cmp_i, dmg_cmp_i, ds in cmp_list
@@ -1976,18 +1970,15 @@ class RepairModel_DS(RepairModel_Base):
                 ]
 
         lvl_names = ['dv', 'loss', 'dmg', 'ds', 'loc', 'dir', 'uid']
-        DV_sample = pd.concat(res_list, axis=1, keys=key_list, names=lvl_names)
+        dv_sample = pd.concat(res_list, axis=1, keys=key_list, names=lvl_names)
 
-        DV_sample = DV_sample.fillna(0).convert_dtypes()
+        dv_sample = dv_sample.fillna(0).convert_dtypes()
 
-        self.log.msg("Successfully obtained DV sample.", prepend_timestamp=False)
-        self.sample = DV_sample
+        self.log.msg('Successfully obtained DV sample.', prepend_timestamp=False)
+        self.sample = dv_sample
 
-    def _convert_loss_parameter_units(self) -> None:
-        """
-        Converts previously loaded loss parameters to base units.
-
-        """
+    def convert_loss_parameter_units(self) -> None:
+        """Convert previously loaded loss parameters to base units."""
         if self.loss_params is None:
             return
         units = self.loss_params[('DV', 'Unit')]
@@ -1999,11 +1990,13 @@ class RepairModel_DS(RepairModel_Base):
             assert isinstance(params, pd.DataFrame)
             self.loss_params.loc[:, column] = self._convert_marginal_params(
                 params, units, arg_units
-            ).values
+            ).to_numpy()
 
-    def _drop_unused_damage_states(self) -> None:
+    def drop_unused_damage_states(self) -> None:
         """
-        Removes columns from the loss model parameters corresponding
+        Remove unused columns.
+
+        Remove columns from the loss model parameters corresponding
         to unused damage states.
 
         """
@@ -2028,14 +2021,16 @@ class RepairModel_DS(RepairModel_Base):
                 # but the way it's written now does what we want in
                 # each case.
             ):
-                ds_to_drop.append(damage_state)
+                ds_to_drop.append(damage_state)  # noqa: PERF401
 
-        self.loss_params.drop(columns=ds_to_drop, level=0, inplace=True)
+        self.loss_params = self.loss_params.drop(columns=ds_to_drop, level=0)
 
-    def _create_DV_RVs(
+    def _create_DV_RVs(  # noqa: N802, C901
         self, cases: pd.MultiIndex
     ) -> uq.RandomVariableRegistry | None:
         """
+        Prepare the random variables.
+
         Prepare the random variables associated with decision
         variables, such as repair cost and time.
 
@@ -2060,7 +2055,6 @@ class RepairModel_DS(RepairModel_Base):
             indicating a configuration or data input error.
 
         """
-
         # Convert the MultiIndex to a DataFrame
         case_df = pd.DataFrame(index=cases).reset_index()
         # maps `cmp` to array of damage states
@@ -2081,14 +2075,13 @@ class RepairModel_DS(RepairModel_Base):
         )
         damaged_components = set(cases.get_level_values('cmp'))
 
-        RV_reg = uq.RandomVariableRegistry(self._asmnt.options.rng)
+        rv_reg = uq.RandomVariableRegistry(self._asmnt.options.rng)
 
         rv_count = 0
 
         # for each component in the loss map
-        assert isinstance(self._loss_map, pd.DataFrame)
-        for component, consequence in self._loss_map['Repair'].items():
-
+        assert isinstance(self.loss_map, pd.DataFrame)
+        for component, consequence in self.loss_map['Repair'].items():
             # if that component does not have realized damage states,
             # skip it (e.g., this can happen when there is only
             # `collapse`).
@@ -2097,11 +2090,10 @@ class RepairModel_DS(RepairModel_Base):
 
             # for each DV
             for decision_variable in self.decision_variables:
-
                 # If loss parameters are missing for that consequence,
                 # don't estimate losses for it. A warning has already
                 # been issued for what is missing.
-                if (consequence, decision_variable) in self._missing:
+                if (consequence, decision_variable) in self.missing:
                     continue
 
                 # If loss parameters are missing for that consequence,
@@ -2119,7 +2111,6 @@ class RepairModel_DS(RepairModel_Base):
                 )
 
                 for ds in damage_states[component]:
-
                     if ds == '0':
                         continue
 
@@ -2143,7 +2134,7 @@ class RepairModel_DS(RepairModel_Base):
 
                     for loc, direction, uid in loc_dir_uid:
                         # assign RVs
-                        RV_reg.add_RV(
+                        rv_reg.add_RV(
                             uq.rv_class_map(ds_family)(  # type: ignore
                                 name=(
                                     f'{decision_variable}-{component}-'
@@ -2158,7 +2149,7 @@ class RepairModel_DS(RepairModel_Base):
         # assign Time-Cost correlation whenever applicable
         rho = self._asmnt.options.rho_cost_time
         if rho != 0.0:
-            for rv_tag in RV_reg.RV:
+            for rv_tag in rv_reg.RV:
                 if not rv_tag.startswith('Cost'):
                     continue
                 component = rv_tag.split('-')[1]
@@ -2167,26 +2158,28 @@ class RepairModel_DS(RepairModel_Base):
                 direction = rv_tag.split('-')[4]
                 uid = rv_tag.split('-')[5]
                 time_rv_tag = rv_tag.replace('Cost', 'Time')
-                if time_rv_tag in RV_reg.RV:
-                    RV_reg.add_RV_set(
+                if time_rv_tag in rv_reg.RV:
+                    rv_reg.add_RV_set(
                         uq.RandomVariableSet(
                             f'DV-{component}-{ds}-{loc}-{direction}-{uid}_set',
-                            list(RV_reg.RVs([rv_tag, time_rv_tag]).values()),
+                            list(rv_reg.RVs([rv_tag, time_rv_tag]).values()),
                             np.array([[1.0, rho], [rho, 1.0]]),
                         )
                     )
 
         self.log.msg(
-            f"\n{rv_count} random variables created.", prepend_timestamp=False
+            f'\n{rv_count} random variables created.', prepend_timestamp=False
         )
 
         if rv_count > 0:
-            return RV_reg
+            return rv_reg
         return None
 
-    def _calc_median_consequence(self, eco_qnt: pd.DataFrame) -> dict:
+    def _calc_median_consequence(self, eco_qnt: pd.DataFrame) -> dict:  # noqa: C901
         """
-        Calculates the median repair consequences for each loss
+        Calculate median reiapr consequences.
+
+        Calculate the median repair consequences for each loss
         component based on its quantity realizations and the
         associated loss parameters.
 
@@ -2220,18 +2213,17 @@ class RepairModel_DS(RepairModel_Base):
             If any loss driver types or distribution types are not
             recognized, or if the parameters are incomplete or
             unsupported.
-        """
 
+        """
         medians = {}
 
         for decision_variable in self.decision_variables:
             cmp_list = []
             median_list = []
 
-            assert self._loss_map is not None
-            for loss_cmp_id, loss_cmp_name in self._loss_map['Repair'].items():
-
-                if (loss_cmp_name, decision_variable) in self._missing:
+            assert self.loss_map is not None
+            for loss_cmp_id, loss_cmp_name in self.loss_map['Repair'].items():
+                if (loss_cmp_name, decision_variable) in self.missing:
                     continue
 
                 if loss_cmp_id not in eco_qnt.columns.get_level_values(0).unique():
@@ -2250,31 +2242,32 @@ class RepairModel_DS(RepairModel_Base):
                     if ds_id == '0':
                         continue
 
-                    loss_params_DS = self.loss_params.loc[
+                    loss_params_ds = self.loss_params.loc[
                         (loss_cmp_name, decision_variable), ds
                     ]
 
                     # check if theta_0 is defined
-                    theta_0 = loss_params_DS.get('Theta_0', np.nan)
+                    theta_0 = loss_params_ds.get('Theta_0', np.nan)
 
                     if pd.isna(theta_0):
                         continue
 
                     # check if the distribution type is supported
-                    family = loss_params_DS.get('Family', np.nan)
+                    family = loss_params_ds.get('Family', np.nan)
 
                     if (not pd.isna(family)) and (
-                        family not in ['normal', 'lognormal', 'deterministic']
+                        family not in {'normal', 'lognormal', 'deterministic'}
                     ):
-                        raise ValueError(
-                            f"Loss Distribution of type {family} " f"not supported."
+                        msg = (
+                            f'Loss Distribution of type {family} ' f'not supported.'
                         )
+                        raise ValueError(msg)
 
                     # If theta_0 is a scalar
                     try:
                         theta_0 = float(theta_0)
 
-                        if pd.isna(loss_params_DS.get('Family', np.nan)):
+                        if pd.isna(loss_params_ds.get('Family', np.nan)):
                             # if theta_0 is constant, then use it directly
                             f_median = _prep_constant_median_DV(theta_0)
 
@@ -2353,15 +2346,11 @@ class RepairModel_DS(RepairModel_Base):
 
 
 class RepairModel_LF(RepairModel_Base):
-    """
-    Manages repair consequences driven by components that are modeled
-    with Loss Functions (LF)
-
-    """
+    """Repair consequences for components with loss functions."""
 
     __slots__ = []
 
-    def _calculate(
+    def calculate(
         self,
         demand_sample: pd.DataFrame,
         cmp_sample: dict,
@@ -2370,14 +2359,26 @@ class RepairModel_LF(RepairModel_Base):
         nondirectional_multipliers: dict,
     ) -> None:
         """
-        Calculate the repair consequences of each loss function-driven
-        component block in the asset.
+        Calculate repair consequences.
 
         Parameters
         ----------
         demand_sample: pd.DataFrame
             The sample of the demand model to be used for the inputs
             of the loss functions.
+        cmp_sample: dict
+            Dict mapping each `cmp`-`loc`-`dir`-`uid` to the component
+            quantity realizations in the asset model in the form of
+            pd.Series objects.
+        cmp_marginal_params: pd.DataFrame
+            Dataframe containing component marginal distribution
+            parameters.
+        demand_offset: dict
+            Dictionary specifying the demand offset.
+        nondirectional_multipliers: dict
+            Dictionary specifying the non directional multipliers used
+            to combine the directional demands.
+
 
         Raises
         ------
@@ -2385,15 +2386,14 @@ class RepairModel_LF(RepairModel_Base):
             When any Loss Driver is not recognized.
 
         """
-
         if self.loss_params is None:
-            return None
+            return
 
-        assert self._loss_map is not None
-        loss_map = self._loss_map['Repair'].to_dict()
+        assert self.loss_map is not None
+        loss_map = self.loss_map['Repair'].to_dict()
         sample_size = len(demand_sample)
 
-        # TODO: this can be taken out and simply passed as blocks in
+        # TODO(JVM): this can be taken out and simply passed as blocks in
         # the arguments, and cast to a dict in here. Index can be
         # obtained from there.
         index = [
@@ -2410,7 +2410,7 @@ class RepairModel_LF(RepairModel_Base):
         performance_group_dict = {}
         for (component, location, direction, uid), num_blocks in blocks.items():
             for decision_variable in self.decision_variables:
-                if (component, decision_variable) in self._missing:
+                if (component, decision_variable) in self.missing:
                     continue
                 performance_group_dict[
                     ((component, decision_variable), location, direction, uid)
@@ -2418,10 +2418,10 @@ class RepairModel_LF(RepairModel_Base):
 
         if not performance_group_dict:
             self.log.msg(
-                "No loss function-driven components---LF sample is set to None.",
+                'No loss function-driven components---LF sample is set to None.',
                 prepend_timestamp=False,
             )
-            return None
+            return
 
         performance_group = pd.DataFrame(  # type: ignore
             performance_group_dict.values(),
@@ -2454,7 +2454,7 @@ class RepairModel_LF(RepairModel_Base):
         )
 
         self.log.msg(
-            "\nCalculating the median repair consequences...",
+            '\nCalculating the median repair consequences...',
             prepend_timestamp=False,
         )
 
@@ -2463,29 +2463,29 @@ class RepairModel_LF(RepairModel_Base):
         )
 
         self.log.msg(
-            "Successfully determined median repair consequences.",
+            'Successfully determined median repair consequences.',
             prepend_timestamp=False,
         )
 
         self.log.msg(
-            "\nConsidering deviations from the median values to obtain "
-            "random DV sample..."
+            '\nConsidering deviations from the median values to obtain '
+            'random DV sample...'
         )
 
         self.log.msg(
-            "Preparing random variables for repair cost and time...",
+            'Preparing random variables for repair cost and time...',
             prepend_timestamp=False,
         )
 
-        RV_reg = self._create_DV_RVs(medians.columns)  # type: ignore
-        if RV_reg is not None:
+        rv_reg = self._create_DV_RVs(medians.columns)  # type: ignore
+        if rv_reg is not None:
             assert self._asmnt.options.sampling_method is not None
-            RV_reg.generate_sample(
+            rv_reg.generate_sample(
                 sample_size=sample_size, method=self._asmnt.options.sampling_method
             )
 
             std_sample = base.convert_to_MultiIndex(
-                pd.DataFrame(RV_reg.RV_sample), axis=1
+                pd.DataFrame(rv_reg.RV_sample), axis=1
             )
             std_sample.columns.names = [
                 'dv',
@@ -2496,15 +2496,15 @@ class RepairModel_LF(RepairModel_Base):
                 'uid',
                 'block',
             ]
-            std_sample.sort_index(axis=1, inplace=True)
+            std_sample = std_sample.sort_index(axis=1)
             sample = (medians * std_sample).combine_first(medians)
 
         else:
             sample = medians
 
         self.log.msg(
-            f"\nSuccessfully generated {sample_size} realizations of "
-            "deviation from the median consequences.",
+            f'\nSuccessfully generated {sample_size} realizations of '
+            'deviation from the median consequences.',
             prepend_timestamp=False,
         )
 
@@ -2513,18 +2513,15 @@ class RepairModel_LF(RepairModel_Base):
             by=['dv', 'loss', 'dmg', 'loc', 'dir', 'uid'], axis=1
         ).sum()
 
-        self.log.msg("Successfully obtained DV sample.", prepend_timestamp=False)
+        self.log.msg('Successfully obtained DV sample.', prepend_timestamp=False)
         self.sample = sample
 
-        return None
+        return
 
-    def _convert_loss_parameter_units(self) -> None:
-        """
-        Converts previously loaded loss parameters to base units.
-
-        """
+    def convert_loss_parameter_units(self) -> None:
+        """Convert previously loaded loss parameters to base units."""
         if self.loss_params is None:
-            return None
+            return
         units = self.loss_params[('DV', 'Unit')]
         arg_units = self.loss_params[('Demand', 'Unit')]
         column = 'LossFunction'
@@ -2535,8 +2532,8 @@ class RepairModel_LF(RepairModel_Base):
             units,
             arg_units,
             divide_units=False,
-        ).values
-        return None
+        ).to_numpy()
+        return
 
     def _calc_median_consequence(
         self,
@@ -2547,6 +2544,8 @@ class RepairModel_LF(RepairModel_Base):
         cmp_sample: dict,
     ) -> pd.DataFrame:
         """
+        Calculate median repair consequences.
+
         Calculates the median repair consequences for each loss
         function-driven component based on its quantity realizations
         and the associated loss parameters.
@@ -2581,7 +2580,6 @@ class RepairModel_LF(RepairModel_Base):
             components.
 
         """
-
         medians_dict = {}
 
         # for each component in the asset model
@@ -2603,19 +2601,21 @@ class RepairModel_LF(RepairModel_Base):
             ]
             edp_values = demand_dict[edp]
             assert self.loss_params is not None
-            loss_function_str = self.loss_params.at[
+            loss_function_str = self.loss_params.loc[
                 (component, decision_variable), ('LossFunction', 'Theta_0')
             ]
+            assert isinstance(loss_function_str, str)
             try:
                 median_loss = base.stringterpolation(loss_function_str)(edp_values)
             except ValueError as exc:
-                raise ValueError(
+                msg = (
                     f'Loss function interpolation for consequence '
                     f'`{consequence}-{decision_variable}` has failed. '
                     f'Ensure a sufficient interpolation domain  '
                     f'for the X values (those after the `|` symbol)  '
                     f'and verify the X-value and Y-value lengths match.'
-                ) from exc
+                )
+                raise ValueError(msg) from exc
             for block in range(blocks):
                 medians_dict[
                     (
@@ -2629,21 +2629,21 @@ class RepairModel_LF(RepairModel_Base):
                     )
                 ] = (
                     median_loss
-                    * cmp_sample[component, location, direction, uid].values
+                    * cmp_sample[component, location, direction, uid].to_numpy()
                     / float(blocks)
                 )
 
         medians = pd.DataFrame(medians_dict)
         medians.columns.names = ['dv', 'loss', 'dmg', 'loc', 'dir', 'uid', 'block']
-        medians.sort_index(axis=1, inplace=True)
+        return medians.sort_index(axis=1)
 
-        return medians
-
-    def _create_DV_RVs(
+    def _create_DV_RVs(  # noqa: N802
         self, cases: pd.MultiIndex
     ) -> uq.RandomVariableRegistry | None:
         """
-        Prepare the random variables associated with decision
+        Prepare the decision variable random variables.
+
+        Prepares the random variables associated with decision
         variables, such as repair cost and time.
 
         Parameters
@@ -2662,8 +2662,7 @@ class RepairModel_LF(RepairModel_Base):
             or conditions), returns None.
 
         """
-
-        RV_reg = uq.RandomVariableRegistry(self._asmnt.options.rng)
+        rv_reg = uq.RandomVariableRegistry(self._asmnt.options.rng)
 
         rv_count = 0
 
@@ -2677,7 +2676,6 @@ class RepairModel_LF(RepairModel_Base):
             uid,
             block,
         ) in cases:
-
             # load the corresponding parameters
             assert self.loss_params is not None
             parameters = self.loss_params.loc[(consequence, decision_variable), :]
@@ -2685,7 +2683,7 @@ class RepairModel_LF(RepairModel_Base):
             if ('LossFunction', 'Family') not in parameters:
                 # Everything is deterministic, no need to create RVs.
                 continue
-            family = parameters.at[('LossFunction', 'Family')]
+            family = parameters.loc[('LossFunction', 'Family')]
             theta = [
                 parameters.get(('LossFunction', f'Theta_{t_i}'), np.nan)
                 for t_i in range(3)
@@ -2701,7 +2699,7 @@ class RepairModel_LF(RepairModel_Base):
             theta[0] = 1.0
 
             # assign RVs
-            RV_reg.add_RV(
+            rv_reg.add_RV(
                 uq.rv_class_map(family)(  # type: ignore
                     name=(
                         f'{decision_variable}-{consequence}-'
@@ -2716,7 +2714,7 @@ class RepairModel_LF(RepairModel_Base):
         # assign Time-Cost correlation whenever applicable
         rho = self._asmnt.options.rho_cost_time
         if rho != 0.0:
-            for rv_tag in RV_reg.RV:
+            for rv_tag in rv_reg.RV:
                 if not rv_tag.startswith('Cost'):
                     continue
                 split = rv_tag.split('-')
@@ -2727,30 +2725,30 @@ class RepairModel_LF(RepairModel_Base):
                 uid = split[5]
                 block = split[6]
                 time_rv_tag = rv_tag.replace('Cost', 'Time')
-                if time_rv_tag in RV_reg.RV:
-                    RV_reg.add_RV_set(
+                if time_rv_tag in rv_reg.RV:
+                    rv_reg.add_RV_set(
                         uq.RandomVariableSet(
                             (
                                 f'DV-{consequence}-{component}-'
                                 f'{location}-{direction}-{uid}-{block}_set'
                             ),
-                            list(RV_reg.RVs([rv_tag, time_rv_tag]).values()),
+                            list(rv_reg.RVs([rv_tag, time_rv_tag]).values()),
                             np.array([[1.0, rho], [rho, 1.0]]),
                         )
                     )
 
         self.log.msg(
-            f"\n{rv_count} random variables created.", prepend_timestamp=False
+            f'\n{rv_count} random variables created.', prepend_timestamp=False
         )
 
         if rv_count > 0:
-            return RV_reg
+            return rv_reg
         return None
 
 
-def _prep_constant_median_DV(median: float) -> Callable:
+def _prep_constant_median_DV(median: float) -> Callable:  # noqa: N802
     """
-    Returns a constant median Decision Variable (DV) function.
+    Return a constant median Decision Variable (DV) function.
 
     Parameters
     ----------
@@ -2765,20 +2763,17 @@ def _prep_constant_median_DV(median: float) -> Callable:
 
     """
 
-    def f(*args):
-        # pylint: disable=unused-argument
-        # pylint: disable=missing-return-doc
-        # pylint: disable=missing-return-type-doc
+    def f(*args):  # noqa: ANN002, ANN202, ARG001
         return median
 
     return f
 
 
-def _prep_bounded_multilinear_median_DV(
+def _prep_bounded_multilinear_median_DV(  # noqa: N802
     medians: np.ndarray, quantities: np.ndarray
 ) -> Callable:
     """
-    Returns a bounded multilinear median Decision Variable (DV) function.
+    Return a bounded multilinear median Decision Variable (DV) function.
 
     The median DV equals the min and max values when the quantity is
     outside of the prescribed quantity bounds. When the quantity is within the
@@ -2799,39 +2794,57 @@ def _prep_bounded_multilinear_median_DV(
     callable
         A function that returns the median DV given the quantity of damaged
         components.
+
     """
 
-    def f(quantity):
-        # pylint: disable=missing-return-doc
-        # pylint: disable=missing-return-type-doc
+    def f(quantity):  # noqa: ANN001, ANN202
         if quantity is None:
-            raise ValueError(
+            msg = (
                 'A bounded linear median Decision Variable function called '
                 'without specifying the quantity of damaged components'
             )
+            raise ValueError(msg)
 
         q_array = np.asarray(quantity, dtype=np.float64)
 
         # calculate the median consequence given the quantity of damaged
         # components
-        output = np.interp(q_array, quantities, medians)
-
-        return output
+        return np.interp(q_array, quantities, medians)
 
     return f
 
 
 def _is_for_lf_model(data: pd.DataFrame) -> bool:
     """
-    Determines if the specified loss model parameters are for
-    components modeled with Loss Functions (LF).
+    Determine if the data are for the lf_model.
+
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Data to be checked.
+
+    Returns
+    -------
+    bool
+        Whether the data are for the lf_model.
+
     """
     return 'LossFunction' in data.columns.get_level_values(0)
 
 
 def _is_for_ds_model(data: pd.DataFrame) -> bool:
     """
-    Determines if the specified loss model parameters are for
-    components modeled with discrete Damage States (DS).
+    Determine if the data are for the ds_model.
+
+    Parameters
+    ----------
+    data: pd.DataFrame
+        Data to be checked.
+
+    Returns
+    -------
+    bool
+        Whether the data are for the ds_model.
+
     """
     return 'DS1' in data.columns.get_level_values(0)
