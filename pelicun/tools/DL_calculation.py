@@ -1221,7 +1221,7 @@ def main() -> None:
         help='Generate detailed results (True/False). Defaults to True.',
     )
     parser.add_argument(
-        '--coupled_edp',
+        '--coupled_EDP',
         default=False,
         type=str2bool,
         nargs='?',
@@ -1301,7 +1301,7 @@ def main() -> None:
         custom_model_dir=args.custom_model_dir,
         output_format=args.output_format,
         detailed_results=args.detailed_results,
-        coupled_edp=args.coupled_edp,
+        coupled_edp=args.coupled_EDP,
     )
 
     log_msg('pelicun calculation completed.')
