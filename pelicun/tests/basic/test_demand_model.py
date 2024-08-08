@@ -60,7 +60,7 @@ if TYPE_CHECKING:
     from pelicun.assessment import Assessment
 
 
-class TestDemandModel(TestModelModule):
+class TestDemandModel(TestModelModule):  # noqa: PLR0904
     @pytest.fixture
     def demand_model(self, assessment_instance: Assessment) -> DemandModel:
         return deepcopy(assessment_instance.demand)
@@ -243,6 +243,44 @@ class TestDemandModel(TestModelModule):
         assert list(res.columns) == [('RID', '1', '1')]
         with pytest.raises(ValueError, match='Invalid method: `xyz`'):
             demand_model_with_sample.estimate_RID(demands, params, method='xyz')
+
+    def test_expand_sample_float(
+        self, demand_model_with_sample: DemandModel
+    ) -> None:
+        sample_before = ensure_value(demand_model_with_sample.sample).copy()
+        demand_model_with_sample.expand_sample('test_lab', 1.00, 'unitless')
+        sample_after = ensure_value(demand_model_with_sample.sample).copy()
+        pd.testing.assert_frame_equal(
+            sample_before, sample_after.drop('test_lab', axis=1)
+        )
+        assert sample_after.loc[0, ('test_lab', '0', '1')] == 1.0
+
+    def test_expand_sample_numpy(
+        self, demand_model_with_sample: DemandModel
+    ) -> None:
+        sample_before = ensure_value(demand_model_with_sample.sample).copy()
+        demand_model_with_sample.expand_sample(
+            'test_lab', np.array(1.00), 'unitless'
+        )
+        sample_after = ensure_value(demand_model_with_sample.sample).copy()
+        pd.testing.assert_frame_equal(
+            sample_before, sample_after.drop('test_lab', axis=1)
+        )
+        assert sample_after.loc[0, ('test_lab', '0', '1')] == 1.0
+
+    def test_expand_sample_error_no_sample(self, demand_model: DemandModel) -> None:
+        with pytest.raises(
+            ValueError, match='Demand model does not have a sample yet.'
+        ):
+            demand_model.expand_sample('test_lab', 1.00, 'unitless')
+
+    def test_expand_sample_error_wrong_shape(
+        self, demand_model_with_sample: DemandModel
+    ) -> None:
+        with pytest.raises(ValueError, match='Incompatible array length.'):
+            demand_model_with_sample.expand_sample(
+                'test_lab', np.array((1.00, 1.00)), 'unitless'
+            )
 
     def test_calibrate_model(
         self,
@@ -557,6 +595,7 @@ class TestDemandModel(TestModelModule):
     def test__assemble_required_demand_data(
         self, assessment_instance: Assessment
     ) -> None:
+        # Utility demand case: two demands are required
         damage_model = assessment_instance.damage
         cmp_set = {'testing.component'}
         damage_model.load_model_parameters(
