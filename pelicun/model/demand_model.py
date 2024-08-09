@@ -441,14 +441,19 @@ class DemandModel(PelicunModel):
         assert isinstance(demand_units, pd.Series)
         pid = demand_sample['PID']
         rid = self.estimate_RID(pid, params, method)
-        rid_units = pd.Series('rad', index=rid.columns)
+        rid_units = pd.Series('unitless', index=rid.columns)
         demand_sample_ext = pd.concat([demand_sample, rid], axis=1)
         units_ext = pd.concat([demand_units, rid_units])
         demand_sample_ext.loc['Units', :] = units_ext
         self.load_sample(demand_sample_ext)
 
     def expand_sample(
-        self, label: str, value: float, unit: str, location='0', direction='1'
+        self,
+        label: str,
+        value: float | np.ndarray,
+        unit: str,
+        location='0',
+        direction='1',
     ) -> None:
         """
         Adds an extra column to the demand sample.
@@ -461,7 +466,7 @@ class DemandModel(PelicunModel):
         ----------
         label: str
             Label to use to extend the MultiIndex of the demand sample.
-        value: float
+        value: float | np.ndarray
             Values to add to the rows of the additional column.
         unit: str
             Unit that corresponds to the additional column.
@@ -474,6 +479,8 @@ class DemandModel(PelicunModel):
         ------
         ValueError
             If the method is called before a sample is generated.
+        ValueError
+            If `value` is a numpy array of incorrect shape.
 
         """
         if self.sample is None:
@@ -481,6 +488,11 @@ class DemandModel(PelicunModel):
         sample_tuple = self.save_sample(save_units=True)
         assert isinstance(sample_tuple, tuple)
         demand_sample, demand_units = sample_tuple
+        if isinstance(value, np.ndarray):
+            value = np.atleast_1d(value)
+            assert isinstance(value, np.ndarray)
+            if len(value) != len(demand_sample):
+                raise ValueError('Incompatible array length.')
         demand_sample[(label, location, direction)] = value
         demand_units[(label, location, direction)] = unit
         demand_sample.loc['Units', :] = demand_units
@@ -1237,27 +1249,44 @@ def _get_required_demand_type(
 
         cmp = pg[0]
 
-        # Get the directional, offset, and demand_type parameters
-        # from the `model_parameters` DataFrame
-        directional = model_parameters.at[cmp, ('Demand', 'Directional')]
-        offset = model_parameters.at[cmp, ('Demand', 'Offset')]
-        demand_type = model_parameters.at[cmp, ('Demand', 'Type')]
-
         # Utility Demand: if there is an `Expression`, then load the
         # rest of the demand types.
         expression = model_parameters.loc[cmp, :].get(('Demand', 'Expression'))
         if expression is not None:
-            demand_types = []
-            for row, value in model_parameters.loc[cmp, 'Demand'].dropna().items():
-                if isinstance(row, str) and row.startswith('Type'):
-                    demand_types.append(value)
+            # get the number of variables in the expression using
+            # the numexpr library
+            parsed_expr = ne.NumExpr(_clean_up_expression(expression))
+            num_terms = len(parsed_expr.input_names)
+            demand_parameters_list = []
+            for i in range(num_terms):
+                if i == 0:
+                    index_lvl0 = 'Demand'
+                else:
+                    index_lvl0 = f'Demand{i + 1}'
+                demand_parameters_list.append(
+                    (
+                        model_parameters.loc[cmp, (index_lvl0, 'Type')],
+                        model_parameters.loc[cmp, (index_lvl0, 'Offset')],
+                        model_parameters.loc[cmp, (index_lvl0, 'Directional')],
+                    )
+                )
         else:
-            demand_types = [demand_type]
+            demand_parameters_list = [
+                (
+                    model_parameters.loc[cmp, ('Demand', 'Type')],
+                    model_parameters.loc[cmp, ('Demand', 'Offset')],
+                    model_parameters.loc[cmp, ('Demand', 'Directional')],
+                )
+            ]
 
         # Parse the demand type
 
         edps = []
-        for demand_type in demand_types:
+        for demand_parameters in demand_parameters_list:
+
+            demand_type = demand_parameters[0]
+            offset = demand_parameters[1]
+            directional = demand_parameters[2]
 
             assert isinstance(demand_type, str)
 

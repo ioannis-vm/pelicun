@@ -59,6 +59,7 @@ from pelicun.model.demand_model import _verify_edps_available
 from pelicun import base
 from pelicun import uq
 from pelicun import file_io
+from pelicun.warnings import InconsistentUnitsError
 
 if TYPE_CHECKING:
     from pelicun.assessment import AssessmentBase
@@ -75,12 +76,13 @@ class LossModel(PelicunModel):
 
     """
 
-    __slots__ = ['ds_model', 'lf_model']
+    __slots__ = ['ds_model', 'lf_model', 'dv_units']
 
     def __init__(
         self,
         assessment: AssessmentBase,
         decision_variables: tuple[str, ...] = ('Carbon', 'Cost', 'Energy', 'Time'),
+        dv_units: dict[str, str] | None = None,
     ):
         """
         Initializes LossModel objects.
@@ -102,6 +104,7 @@ class LossModel(PelicunModel):
         self.lf_model: RepairModel_LF = RepairModel_LF(assessment)
         self._loss_map = None
         self.decision_variables = decision_variables
+        self.dv_units = dv_units
 
     @property
     def sample(self):
@@ -306,6 +309,9 @@ class LossModel(PelicunModel):
         ValueError
             If the method can't parse the loss parameters in the
             specified paths.
+        InconsistentUnitsError
+            If there are different units used for the same decision
+            variable any of the data paths.
 
         """
 
@@ -342,6 +348,17 @@ class LossModel(PelicunModel):
                 data_path, None, orientation=1, reindex=False, log=self._asmnt.log
             )
             assert isinstance(data, pd.DataFrame)
+
+            # Check for unit consistency
+            data.index.names = ['cmp', 'dv']
+            units_isolated = data.reset_index()[[('dv', ''), ('DV', 'Unit')]]
+            units_isolated.columns = ['dv', 'Units']
+            units_isolated_grp = units_isolated.groupby('dv')['Units']
+            unit_counts = units_isolated_grp.nunique()
+            more_than_one = unit_counts[unit_counts > 1]
+            if not more_than_one.empty:
+                raise InconsistentUnitsError(file=data_path)
+
             # determine if the loss model parameters are for damage
             # states or loss functions
             if _is_for_ds_model(data):
@@ -371,6 +388,26 @@ class LossModel(PelicunModel):
 
         # drop unused damage state columns
         self.ds_model._drop_unused_damage_states()
+
+        #
+        # obtain DV units
+        #
+        dv_units: dict = {}
+        if self.ds_model.loss_params is not None:
+            dv_units.update(
+                self.ds_model.loss_params[('DV', 'Unit')]
+                .groupby(level=[1])
+                .agg(lambda x: x.value_counts().index[0])
+                .to_dict()
+            )
+        if self.lf_model.loss_params is not None:
+            dv_units.update(
+                self.lf_model.loss_params[('DV', 'Unit')]
+                .groupby(level=[1])
+                .agg(lambda x: x.value_counts().index[0])
+                .to_dict()
+            )
+        self.dv_units = dv_units
 
         #
         # convert units
@@ -664,7 +701,8 @@ class LossModel(PelicunModel):
             'in future versions of pelicun. Please use '
             '{loss model}.ds_model.load_sample instead.'
         )
-        self.ds_model.load_sample(filepath=filepath)
+        dv_units = self.ds_model.load_sample(filepath=filepath)
+        self.dv_units = dv_units
 
     def aggregate_losses(
         self,
@@ -885,20 +923,31 @@ class LossModel(PelicunModel):
             )
         for key in replacement_consequence_RV_reg.RV:
             if key not in self.decision_variables:
-                raise ValueError(
+                msg = (
                     f'`replacement_consequence_RV_reg` contains the key '
                     f'`{key}` which is not found in the active '
                     f'decision variables. These are: '
                     f'{self.decision_variables}.'
                 )
+                if self.query_error_setup(
+                    'Loss/ReplacementThreshold/RaiseOnUnknownKeys'
+                ):
+                    raise ValueError(msg)
+                self.log.warn(msg)
+
         for key in replacement_ratios:
             if key not in self.decision_variables:
-                raise ValueError(
+                msg = (
                     f'`replacement_ratios` contains the key '
                     f'`{key}` which is not found in the active '
                     f'decision variables. These are: '
                     f'{self.decision_variables}.'
                 )
+                if self.query_error_setup(
+                    'Loss/ReplacementThreshold/RaiseOnUnknownKeys'
+                ):
+                    raise ValueError(msg)
+                self.log.warn(msg)
         # The replacement_consequence_RV_reg should contain an RV for
         # all active DVs, regardless of whether there is a replacement
         # threshold for that DV, becauase when replacememnt is
@@ -1212,32 +1261,6 @@ class LossModel(PelicunModel):
             else:
                 df_agg = df_agg.drop(f'repair_{decision_variable.lower()}', axis=1)
 
-        cmp_units: dict = {}
-        if self.ds_model.loss_params is not None:
-            cmp_units.update(
-                self.ds_model.loss_params[('DV', 'Unit')]
-                .groupby(level=[1])
-                .agg(lambda x: x.value_counts().index[0])
-                .to_dict()
-            )
-        if self.lf_model.loss_params is not None:
-            cmp_units.update(
-                self.lf_model.loss_params[('DV', 'Unit')]
-                .groupby(level=[1])
-                .agg(lambda x: x.value_counts().index[0])
-                .to_dict()
-            )
-        # If the samples have been loaded to the loss model without
-        # loading loss parameter data, there will be no units here.
-        # In this case we assume default units.
-        if not cmp_units:
-            cmp_units = {
-                'Cost': 'USD_2011',
-                'Time': 'worker_day',
-                'Carbon': 'kg',
-                'Energy': 'MJ',
-            }
-
         # Convert units ..
         column_measures = [
             x.replace('repair_', '')
@@ -1245,7 +1268,7 @@ class LossModel(PelicunModel):
             .replace('-parallel', '')
             for x in df_agg.columns.get_level_values(0)
         ]
-        column_units = [cmp_units[x.title()] for x in column_measures]
+        column_units = [self.dv_units[x.title()] for x in column_measures]
         dv_units = pd.Series(column_units, index=df_agg.columns, name='Units')
         res = file_io.save_to_csv(
             df_agg,
@@ -1361,7 +1384,8 @@ class LossModel(PelicunModel):
             sample.loc[exceedance_realizations, col] = other_sample[
                 exceedance_realizations
             ]
-        # Remove all other realized consequences
+        # Remove all other realized consequences from the realizations
+        # where the threshold was exceeded.
         sample.loc[
             exceedance_realizations,
             sample.columns.get_level_values('dmg') != 'threshold_exceedance',
@@ -1722,22 +1746,51 @@ class RepairModel_DS(RepairModel_Base):
 
         return res
 
-    def load_sample(self, filepath: str | pd.DataFrame) -> None:
+    def load_sample(self, filepath: str | pd.DataFrame) -> dict[str, str]:
         """
         Load damage sample data.
 
+        Parameters
+        ----------
+        filepath: str
+          Path to an existing sample stored in a file, or dataframe
+          containing the existing sample.
+
+        Returns
+        -------
+        dict[str, str]
+          Dictionary mapping each decision variable to its assigned
+          unit.
+
         """
+        names = ['dv', 'loss', 'dmg', 'ds', 'loc', 'dir', 'uid']
         self.log.div()
         self.log.msg('Loading loss sample...')
 
-        sample = file_io.load_data(
-            filepath, self._asmnt.unit_conversion_factors, log=self._asmnt.log
+        sample, units = file_io.load_data(
+            filepath,
+            self._asmnt.unit_conversion_factors,
+            log=self._asmnt.log,
+            return_units=True,
         )
-        assert isinstance(sample, pd.DataFrame)
+        units.index.names = names
+        # Obtain the DV units
+        # Note: we don't need to check for consistency (all rows
+        # having the same unit) since the units are extracted from a
+        # single row in the CSV, affecting all subsequent rows.
+        units_isolated = (
+            units.reset_index()[['dv', 'Units']]
+            .set_index('dv')
+            .groupby('dv')['Units']
+        )
+        dv_units = units_isolated.first().to_dict()
+
         self.sample = sample
-        self.sample.columns.names = ['dv', 'loss', 'dmg', 'ds', 'loc', 'dir', 'uid']
+        self.sample.columns.names = names
 
         self.log.msg('Loss sample successfully loaded.', prepend_timestamp=False)
+
+        return dv_units
 
     def _calculate(self, dmg_quantities: pd.DataFrame) -> None:
         """

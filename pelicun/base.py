@@ -158,6 +158,7 @@ class Options:
         'nondir_multi_dict',
         'rho_cost_time',
         'eco_scale',
+        'error_setup',
         'log',
     ]
 
@@ -202,6 +203,8 @@ class Options:
         self.nondir_multi_dict = merged_config_options['NonDirectionalMultipliers']
         self.rho_cost_time = merged_config_options['RepairCostAndTimeCorrelation']
         self.eco_scale = merged_config_options['EconomiesOfScale']
+
+        self.error_setup = merged_config_options['ErrorSetup']
 
         # instantiate a Logger object with the finalized configuration
         self.log = Logger(
@@ -1595,9 +1598,7 @@ def invert_mapping(original_dict: dict) -> dict:
     return inverted_dict
 
 
-def get(
-    d: dict | None, path: str, default: Any | None = None
-) -> Any:
+def get(d: dict | None, path: str, default: Any | None = None) -> Any:
     """
     Retrieve a value from a nested dictionary using a path with '/' as
     the separator.
