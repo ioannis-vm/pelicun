@@ -1,0 +1,10 @@
+.. _cite:
+
+Citing Pelicun in Research Publications
+---------------------------------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Sample text.

@@ -1,0 +1,15 @@
+.. _pelicun_framework:
+
+The pelicun framework
+---------------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Section objectives:
+
+- introduce the pelicun framework
+- define terminology
+- describe the components of pelicun and how they interact with each other
+- provide a set of reference documents on loss estimation frameworks

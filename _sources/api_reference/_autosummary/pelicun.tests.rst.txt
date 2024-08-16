@@ -1,0 +1,34 @@
+pelicun.tests
+=============
+
+.. automodule:: pelicun.tests
+   :members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   code_repetition_checker
+   util
+

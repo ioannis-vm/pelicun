@@ -1,0 +1,14 @@
+.. _new_python_users:
+
+Resources for new python users
+------------------------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Section objectives:
+
+- help those who have never used python before install python on their system, install pelicun and get started, assuming no prior experience
+- include step-by-step instructions for a VS Code and Jupyter notebook setup (to help those who want to get started from scratch avoid having to navigate external links), but mention we don't endorse any specific editor
+- mention where to get help (past NHERI Symposium recordings and other available material we have)

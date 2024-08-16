@@ -1,0 +1,7 @@
+html {
+    --pst-font-family-base: Montserrat, var(--pst-font-family-base-system);
+    --pst-font-size-base: 17px;
+    --pst-font-family-heading: Palatino, var(--pst-font-family-base-system);
+    --pst-font-family-monospace: Courier, var(--pst-font-family-monospace-system);
+}
+

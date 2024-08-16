@@ -1,0 +1,10 @@
+.. _brand_logo:
+
+Branding and logo
+-----------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Sample text.

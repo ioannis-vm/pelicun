@@ -1,0 +1,19 @@
+.. _developer_guide:
+
+***************
+Developer Guide
+***************
+
+Welcome to the pelicun developer guide.
+The following pages contain information on setting up a development environment, our code quality requirements, our code of conduct, and information on the submission process.
+Thank you for your interest in extending pelicun.
+We are looking forward to your contributions!
+
+.. toctree::
+   :maxdepth: 1
+
+   code_of_conduct
+   contributing
+   development_environment
+   code_quality
+   internals

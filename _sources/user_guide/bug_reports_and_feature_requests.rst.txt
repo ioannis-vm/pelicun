@@ -1,0 +1,10 @@
+.. _bug_reports_and_feature_requests:
+
+Bug reports and feature requests
+--------------------------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Sample text.

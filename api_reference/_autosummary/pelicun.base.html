@@ -1,0 +1,1640 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pelicun.base &#8212; pelicun  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=a96cf9eb" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api_reference/_autosummary/pelicun.base';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pelicun.file_io" href="pelicun.file_io.html" />
+    <link rel="prev" title="pelicun.auto" href="pelicun.auto.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pelicun.svg" class="logo__image only-light" alt="pelicun  documentation - Home"/>
+    <script>document.write(`<img src="../../_static/pelicun_dark.svg" class="logo__image only-dark" alt="pelicun  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/index.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Release Notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NHERI-SimCenter/pelicun" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/orgs/NHERI-SimCenter/discussions" title="Discussions" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-regular fa-message fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discussions</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NHERI-SimCenter/pelicun/issues" title="Issues" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-regular fa-circle-dot fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Issues</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../developer_guide/index.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release_notes/index.html">
+    Release Notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NHERI-SimCenter/pelicun" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/orgs/NHERI-SimCenter/discussions" title="Discussions" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-regular fa-message fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Discussions</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NHERI-SimCenter/pelicun/issues" title="Issues" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-regular fa-circle-dot fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Issues</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="pelicun.html">pelicun</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pelicun.assessment.html">pelicun.assessment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pelicun.auto.html">pelicun.auto</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">pelicun.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pelicun.file_io.html">pelicun.file_io</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pelicun.model.html">pelicun.model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.model.asset_model.html">pelicun.model.asset_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.model.damage_model.html">pelicun.model.damage_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.model.demand_model.html">pelicun.model.demand_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.model.loss_model.html">pelicun.model.loss_model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.model.pelicun_model.html">pelicun.model.pelicun_model</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pelicun.tests.html">pelicun.tests</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.tests.code_repetition_checker.html">pelicun.tests.code_repetition_checker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pelicun.tests.util.html">pelicun.tests.util</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="pelicun.uq.html">pelicun.uq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pelicun.warnings.html">pelicun.warnings</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="pelicun.html" class="nav-link">pelicun</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">pelicun.base</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pelicun.base">
+<span id="pelicun-base"></span><h1>pelicun.base<a class="headerlink" href="#module-pelicun.base" title="Link to this heading">#</a></h1>
+<p>This module defines constants, basic classes and methods for pelicun.</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.control_warnings" title="pelicun.base.control_warnings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">control_warnings</span></code></a>()</p></td>
+<td><p>Convenience function to turn warnings on/off</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.convert_dtypes" title="pelicun.base.convert_dtypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_dtypes</span></code></a>(dataframe)</p></td>
+<td><p>Convert columns to a numeric datatype whenever possible.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.convert_to_MultiIndex" title="pelicun.base.convert_to_MultiIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_MultiIndex</span></code></a>(data[, axis, inplace])</p></td>
+<td><p>Converts the index of a DataFrame to a MultiIndex</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.convert_to_SimpleIndex" title="pelicun.base.convert_to_SimpleIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_SimpleIndex</span></code></a>(data[, axis, inplace])</p></td>
+<td><p>Converts the index of a DataFrame to a simple, one-level index</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.convert_units" title="pelicun.base.convert_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_units</span></code></a>(values, unit, to_unit[, category])</p></td>
+<td><p>Converts numeric values between different units.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.dedupe_index" title="pelicun.base.dedupe_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dedupe_index</span></code></a>(dataframe[, dtype])</p></td>
+<td><p>Modifies the index of a DataFrame to ensure all index elements are unique by adding an extra level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.describe" title="pelicun.base.describe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe</span></code></a>(df[, percentiles])</p></td>
+<td><p>Provides extended descriptive statistics for given data, including percentiles and log standard deviation for applicable columns.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.dict_raise_on_duplicates" title="pelicun.base.dict_raise_on_duplicates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_raise_on_duplicates</span></code></a>(ordered_pairs)</p></td>
+<td><p>Constructs a dictionary from a list of key-value pairs, raising an exception if duplicate keys are found.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.float_or_None" title="pelicun.base.float_or_None"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float_or_None</span></code></a>(string)</p></td>
+<td><p>This is a convenience function for converting strings to float or None</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.get" title="pelicun.base.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>(d, path[, default])</p></td>
+<td><p>Retrieve a value from a nested dictionary using a path with '/' as the separator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.int_or_None" title="pelicun.base.int_or_None"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int_or_None</span></code></a>(string)</p></td>
+<td><p>This is a convenience function for converting strings to int or None</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.invert_mapping" title="pelicun.base.invert_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invert_mapping</span></code></a>(original_dict)</p></td>
+<td><p>Inverts a dictionary mapping from key to list of values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.is_specified" title="pelicun.base.is_specified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_specified</span></code></a>(d, path)</p></td>
+<td><p>Opposite of <cite>is_unspecified()</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.is_unspecified" title="pelicun.base.is_unspecified"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_unspecified</span></code></a>(d, path)</p></td>
+<td><p>Check if a value in a nested dictionary is either non-existent, None, NaN, or an empty dictionary or list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.load_default_options" title="pelicun.base.load_default_options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_default_options</span></code></a>()</p></td>
+<td><p>Load the default_config.json file to set options to default values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.merge_default_config" title="pelicun.base.merge_default_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_default_config</span></code></a>(user_config)</p></td>
+<td><p>Merge the user-specified config with the configuration defined in the default_config.json file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.multiply_factor_multiple_levels" title="pelicun.base.multiply_factor_multiple_levels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiply_factor_multiple_levels</span></code></a>(df, ...[, ...])</p></td>
+<td><p>Multiply a value to selected rows of a DataFrame that is indexed with a hierarchical index (pd.MultiIndex).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.parse_units" title="pelicun.base.parse_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_units</span></code></a>([custom_file, preserve_categories])</p></td>
+<td><p>Parse the unit conversion factor JSON file and return a dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.show_matrix" title="pelicun.base.show_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_matrix</span></code></a>(data[, use_describe])</p></td>
+<td><p>Print a matrix in a nice way using a DataFrame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.split_file_name" title="pelicun.base.split_file_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_file_name</span></code></a>(file_path)</p></td>
+<td><p>Separates a file name from the extension accounting for the case where the file name itself contains periods.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.str2bool" title="pelicun.base.str2bool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str2bool</span></code></a>(v)</p></td>
+<td><p>Converts a string representation of truth to boolean True or False.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.stringterpolation" title="pelicun.base.stringterpolation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stringterpolation</span></code></a>(arguments)</p></td>
+<td><p>Turns a string of specially formatted arguments into a multilinear interpolating function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.update" title="pelicun.base.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(d, path, value[, only_if_empty_or_none])</p></td>
+<td><p>Set a value in a nested dictionary using a path with '/' as the separator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.update_vals" title="pelicun.base.update_vals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_vals</span></code></a>(update_value, primary, ...)</p></td>
+<td><p>Updates the values of the <cite>update</cite> nested dictionary with those provided in the <cite>primary</cite> nested dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.with_parsed_str_na_values" title="pelicun.base.with_parsed_str_na_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with_parsed_str_na_values</span></code></a>(df)</p></td>
+<td><p>Given a dataframe, this function identifies values that have string type and can be interpreted as N/A, and replaces them with actual NA's.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.Logger" title="pelicun.base.Logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Logger</span></code></a>(verbose, log_show_ms, log_file, print_log)</p></td>
+<td><p>Logger objects are used to generate log files documenting execution events and related messages.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.Options" title="pelicun.base.Options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Options</span></code></a>(user_config_options[, assessment])</p></td>
+<td><p>Options objects store analysis options and the logging configuration.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="pelicun.base.Logger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">Logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_show_ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger" title="Link to this definition">#</a></dt>
+<dd><p>Logger objects are used to generate log files documenting
+execution events and related messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>verbose: bool</strong></dt><dd><p>If True, the pelicun echoes more information throughout the
+assessment.  This can be useful for debugging purposes. The
+value is specified in the user’s configuration dictionary,
+otherwise left as provided in the default configuration file
+(see settings/default_config.json in the pelicun source code).</p>
+</dd>
+<dt><strong>log_show_ms: bool</strong></dt><dd><p>If True, the timestamps in the log file are in microsecond
+precision. The value is specified in the user’s configuration
+dictionary, otherwise left as provided in the default
+configuration file (see settings/default_config.json in the
+pelicun source code).</p>
+</dd>
+<dt><strong>log_file: str, optional</strong></dt><dd><p>If a value is provided, the log is written to that file. The
+value is specified in the user’s configuration dictionary,
+otherwise left as provided in the default configuration file
+(see settings/default_config.json in the pelicun source code).</p>
+</dd>
+<dt><strong>print_log: bool</strong></dt><dd><p>If True, the log is also printed to standard output. The
+value is specified in the user’s configuration dictionary,
+otherwise left as provided in the default configuration file
+(see settings/default_config.json in the pelicun source code).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.add_warning">
+<span class="sig-name descname"><span class="pre">add_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.add_warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.add_warning" title="Link to this definition">#</a></dt>
+<dd><p>Adds a warning to the warning stack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg: str</strong></dt><dd><p>The warning message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Warnings are only emitted when <cite>emit_warnings</cite> is called.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.div">
+<span class="sig-name descname"><span class="pre">div</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prepend_timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.div"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.div" title="Link to this definition">#</a></dt>
+<dd><p>Adds a divider line in the log file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.emit_warnings">
+<span class="sig-name descname"><span class="pre">emit_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.emit_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.emit_warnings" title="Link to this definition">#</a></dt>
+<dd><p>Issues all warnings and clears the warning stack.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.msg">
+<span class="sig-name descname"><span class="pre">msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend_timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend_blank_space</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.msg" title="Link to this definition">#</a></dt>
+<dd><p>Writes a message in the log file with the current time as prefix</p>
+<p>The time is in ISO-8601 format, e.g. 2018-06-16T20:24:04Z</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg: string</strong></dt><dd><p>Message to print.</p>
+</dd>
+<dt><strong>prepend_timestamp: bool</strong></dt><dd><p>Controls whether a timestamp is placed before the message.</p>
+</dd>
+<dt><strong>prepend_blank_space: bool</strong></dt><dd><p>Controls whether blank space is placed before the message.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.print_system_info">
+<span class="sig-name descname"><span class="pre">print_system_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.print_system_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.print_system_info" title="Link to this definition">#</a></dt>
+<dd><p>Writes system information in the log.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.reset_log_strings">
+<span class="sig-name descname"><span class="pre">reset_log_strings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.reset_log_strings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.reset_log_strings" title="Link to this definition">#</a></dt>
+<dd><p>Populates the string-related attributes of the logger</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.Logger.warn">
+<span class="sig-name descname"><span class="pre">warn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#Logger.warn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Logger.warn" title="Link to this definition">#</a></dt>
+<dd><p>Add an emit a warning immediately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>msg: str</strong></dt><dd><p>Warning message</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pelicun.base.Options">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">Options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_config_options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">assessment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pelicun.assessment.html#pelicun.assessment.AssessmentBase" title="pelicun.assessment.AssessmentBase"><span class="pre">AssessmentBase</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pelicun/base.html#Options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.Options" title="Link to this definition">#</a></dt>
+<dd><p>Options objects store analysis options and the logging
+configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sampling_method: str</strong></dt><dd><p>Sampling method to use. Specified in the user’s configuration
+dictionary, otherwise left as provided in the default configuration
+file (see settings/default_config.json in the pelicun source
+code). Can be any of [‘LHS’, ‘LHS_midpoint’,
+‘MonteCarlo’]. The default is ‘LHS’.</p>
+</dd>
+<dt><strong>units_file: str</strong></dt><dd><p>Location of a user-specified units file, which should contain
+the names of supported units and their conversion factors (the
+value some quantity of a given unit needs to be multiplied to
+be expressed in the base units). Value specified in the user
+configuration dictionary. Pelicun comes with a set of default
+units which are always loaded (see
+<cite>settings/default_units.json</cite> in the pelicun source
+code). Units specified in the units_file overwrite the default
+units.</p>
+</dd>
+<dt><strong>demand_offset: dict</strong></dt><dd><p>Demand offsets are used in the process of mapping a component
+location to its associated EDP. This allows components that
+are sensitive to EDPs of different levels to be specified as
+present at the same location (e.g. think of desktop computer
+and suspended ceiling, both at the same story). Each
+component’s offset value is specified in the component
+fragility database. This setting applies a supplemental global
+offset to specific EDP types. The value is specified in the
+user’s configuration dictionary, otherwise left as provided in
+the default configuration file (see
+settings/default_config.json in the pelicun source code).</p>
+</dd>
+<dt><strong>nondir_multi_dict: dict</strong></dt><dd><p>Nondirectional components are sensitive to demands coming in
+any direction. Results are typically available in two
+orthogonal directions. FEMA P-58 suggests using the formula
+<cite>max(dir_1, dir_2) * 1.2</cite> to estimate the demand for such
+components. This parameter allows modifying the 1.2 multiplier
+with a user-specified value. The change can be applied to
+“ALL” EDPs, or for specific EDPs, such as “PFA”, “PFV”,
+etc. The value is specified in the user’s configuration
+dictionary, otherwise left as provided in the default
+configuration file (see settings/default_config.json in the
+pelicun source code).</p>
+</dd>
+<dt><strong>rho_cost_time: float</strong></dt><dd><p>Specifies the correlation between the repair cost and repair
+time consequences. The value is specified in the user’s
+configuration dictionary, otherwise left as provided in the
+default configuration file (see
+“RepairCostAndTimeCorrelation”) (see
+settings/default_config.json in the pelicun source code).</p>
+</dd>
+<dt><strong>eco_scale: dict</strong></dt><dd><p>Controls how the effects of economies of scale are handled in
+the damaged component quantity aggregation for loss measure
+estimation. The dictionary is specified in the user’s
+configuration dictionary, otherwise left as provided in the
+default configuration file (see settings/default_config.json
+in the pelicun source code).</p>
+</dd>
+<dt><strong>log: Logger</strong></dt><dd><p>Logger object. Configuration parameters coming from the user’s
+configuration dictionary or the default configuration file
+control logging behavior. See Logger class.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pelicun.base.Options.rng">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.0)"><span class="pre">Generator</span></a></em><a class="headerlink" href="#pelicun.base.Options.rng" title="Link to this definition">#</a></dt>
+<dd><p>rng property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Generator</dt><dd><p>Random generator</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pelicun.base.Options.seed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></em><a class="headerlink" href="#pelicun.base.Options.seed" title="Link to this definition">#</a></dt>
+<dd><p>Seed property</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>float</dt><dd><p>Seed value</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.control_warnings">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">control_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#control_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.control_warnings" title="Link to this definition">#</a></dt>
+<dd><p>Convenience function to turn warnings on/off</p>
+<blockquote>
+<div><p>See also: <cite>pelicun/pytest.ini</cite>. Devs: make sure to update that
+file when addressing &amp; eliminating warnings.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.convert_dtypes">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">convert_dtypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#convert_dtypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.convert_dtypes" title="Link to this definition">#</a></dt>
+<dd><p>Convert columns to a numeric datatype whenever possible. The
+function replaces None with NA otherwise columns containing None
+would continue to have the <cite>object</cite> type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataframe: DataFrame</strong></dt><dd><p>The DataFrame that will be modified.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>DataFrame</dt><dd><p>The modified DataFrame.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.convert_to_MultiIndex">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">convert_to_MultiIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Series</span></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#convert_to_MultiIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.convert_to_MultiIndex" title="Link to this definition">#</a></dt>
+<dd><p>Converts the index of a DataFrame to a MultiIndex</p>
+<p>We assume that the index uses standard SimCenter convention to
+identify different levels: a dash character (‘-’) is expected to
+separate each level of the index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: DataFrame</strong></dt><dd><p>The DataFrame that will be modified.</p>
+</dd>
+<dt><strong>axis: int, optional, default:0</strong></dt><dd><p>Identifies if the index (0) or the columns (1) shall be
+edited.</p>
+</dd>
+<dt><strong>inplace: bool, optional, default:False</strong></dt><dd><p>If yes, the operation is performed directly on the input
+DataFrame and not on a copy of it.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>DataFrame</dt><dd><p>The modified DataFrame.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If an invalid axis is specified.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.convert_to_SimpleIndex">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">convert_to_SimpleIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#convert_to_SimpleIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.convert_to_SimpleIndex" title="Link to this definition">#</a></dt>
+<dd><p>Converts the index of a DataFrame to a simple, one-level index</p>
+<p>The target index uses standard SimCenter convention to identify
+different levels: a dash character (‘-’) is used to separate each
+level of the index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data: DataFrame</strong></dt><dd><p>The DataFrame that will be modified.</p>
+</dd>
+<dt><strong>axis: int, optional, default:0</strong></dt><dd><p>Identifies if the index (0) or the columns (1) shall be
+edited.</p>
+</dd>
+<dt><strong>inplace: bool, optional, default:False</strong></dt><dd><p>If yes, the operation is performed directly on the input
+DataFrame and not on a copy of it.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>DataFrame</dt><dd><p>The modified DataFrame</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>When an invalid axis parameter is specified</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.convert_units">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">convert_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#convert_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.convert_units" title="Link to this definition">#</a></dt>
+<dd><p>Converts numeric values between different units.</p>
+<p>Supports conversion within a specified category of units and
+automatically infers the category if not explicitly provided. It
+maintains the type of the input in the output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>values (float | list[float] | np.ndarray):</strong></dt><dd><p>The numeric value(s) to convert.</p>
+</dd>
+<dt><strong>unit (str):</strong></dt><dd><p>The current unit of the values.</p>
+</dd>
+<dt><strong>to_unit (str):</strong></dt><dd><p>The target unit to convert the values into.</p>
+</dd>
+<dt><strong>category (Optional[str]):</strong></dt><dd><p>The category of the units (e.g., ‘length’, ‘pressure’). If not
+provided, the category will be inferred based on the provided
+units.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>float or list[float] or np.ndarray</dt><dd><p>The converted value(s) in the target unit, in the same data type
+as the input values.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>TypeError</dt><dd><p>If the input <cite>values</cite> are not of type float, list, or
+np.ndarray.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the <cite>unit</cite>, <cite>to_unit</cite>, or <cite>category</cite> is unknown or if <cite>unit</cite>
+and <cite>to_unit</cite> are not in the same category.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.dedupe_index">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">dedupe_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe:</span> <span class="pre">~pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype:</span> <span class="pre">type</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#dedupe_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.dedupe_index" title="Link to this definition">#</a></dt>
+<dd><p>Modifies the index of a DataFrame to ensure all index elements are
+unique by adding an extra level.  Assumes that the DataFrame’s
+original index is a MultiIndex with specified names. A unique
+identifier (‘uid’) is added as an additional index level based on
+the cumulative count of occurrences of the original index
+combinations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataframe</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The DataFrame whose index is to be modified. It must have a
+MultiIndex.</p>
+</dd>
+<dt><strong>dtype</strong><span class="classifier">type, optional</span></dt><dd><p>The data type for the new index level ‘uid’. Defaults to str.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function changes the DataFrame in place, hence it does not
+return the DataFrame but modifies the original one provided.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.describe">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.001,</span> <span class="pre">0.023,</span> <span class="pre">0.1,</span> <span class="pre">0.159,</span> <span class="pre">0.5,</span> <span class="pre">0.841,</span> <span class="pre">0.9,</span> <span class="pre">0.977,</span> <span class="pre">0.999)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pelicun/base.html#describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.describe" title="Link to this definition">#</a></dt>
+<dd><p>Provides extended descriptive statistics for given data, including
+percentiles and log standard deviation for applicable columns.</p>
+<p>This function accepts both pandas Series and DataFrame objects
+directly, or any array-like structure which can be converted to
+them. It calculates common descriptive statistics and optionally
+adds log standard deviation for columns where all values are
+positive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>df</strong><span class="classifier">pd.Series, pd.DataFrame, or array-like</span></dt><dd><p>The data to describe. If array-like, it is converted to a
+DataFrame or Series before analysis.</p>
+</dd>
+<dt><strong>percentiles</strong><span class="classifier">tuple of float, optional</span></dt><dd><p>Specific percentiles to include in the output. Default
+includes an extensive range tailored to provide a detailed
+summary.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>A DataFrame containing the descriptive statistics of the input
+data, transposed so that each descriptive statistic is a row.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.dict_raise_on_duplicates">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">dict_raise_on_duplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ordered_pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#dict_raise_on_duplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.dict_raise_on_duplicates" title="Link to this definition">#</a></dt>
+<dd><p>Constructs a dictionary from a list of key-value pairs, raising an
+exception if duplicate keys are found.</p>
+<p>This function ensures that no two pairs have the same key. It is
+particularly useful when parsing JSON-like data where unique keys
+are expected but not enforced by standard parsing methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ordered_pairs</strong><span class="classifier">list of tuples</span></dt><dd><p>A list of tuples, each containing a key and a value. Keys are
+expected to be unique across the list.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary constructed from the ordered_pairs without any
+duplicates.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If a duplicate key is found in the input list, a ValueError is
+raised with a message indicating the duplicate key.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This implementation is useful for contexts in which data integrity
+is crucial and key uniqueness must be ensured.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_raise_on_duplicates</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[(</span><span class="s2">&quot;key1&quot;</span><span class="p">,</span> <span class="s2">&quot;value1&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;key2&quot;</span><span class="p">,</span> <span class="s2">&quot;value2&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;key1&quot;</span><span class="p">,</span> <span class="s2">&quot;value3&quot;</span><span class="p">)]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">ValueError: duplicate key: key1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.float_or_None">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">float_or_None</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#float_or_None"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.float_or_None" title="Link to this definition">#</a></dt>
+<dd><p>This is a convenience function for converting strings to float or
+None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>string: str</strong></dt><dd><p>A string</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>float or None</dt><dd><p>A float, if the given string can be converted to a
+float. Otherwise, it returns None</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.get">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.get" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve a value from a nested dictionary using a path with ‘/’ as
+the separator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>d</strong><span class="classifier">dict</span></dt><dd><p>The dictionary to search.</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>The path to the desired value, with keys separated by ‘/’.</p>
+</dd>
+<dt><strong>default</strong><span class="classifier">Any, optional</span></dt><dd><p>The value to return if the path is not found. Defaults to
+None.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Any</dt><dd><p>The value found at the specified path, or the default value if
+the path is not found.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;DL&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;Outputs&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">&quot;Format&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>                <span class="s2">&quot;JSON&quot;</span><span class="p">:</span> <span class="s2">&quot;desired_value&quot;</span>
+<span class="gp">... </span>            <span class="p">}</span>
+<span class="gp">... </span>        <span class="p">}</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;/DL/Outputs/Format/JSON&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default_value&#39;</span><span class="p">)</span>
+<span class="go">&#39;desired_value&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;/DL/Outputs/Format/XML&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default_value&#39;</span><span class="p">)</span>
+<span class="go">&#39;default_value&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.int_or_None">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">int_or_None</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#int_or_None"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.int_or_None" title="Link to this definition">#</a></dt>
+<dd><p>This is a convenience function for converting strings to int or
+None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>string: str</strong></dt><dd><p>A string</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>int or None</dt><dd><p>An int, if the given string can be converted to an
+int. Otherwise, it returns None</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.invert_mapping">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">invert_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#invert_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.invert_mapping" title="Link to this definition">#</a></dt>
+<dd><p>Inverts a dictionary mapping from key to list of values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>original_dict</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with values that are lists of hashable items.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>New dictionary where each item in the original value lists
+becomes a key and the original key becomes the corresponding
+value.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If any value in the original dictionary’s value lists appears
+more than once.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.is_specified">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">is_specified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#is_specified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.is_specified" title="Link to this definition">#</a></dt>
+<dd><p>Opposite of <cite>is_unspecified()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>d</strong><span class="classifier">dict</span></dt><dd><p>The dictionary to search.</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>The path to the desired value, with keys separated by ‘/’.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd><p>True if the value is specified, False otherwise.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.is_unspecified">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">is_unspecified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#is_unspecified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.is_unspecified" title="Link to this definition">#</a></dt>
+<dd><p>Check if a value in a nested dictionary is either non-existent,
+None, NaN, or an empty dictionary or list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>d</strong><span class="classifier">dict</span></dt><dd><p>The dictionary to search.</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>The path to the desired value, with keys separated by ‘/’.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd><p>True if the value is non-existent, None, or an empty
+dictionary or list. False otherwise.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;DL&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;Outputs&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">&quot;Format&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>                <span class="s2">&quot;JSON&quot;</span><span class="p">:</span> <span class="s2">&quot;desired_value&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="s2">&quot;EmptyDict&quot;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="gp">... </span>            <span class="p">}</span>
+<span class="gp">... </span>        <span class="p">}</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_unspecified</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;/DL/Outputs/Format/JSON&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_unspecified</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;/DL/Outputs/Format/XML&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_unspecified</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;/DL/Outputs/Format/EmptyDict&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.load_default_options">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">load_default_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#load_default_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.load_default_options" title="Link to this definition">#</a></dt>
+<dd><p>Load the default_config.json file to set options to default values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict</dt><dd><p>Default options</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.merge_default_config">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">merge_default_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#merge_default_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.merge_default_config" title="Link to this definition">#</a></dt>
+<dd><p>Merge the user-specified config with the configuration defined in
+the default_config.json file. If the user-specified config does
+not include some option available in the default options, then the
+default option is used in the merged config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>user_config: dict</strong></dt><dd><p>User-specified configuration dictionary</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Merged configuration dictionary</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.multiply_factor_multiple_levels">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">multiply_factor_multiple_levels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_missing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#multiply_factor_multiple_levels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.multiply_factor_multiple_levels" title="Link to this definition">#</a></dt>
+<dd><p>Multiply a value to selected rows of a DataFrame that is indexed
+with a hierarchical index (pd.MultiIndex). The change is done in
+place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>df: pd.DataFrame</strong></dt><dd><p>The DataFrame to be modified.</p>
+</dd>
+<dt><strong>conditions: dict</strong></dt><dd><p>A dictionary mapping level names with a single value. Only the
+rows where the index levels have the provided values will be
+affected. The dictionary can be empty, in which case all rows
+will be affected, or contain only some levels and values, in
+which case only the matching rows will be affected.</p>
+</dd>
+<dt><strong>factor: float</strong></dt><dd><p>Scaling factor to use.</p>
+</dd>
+<dt><strong>axis: int</strong></dt><dd><p>With 0 the condition is checked against the DataFrame’s index,
+otherwise with 1 it is checked against the DataFrame’s
+columns.</p>
+</dd>
+<dt><strong>raise_missing: bool</strong></dt><dd><p>Raise an error if no rows are matching the given conditions.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If the provided <cite>axis</cite> values is not either 0 or 1.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If there are no rows matching the conditions and raise_missing
+is True.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.parse_units">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">parse_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#parse_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.parse_units" title="Link to this definition">#</a></dt>
+<dd><p>Parse the unit conversion factor JSON file and return a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>custom_file: str, optional</strong></dt><dd><p>If a custom file is provided, only the units specified in the
+custom file are used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary where keys are unit names and values are
+their corresponding conversion factors. If
+<cite>preserve_categories</cite> is True, the dictionary may maintain
+its original nested structure based on the JSON file. If
+<cite>preserve_categories</cite> is False, the dictionary is flattened
+to have globally unique unit names.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>KeyError</dt><dd><p>If a key is defined twice.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If a unit conversion factor is not a float.</p>
+</dd>
+<dt>FileNotFoundError</dt><dd><p>If a file does not exist.</p>
+</dd>
+<dt>Exception</dt><dd><p>If a file does not have the JSON format.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.show_matrix">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">show_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_describe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pelicun/base.html#show_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.show_matrix" title="Link to this definition">#</a></dt>
+<dd><p>Print a matrix in a nice way using a DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">array-like</span></dt><dd><p>The matrix data to display. Can be any array-like structure
+that pandas can convert to a DataFrame.</p>
+</dd>
+<dt><strong>use_describe</strong><span class="classifier">bool, default: False</span></dt><dd><p>If True, provides a descriptive statistical summary of the
+matrix including specified percentiles.
+If False, simply prints the matrix as is.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.split_file_name">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">split_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#split_file_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.split_file_name" title="Link to this definition">#</a></dt>
+<dd><p>Separates a file name from the extension accounting for the case
+where the file name itself contains periods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_path: str</strong></dt><dd><p>Original file path.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple</dt><dd><dl class="simple">
+<dt>name: str</dt><dd><p>Name of the file.</p>
+</dd>
+<dt>extension: str</dt><dd><p>File extension.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.str2bool">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">str2bool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#str2bool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.str2bool" title="Link to this definition">#</a></dt>
+<dd><p>Converts a string representation of truth to boolean True or
+False.</p>
+<p>This function is designed to convert string inputs that represent
+boolean values into actual Python boolean types. It handles
+typical representations of truthiness and falsiness, and is case
+insensitive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>v</strong><span class="classifier">str or bool</span></dt><dd><p>The value to convert into a boolean. This can be a boolean
+itself (in which case it is simply returned) or a string that
+is expected to represent a boolean value.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>bool</dt><dd><p>The boolean value corresponding to the input.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>argparse.ArgumentTypeError</dt><dd><p>If <cite>v</cite> is a string that does not correspond to a boolean
+value, an error is raised indicating that a boolean value was
+expected.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.stringterpolation">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">stringterpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#stringterpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.stringterpolation" title="Link to this definition">#</a></dt>
+<dd><p>Turns a string of specially formatted arguments into a multilinear
+interpolating function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>arguments: str</strong></dt><dd><p>String of arguments containing Y values and X values,
+separated by a pipe symbol (<cite>|</cite>). Individual values are
+separated by commas (<cite>,</cite>). Example:
+arguments = ‘y1,y2,y3|x1,x2,x3’</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Callable</dt><dd><p>A callable interpolating function</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.update">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_if_empty_or_none</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.update" title="Link to this definition">#</a></dt>
+<dd><p>Set a value in a nested dictionary using a path with ‘/’ as the separator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>d</strong><span class="classifier">dict</span></dt><dd><p>The dictionary to update.</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">str</span></dt><dd><p>The path to the desired value, with keys separated by ‘/’.</p>
+</dd>
+<dt><strong>value</strong><span class="classifier">Any</span></dt><dd><p>The value to set at the specified path.</p>
+</dd>
+<dt><strong>only_if_empty_or_none</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, only update the value if it is None or an empty
+dictionary. Defaults to False.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;x/y/z&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">{&#39;x&#39;: {&#39;y&#39;: {&#39;z&#39;: 1}}}</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;x/y/z&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">only_if_empty_or_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">{&#39;x&#39;: {&#39;y&#39;: {&#39;z&#39;: 1}}}  # value remains 1 since it is not empty or None</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;x/y/z&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">{&#39;x&#39;: {&#39;y&#39;: {&#39;z&#39;: 2}}}  # value is updated to 2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.update_vals">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">update_vals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#update_vals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.update_vals" title="Link to this definition">#</a></dt>
+<dd><p>Updates the values of the <cite>update</cite> nested dictionary with
+those provided in the <cite>primary</cite> nested dictionary. If a key
+already exists in update, and does not map to another
+dictionary, the value is left unchanged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>update_value: dict</strong></dt><dd><p>Dictionary -which can contain nested dictionaries- to be
+updated based on the values of <cite>primary</cite>. New keys existing
+in <cite>primary</cite> are added to <cite>update</cite>. Values of which keys
+already exist in <cite>primary</cite> are left unchanged.</p>
+</dd>
+<dt><strong>primary: dict</strong></dt><dd><p>Dictionary -which can contain nested dictionaries- to
+be used to update the values of <cite>update</cite>.</p>
+</dd>
+<dt><strong>update_path: str</strong></dt><dd><p>Identifier for the update dictionary. Used to make error
+messages more meaningful.</p>
+</dd>
+<dt><strong>primary_path: str</strong></dt><dd><p>Identifier for the update dictionary. Used to make error
+messages more meaningful.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If primary[key] is dict but update[key] is not.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If update[key] is dict but primary[key] is not.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pelicun.base.with_parsed_str_na_values">
+<span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">with_parsed_str_na_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#with_parsed_str_na_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.with_parsed_str_na_values" title="Link to this definition">#</a></dt>
+<dd><p>Given a dataframe, this function identifies values that have
+string type and can be interpreted as N/A, and replaces them with
+actual NA’s.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>df: pd.DataFrame</strong></dt><dd><p>Dataframe to process</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The dataframe with proper N/A values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger"><code class="docutils literal notranslate"><span class="pre">Logger</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.add_warning"><code class="docutils literal notranslate"><span class="pre">Logger.add_warning()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.div"><code class="docutils literal notranslate"><span class="pre">Logger.div()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.emit_warnings"><code class="docutils literal notranslate"><span class="pre">Logger.emit_warnings()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.msg"><code class="docutils literal notranslate"><span class="pre">Logger.msg()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.print_system_info"><code class="docutils literal notranslate"><span class="pre">Logger.print_system_info()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.reset_log_strings"><code class="docutils literal notranslate"><span class="pre">Logger.reset_log_strings()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Logger.warn"><code class="docutils literal notranslate"><span class="pre">Logger.warn()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Options"><code class="docutils literal notranslate"><span class="pre">Options</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Options.rng"><code class="docutils literal notranslate"><span class="pre">Options.rng</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.Options.seed"><code class="docutils literal notranslate"><span class="pre">Options.seed</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.control_warnings"><code class="docutils literal notranslate"><span class="pre">control_warnings()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.convert_dtypes"><code class="docutils literal notranslate"><span class="pre">convert_dtypes()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.convert_to_MultiIndex"><code class="docutils literal notranslate"><span class="pre">convert_to_MultiIndex()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.convert_to_SimpleIndex"><code class="docutils literal notranslate"><span class="pre">convert_to_SimpleIndex()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.convert_units"><code class="docutils literal notranslate"><span class="pre">convert_units()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.dedupe_index"><code class="docutils literal notranslate"><span class="pre">dedupe_index()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.describe"><code class="docutils literal notranslate"><span class="pre">describe()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.dict_raise_on_duplicates"><code class="docutils literal notranslate"><span class="pre">dict_raise_on_duplicates()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.float_or_None"><code class="docutils literal notranslate"><span class="pre">float_or_None()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.int_or_None"><code class="docutils literal notranslate"><span class="pre">int_or_None()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.invert_mapping"><code class="docutils literal notranslate"><span class="pre">invert_mapping()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.is_specified"><code class="docutils literal notranslate"><span class="pre">is_specified()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.is_unspecified"><code class="docutils literal notranslate"><span class="pre">is_unspecified()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.load_default_options"><code class="docutils literal notranslate"><span class="pre">load_default_options()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.merge_default_config"><code class="docutils literal notranslate"><span class="pre">merge_default_config()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.multiply_factor_multiple_levels"><code class="docutils literal notranslate"><span class="pre">multiply_factor_multiple_levels()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.parse_units"><code class="docutils literal notranslate"><span class="pre">parse_units()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.show_matrix"><code class="docutils literal notranslate"><span class="pre">show_matrix()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.split_file_name"><code class="docutils literal notranslate"><span class="pre">split_file_name()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.str2bool"><code class="docutils literal notranslate"><span class="pre">str2bool()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.stringterpolation"><code class="docutils literal notranslate"><span class="pre">stringterpolation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.update"><code class="docutils literal notranslate"><span class="pre">update()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.update_vals"><code class="docutils literal notranslate"><span class="pre">update_vals()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pelicun.base.with_parsed_str_na_values"><code class="docutils literal notranslate"><span class="pre">with_parsed_str_na_values()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Leland Stanford Junior University and The Regents of the University of California.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

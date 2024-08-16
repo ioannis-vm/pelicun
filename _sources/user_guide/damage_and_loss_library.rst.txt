@@ -1,0 +1,14 @@
+.. _damage_and_loss_library:
+
+Damage and loss library
+-----------------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Section objectives:
+
+- discuss the damage and loss model library repository
+- what is in there and how to browse the files
+- how to use those files in pelicun

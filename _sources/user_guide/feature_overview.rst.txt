@@ -1,0 +1,15 @@
+.. _feature_overview:
+
+Overview of pelicun features
+----------------------------
+
+.. admonition:: Coming soon.
+
+   This section is under construction.
+
+Section objectives:
+
+- high-level overview of the available features for damage and loss estimation
+- standalone tools (unit conversion, fit distribution, etc)
+
+
