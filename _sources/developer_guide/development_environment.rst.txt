@@ -1,9 +1,5 @@
 .. _development_environment:
 
-===============
-Getting started
-===============
-
 Setting up a development environment
 ------------------------------------
 

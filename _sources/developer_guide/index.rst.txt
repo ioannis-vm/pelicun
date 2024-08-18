@@ -13,8 +13,7 @@ We are looking forward to your contributions!
    :maxdepth: 1
    :hidden:
 
-   code_of_conduct
-   contributing
+   getting_started
    development_environment
    code_quality
    internals
