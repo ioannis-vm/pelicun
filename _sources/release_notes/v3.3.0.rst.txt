@@ -80,7 +80,7 @@ Other changes
 - Introduced ``calibrated`` attribute for demand model: This new attribute will allow users to check if a model has already been calibrated to the provided empirical data.
 
 - Version ceiling was raised for pandas, supporting version 2.0 and above up until 3.0.
-  
+
 Soon-to-be removed features
 ---------------------------
 

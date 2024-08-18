@@ -26,7 +26,7 @@ Overview of files
 .. note::
 
   We are currently in the process of migrating most configuration files to ``pyproject.toml``.
-   
+
 We use `setuptools <https://setuptools.pypa.io/en/latest/>`_ to build the package, using ``setup.py`` for configuration.
 In ``setup.py`` we define an entry point called ``pelicun``, directing to the ``main`` method of ``DL_calculation.py``, used to run pelicun from the command line.
 

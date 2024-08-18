@@ -155,26 +155,26 @@ Contributing to pelicun requires being familiar with the following:
    Being able to set up and call command-line programs beyond Git, including the linting and formatting tools we use.
 
    The following resources may be useful:
-   
+
    .. tab-set::
-  
+
       .. tab-item:: Linux & Mac
-  
-	 `Bash Reference Manual <https://www.gnu.org/software/bash/manual/html_node/index.html>`_
-  
+
+         `Bash Reference Manual <https://www.gnu.org/software/bash/manual/html_node/index.html>`_
+
       .. tab-item:: Windows
-  
-	 `PowerShell Documentation <https://learn.microsoft.com/en-us/powershell/>`_
+
+         `PowerShell Documentation <https://learn.microsoft.com/en-us/powershell/>`_
 
 .. dropdown:: Pattern-matching
 
    Ultimately, we learn by example.
    The files already present in the pelicun source code offer an existing template that can help you understand what any potential additions should look like.
    Actively exploring the existing files, tinkering them and breaking things is a great way to gain a deeper understanding of the package.
-  
+
 Contributing workflow
 ---------------------
-  
+
 The development of pelicun is done via Pull Requests (PR) on GitHub.
 Contributors need to carry out the following steps to submit a successful PR:
 

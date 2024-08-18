@@ -23,17 +23,17 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
         :img-top: _static/front_page/book-svgrepo-com.svg
         :class-card: intro-card
         :shadow: md
-	:link: user_guide
-	:link-type: ref
+        :link: user_guide
+        :link-type: ref
 
-	Fundamental information on pelicun, including basic concepts, definition of terms, installation instructions, and how to get help.
+        Fundamental information on pelicun, including basic concepts, definition of terms, installation instructions, and how to get help.
 
     .. grid-item-card:: Examples
         :img-top: _static/front_page/right-arrow-svgrepo-com.svg
         :class-card: intro-card
         :shadow: md
-	:link: examples
-	:link-type: ref
+        :link: examples
+        :link-type: ref
 
         See pelicun's capabilities in action with illustrative and configurable usage examples involving a broad range of hazard and asset types.
 
@@ -41,8 +41,8 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
         :img-top: _static/front_page/programmer-svgrepo-com.svg
         :class-card: intro-card
         :shadow: md
-	:link: developer_guide
-	:link-type: ref
+        :link: developer_guide
+        :link-type: ref
 
         Important information for contributors, including information on setting up a development environment, our code quality requirements, and the submission process.
 
@@ -50,8 +50,8 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
         :img-top: _static/front_page/api-svgrepo-com.svg
         :class-card: intro-card
         :shadow: md
-	:link: api_reference
-	:link-type: ref
+        :link: api_reference
+        :link-type: ref
 
         Browse the comprehensive documentation of the public classes, methods, and functions in pelicun.
 
