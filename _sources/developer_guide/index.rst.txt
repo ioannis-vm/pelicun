@@ -11,6 +11,7 @@ We are looking forward to your contributions!
 
 .. toctree::
    :maxdepth: 1
+   :hidden:
 
    code_of_conduct
    contributing

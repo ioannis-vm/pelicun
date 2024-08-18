@@ -93,7 +93,7 @@ Avoid opening pull requests with changes that reduce code coverage by not writin
 Documentation
 =============
 
-We use `sphinx <https://www.sphinx-doc.org/en/master/>`_ with the `PyData theme <https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/layout.html>`_ to generate our documentation pages.
+We use `sphinx <https://www.sphinx-doc.org/en/master/>`_ with the `Read the Docs theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_ to generate our documentation pages.
 
 We use the following extensions:
 

@@ -49,11 +49,9 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
 
         Browse the comprehensive documentation of the public classes, methods, and functions in pelicun.
 
-
 .. toctree::
    :maxdepth: 1
    :hidden:
-   :titlesonly:
 
    user_guide/index
    examples/index
