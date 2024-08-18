@@ -1,5 +1,10 @@
 .. _user_install:
 
+Welcome to the pelicun user guide.
+Below, you will find instructions on installing pelicun and information about the supported features, the basic concepts behind them, the terminology used, the expected inputs, and where to get help.
+Join our growing community of users and developers dedicated to advancing risk estimation practices and sharing insights.
+
+
 Getting started
 ---------------
 

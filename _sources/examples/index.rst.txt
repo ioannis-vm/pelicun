@@ -2,9 +2,9 @@
 
 .. _examples:
 
-********
-Examples
-********
+*************
+Example Index
+*************
 
 Pelicun examples are listed in the following index.
 
@@ -14,8 +14,8 @@ Pelicun examples are listed in the following index.
    Increasing the set of examples is a very high priority.
    Please come back soon!
 
-Index
------
+Complete list
+-------------
 
 +-----------+---------------------------------------------------------+
 |Example    |Description                                              |
@@ -37,8 +37,8 @@ Index
 |E7         |...                                                      |
 +-----------+---------------------------------------------------------+
 
-Interested in a specific feature?
----------------------------------
+Grouped by feature
+------------------
 
 The following sections group the examples above based on the specific features they illustrate, helping you pick the ones most relevant to what you are looking for.
 
@@ -79,6 +79,6 @@ The following sections group the examples above based on the specific features t
    :maxdepth: 1
    :hidden:
 
-   notebooks/custom.pct.py
+   notebooks/example_1.pct.py
 
-.. _E1: notebooks/custom.pct.py
+.. _E1: notebooks/example_1.pct.py

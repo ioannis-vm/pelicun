@@ -14,53 +14,45 @@ Pelicun is an open-source Python package for the probabilistic estimation of los
 Community-driven, easy to use and extend, it serves as an integrated multi-hazard risk estimation framework for buildings and other infrastructure.
 Utilized in both academia and industry, it supports cutting-edge natural hazards engineering research while helping spread the adoption of performance-based engineering in practical applications.
 
-.. grid:: 1 2 2 2
-    :gutter: 4
-    :padding: 2 2 0 0
-    :class-container: sd-text-center
+.. toctree::
+   :caption: User Guide
+   :maxdepth: 1
+   :numbered: 4
 
-    .. grid-item-card:: User Guide
-        :img-top: _static/front_page/book-svgrepo-com.svg
-        :class-card: intro-card
-        :shadow: md
-        :link: user_guide
-        :link-type: ref
-
-        Fundamental information on pelicun, including basic concepts, definition of terms, installation instructions, and how to get help.
-
-    .. grid-item-card:: Examples
-        :img-top: _static/front_page/right-arrow-svgrepo-com.svg
-        :class-card: intro-card
-        :shadow: md
-        :link: examples
-        :link-type: ref
-
-        See pelicun's capabilities in action with illustrative and configurable usage examples involving a broad range of hazard and asset types.
-
-    .. grid-item-card:: Developer Guide
-        :img-top: _static/front_page/programmer-svgrepo-com.svg
-        :class-card: intro-card
-        :shadow: md
-        :link: developer_guide
-        :link-type: ref
-
-        Important information for contributors, including information on setting up a development environment, our code quality requirements, and the submission process.
-
-    .. grid-item-card:: API Reference
-        :img-top: _static/front_page/api-svgrepo-com.svg
-        :class-card: intro-card
-        :shadow: md
-        :link: api_reference
-        :link-type: ref
-
-        Browse the comprehensive documentation of the public classes, methods, and functions in pelicun.
+   user_guide/install
+   user_guide/pelicun_framework
+   user_guide/feature_overview
+   user_guide/input_specification
+   user_guide/damage_and_loss_library
+   user_guide/bug_reports_and_feature_requests
+   user_guide/resources_for_new_python_users
 
 .. toctree::
+   :caption: Developer Guide
    :maxdepth: 1
-   :hidden:
+   :numbered: 4
 
-   user_guide/index
+   developer_guide/getting_started
+   developer_guide/development_environment
+   developer_guide/code_quality
+   developer_guide/internals
+
+.. toctree::
+   :caption: Examples
+   :maxdepth: 1
+
    examples/index
-   developer_guide/index
+
+.. toctree::
+   :caption: API Reference
+   :maxdepth: 1
+
    api_reference/index.rst
+
+.. toctree::
+   :caption: Other
+   :maxdepth: 1
+
    release_notes/index.rst
+   other/license
+   other/cite
