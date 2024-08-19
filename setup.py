@@ -114,6 +114,7 @@ setup(
             'sphinx_design',
             'sphinx-rtd-theme',
             'nbsphinx',
+            'sphinxcontrib-bibtex',
             'numpydoc',
             'rendre>0.0.14',
             'jsonpath2',
