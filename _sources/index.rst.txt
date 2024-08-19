@@ -56,3 +56,4 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
    release_notes/index.rst
    other/license
    other/cite
+   other/acknowledgments

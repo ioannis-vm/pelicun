@@ -52,7 +52,18 @@
 <li class="toctree-l2"><a class="reference internal" href="user_guide/install.html#staying-up-to-date">1.1. Staying up to date</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user_guide/pelicun_framework.html">2. The pelicun framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/pelicun_framework.html">2. The pelicun framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#abbreviations">2.1. Abbreviations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#glossary">2.2. Glossary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#introduction-to-pelicun">2.3. Introduction to pelicun</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#overview">2.4. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#performance-assessment-workflow">2.5. Performance Assessment Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#response-model">2.6. Response Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#performance-model">2.7. Performance Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#damage-model">2.8. Damage Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/pelicun_framework.html#loss-model">2.9. Loss Model</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide/feature_overview.html">3. Overview of pelicun features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide/input_specification.html">4. Input Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide/damage_and_loss_library.html">5. Damage and loss library</a></li>
@@ -102,7 +113,13 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="other/license.html">Copyright and license</a></li>
-<li class="toctree-l1"><a class="reference internal" href="other/cite.html">Citing pelicun and pelicun logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other/cite.html">Citing pelicun</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other/cite.html#pelicun-logo">pelicun logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other/acknowledgments.html">Acknowledgments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="other/acknowledgments.html#national-science-foundation">National Science Foundation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other/acknowledgments.html#contributors">Contributors</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -171,6 +188,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference/_autosummary/pelicun.tests.code_repetition_checker.html#pelicun.tests.code_repetition_checker.all_test_files">all_test_files() (in module pelicun.tests.code_repetition_checker)</a>
+</li>
+      <li><a href="user_guide/pelicun_framework.html#term-Application"><strong>Application</strong></a>
 </li>
       <li><a href="api_reference/_autosummary/pelicun.uq.html#pelicun.uq.RandomVariableSet.apply_correlation">apply_correlation() (pelicun.uq.RandomVariableSet method)</a>
 </li>
@@ -743,19 +762,25 @@
         <li><a href="api_reference/_autosummary/pelicun.model.loss_model.html#pelicun.model.loss_model.RepairModel_DS.save_sample">(pelicun.model.loss_model.RepairModel_DS method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference/_autosummary/pelicun.file_io.html#pelicun.file_io.save_to_csv">save_to_csv() (in module pelicun.file_io)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference/_autosummary/pelicun.uq.html#pelicun.uq.scale_distribution">scale_distribution() (in module pelicun.uq)</a>
 </li>
       <li><a href="api_reference/_autosummary/pelicun.assessment.html#pelicun.assessment.AssessmentBase.scale_factor">scale_factor() (pelicun.assessment.AssessmentBase method)</a>
+</li>
+      <li><a href="user_guide/pelicun_framework.html#term-Scientific-Workflow"><strong>Scientific Workflow</strong></a>
+</li>
+      <li><a href="user_guide/pelicun_framework.html#term-Scientific-Workflow-System"><strong>Scientific Workflow System</strong></a>
 </li>
       <li><a href="api_reference/_autosummary/pelicun.base.html#pelicun.base.Options.seed">seed (pelicun.base.Options property)</a>
 </li>
       <li><a href="api_reference/_autosummary/pelicun.base.html#pelicun.base.show_matrix">show_matrix() (in module pelicun.base)</a>
 </li>
       <li><a href="api_reference/_autosummary/pelicun.uq.html#pelicun.uq.RandomVariableSet.size">size (pelicun.uq.RandomVariableSet property)</a>
+</li>
+      <li><a href="user_guide/pelicun_framework.html#term-Software-Framework"><strong>Software Framework</strong></a>
 </li>
       <li><a href="api_reference/_autosummary/pelicun.base.html#pelicun.base.split_file_name">split_file_name() (in module pelicun.base)</a>
 </li>
@@ -799,11 +824,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference/_autosummary/pelicun.base.html#pelicun.base.Logger.warn">warn() (pelicun.base.Logger method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference/_autosummary/pelicun.uq.html#pelicun.uq.WeibullRandomVariable">WeibullRandomVariable (class in pelicun.uq)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference/_autosummary/pelicun.base.html#pelicun.base.with_parsed_str_na_values">with_parsed_str_na_values() (in module pelicun.base)</a>
+</li>
+      <li><a href="user_guide/pelicun_framework.html#term-Workflow"><strong>Workflow</strong></a>
 </li>
   </ul></td>
 </tr></table>
