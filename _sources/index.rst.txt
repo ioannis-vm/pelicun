@@ -22,10 +22,15 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
    user_guide/install
    user_guide/pelicun_framework
    user_guide/feature_overview
-   user_guide/input_specification
    user_guide/damage_and_loss_library
    user_guide/bug_reports_and_feature_requests
    user_guide/resources_for_new_python_users
+
+.. toctree::
+   :caption: Examples
+   :maxdepth: 1
+
+   examples/index
 
 .. toctree::
    :caption: Developer Guide
@@ -36,12 +41,6 @@ Utilized in both academia and industry, it supports cutting-edge natural hazards
    developer_guide/development_environment
    developer_guide/code_quality
    developer_guide/internals
-
-.. toctree::
-   :caption: Examples
-   :maxdepth: 1
-
-   examples/index
 
 .. toctree::
    :caption: API Reference
