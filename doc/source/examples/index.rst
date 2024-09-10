@@ -20,7 +20,7 @@ Complete list
 +-----------+---------------------------------------------------------+
 |Example    |Description                                              |
 +===========+=========================================================+
-|`E1`_      |This example demonstrates the seismic performance        |
+|`E2`_      |This example demonstrates the seismic performance        |
 |           |assessment of a steel moment frame structure using the   |
 |           |FEMA P-58 methodology.                                   |
 +-----------+---------------------------------------------------------+
@@ -35,7 +35,7 @@ The following sections group the examples above based on the specific features t
    +------------------------------------------------------+---------------------------------------------------------+
    |Feature                                               |Examples                                                 |
    +======================================================+=========================================================+
-   |Building                                              |`E1`_                                                    |
+   |Building                                              |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
 
 .. dropdown:: Demand Simulation
@@ -43,11 +43,11 @@ The following sections group the examples above based on the specific features t
    +------------------------------------------------------+---------------------------------------------------------+
    |Feature                                               |Examples                                                 |
    +======================================================+=========================================================+
-   |:ref:`Model calibration <fo_calibration>`             |`E1`_                                                    |
+   |:ref:`Model calibration <fo_calibration>`             |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
-   |:ref:`RID|PID inference <fo_pidrid>`                  |`E1`_                                                    |
+   |:ref:`RID|PID inference <fo_pidrid>`                  |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
-   |:ref:`Sample expansion <fo_sample_expansion>`         |`E1`_                                                    |
+   |:ref:`Sample expansion <fo_sample_expansion>`         |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
 
 
@@ -56,17 +56,17 @@ The following sections group the examples above based on the specific features t
    +------------------------------------------------------+---------------------------------------------------------+
    |Feature                                               |Examples                                                 |
    +======================================================+=========================================================+
-   |:ref:`Loss maps <fo_loss_maps>`                       |`E1`_                                                    |
+   |:ref:`Loss maps <fo_loss_maps>`                       |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
-   |:ref:`Active decision variables <fo_active_dvs>`      |`E1`_                                                    |
+   |:ref:`Active decision variables <fo_active_dvs>`      |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
-   |:ref:`Loss aggregation <fo_loss_aggregation>`         |`E1`_                                                    |
+   |:ref:`Loss aggregation <fo_loss_aggregation>`         |`E2`_                                                    |
    +------------------------------------------------------+---------------------------------------------------------+
 
 .. toctree::
    :maxdepth: 1
    :hidden:
 
-   notebooks/example_1.pct.py
+   notebooks/example_2.pct.py
 
-.. _E1: notebooks/example_1.pct.py
+.. _E2: notebooks/example_2.pct.py
