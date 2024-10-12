@@ -37,7 +37,7 @@
 
 """Pelicun library."""
 
-name = 'pelicun'
+name = "pelicun"
 
 __version__ = '3.3.3'
 
