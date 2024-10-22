@@ -21,7 +21,7 @@ When the fix is implemented, we will close the issue and notify you of the versi
 
 We accept feature requests.
 If there is a feature pelicun lacks and you would like us to implement, you can request that feature in the pelicun discussion page.
-Please begin the title of your message with "Feature Request: ".
+Please begin the title of your message with "Feature Request:".
 Describe the requested feature as best you can in your message, and point to any relevant technical documents, other software, or any other piece of information that would help us implement the feature.
 We will respond with any questions we have and offer a timeline for implementing the feature or justify our decision to defer implementation.
 If we decide to implement the feature, we will begin by opening an issue page on GitHub, where developer communication will take place, and link it to the discussion page.

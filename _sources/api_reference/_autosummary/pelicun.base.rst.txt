@@ -22,6 +22,7 @@ pelicun.base
       dedupe_index
       describe
       dict_raise_on_duplicates
+      ensure_value
       float_or_None
       get
       int_or_None

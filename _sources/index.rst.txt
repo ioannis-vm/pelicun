@@ -15,44 +15,41 @@ Community-driven, easy to use and extend, it serves as an integrated multi-hazar
 Utilized in both academia and industry, it supports cutting-edge natural hazards engineering research while helping spread the adoption of performance-based engineering in practical applications.
 
 .. toctree::
+   :caption: About
+   :maxdepth: 1
+   :numbered: 4
+
+   about/license.rst
+   about/cite.rst
+   about/acknowledgments.rst
+   release_notes/index.rst
+
+.. toctree::
+   :caption: The Pelicun Framework
+   :maxdepth: 1
+   :numbered: 4
+
+   pelicun_framework/pelicun_framework.rst
+
+.. toctree::
    :caption: User Guide
    :maxdepth: 1
    :numbered: 4
 
-   user_guide/install
-   user_guide/pelicun_framework
-   user_guide/feature_overview
-   user_guide/damage_and_loss_library
-   user_guide/bug_reports_and_feature_requests
-   user_guide/resources_for_new_python_users
-
-.. toctree::
-   :caption: Examples
-   :maxdepth: 1
-
-   examples/index
+   user_guide/install.rst
+   user_guide/feature_overview.rst
+   user_guide/damage_and_loss_library.rst
+   user_guide/bug_reports_and_feature_requests.rst
+   user_guide/resources_for_new_python_users.rst
+   examples/index.rst
+   api_reference/index.rst
 
 .. toctree::
    :caption: Developer Guide
    :maxdepth: 1
    :numbered: 4
 
-   developer_guide/getting_started
-   developer_guide/development_environment
-   developer_guide/code_quality
-   developer_guide/internals
-
-.. toctree::
-   :caption: API Reference
-   :maxdepth: 1
-
-   api_reference/index.rst
-
-.. toctree::
-   :caption: Other
-   :maxdepth: 1
-
-   release_notes/index.rst
-   other/license
-   other/cite
-   other/acknowledgments
+   developer_guide/getting_started.rst
+   developer_guide/development_environment.rst
+   developer_guide/code_quality.rst
+   developer_guide/internals.rst

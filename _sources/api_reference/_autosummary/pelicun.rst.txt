@@ -34,7 +34,8 @@
    base
    file_io
    model
+   pelicun_warnings
    tests
+   tools
    uq
-   warnings
 

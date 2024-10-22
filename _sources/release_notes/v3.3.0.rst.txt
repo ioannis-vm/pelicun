@@ -75,7 +75,7 @@ Other changes
 
 - Automatic code formatting: Further improve consistency in coding style by using black to review and format the code when needed.
 
-- Removed ``bldg`` from variable and class names: Following the changes mentioned earlier, we dropped bldg from lables where the functionality is no longer limited to buildings.
+- Removed ``bldg`` from variable and class names: Following the changes mentioned earlier, we dropped bldg from labels where the functionality is no longer limited to buildings.
 
 - Introduced ``calibrated`` attribute for demand model: This new attribute will allow users to check if a model has already been calibrated to the provided empirical data.
 

@@ -1,0 +1,33 @@
+pelicun.tests.dl\_calculation.other.o1
+======================================
+
+.. automodule:: pelicun.tests.dl_calculation.other.o1
+   :members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   run_o1
+

@@ -29,6 +29,10 @@ pelicun.tests
    :template: custom-module-template.rst
    :recursive:
 
+   basic
    code_repetition_checker
+   dl_calculation
+   maintenance
    util
+   validation
 

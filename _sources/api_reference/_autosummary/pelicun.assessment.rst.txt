@@ -10,12 +10,6 @@ pelicun.assessment
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      load_consequence_info
-   
    
 
    
