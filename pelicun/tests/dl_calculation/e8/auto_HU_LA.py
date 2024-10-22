@@ -49,10 +49,11 @@ from __future__ import annotations
 import contextlib
 
 import pandas as pd
-from BldgClassRulesets import building_class
-from MetaVarRulesets import parse_BIM
-from WindWMUHRulesets import WMUH_config
-from WindWSFRulesets import WSF_config
+
+from pelicun.tests.dl_calculation.rulesets.BldgClassRulesets import building_class
+from pelicun.tests.dl_calculation.rulesets.MetaVarRulesets import parse_BIM
+from pelicun.tests.dl_calculation.rulesets.WindWMUHRulesets import WMUH_config
+from pelicun.tests.dl_calculation.rulesets.WindWSFRulesets import WSF_config
 
 
 def auto_populate(aim: dict) -> tuple[dict, dict, pd.DataFrame]:
@@ -89,7 +90,7 @@ def auto_populate(aim: dict) -> tuple[dict, dict, pd.DataFrame]:
 
     # parse the GI data
     gi_ap = parse_BIM(
-        gi,
+        gi,  # type: ignore
         location='LA',
         hazards=[
             'wind',

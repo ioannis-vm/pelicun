@@ -46,23 +46,26 @@
 from __future__ import annotations
 
 import pandas as pd
-from BuildingClassRulesets import building_class
-from FloodClassRulesets import FL_config
-from WindCECBRulesets import CECB_config
-from WindCERBRulesets import CERB_config
-from WindMECBRulesets import MECB_config
-from WindMERBRulesets import MERB_config
-from WindMetaVarRulesets import parse_BIM
-from WindMHRulesets import MH_config
-from WindMLRIRulesets import MLRI_config
-from WindMLRMRulesets import MLRM_config
-from WindMMUHRulesets import MMUH_config
-from WindMSFRulesets import MSF_config
-from WindSECBRulesets import SECB_config
-from WindSERBRulesets import SERB_config
-from WindSPMBRulesets import SPMB_config
-from WindWMUHRulesets import WMUH_config
-from WindWSFRulesets import WSF_config
+
+from pelicun.tests.dl_calculation.rulesets.BuildingClassRulesets import (
+    building_class,
+)
+from pelicun.tests.dl_calculation.rulesets.FloodClassRulesets import FL_config
+from pelicun.tests.dl_calculation.rulesets.WindCECBRulesets import CECB_config
+from pelicun.tests.dl_calculation.rulesets.WindCERBRulesets import CERB_config
+from pelicun.tests.dl_calculation.rulesets.WindMECBRulesets import MECB_config
+from pelicun.tests.dl_calculation.rulesets.WindMERBRulesets import MERB_config
+from pelicun.tests.dl_calculation.rulesets.WindMetaVarRulesets import parse_BIM
+from pelicun.tests.dl_calculation.rulesets.WindMHRulesets import MH_config
+from pelicun.tests.dl_calculation.rulesets.WindMLRIRulesets import MLRI_config
+from pelicun.tests.dl_calculation.rulesets.WindMLRMRulesets import MLRM_config
+from pelicun.tests.dl_calculation.rulesets.WindMMUHRulesets import MMUH_config
+from pelicun.tests.dl_calculation.rulesets.WindMSFRulesets import MSF_config
+from pelicun.tests.dl_calculation.rulesets.WindSECBRulesets import SECB_config
+from pelicun.tests.dl_calculation.rulesets.WindSERBRulesets import SERB_config
+from pelicun.tests.dl_calculation.rulesets.WindSPMBRulesets import SPMB_config
+from pelicun.tests.dl_calculation.rulesets.WindWMUHRulesets import WMUH_config
+from pelicun.tests.dl_calculation.rulesets.WindWSFRulesets import WSF_config
 
 
 def auto_populate(aim: dict) -> tuple[dict, dict, pd.DataFrame]:  # noqa: C901
@@ -98,7 +101,7 @@ def auto_populate(aim: dict) -> tuple[dict, dict, pd.DataFrame]:  # noqa: C901
     gi = aim.get('GeneralInformation')
 
     # parse the GI data
-    gi_ap = parse_BIM(gi, location='NJ', hazards=['wind', 'inundation'])
+    gi_ap = parse_BIM(gi, location='NJ', hazards=['wind', 'inundation'])  # type: ignore
 
     # identify the building class
     bldg_class = building_class(gi_ap, hazard='wind')
