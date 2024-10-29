@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.WindMSFRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -193,15 +194,14 @@
 <span class="c1"># Meredith Lockhead</span>
 <span class="c1"># Tracy Kijewski-Correa</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">random</span>
-
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 <div class="viewcode-block" id="MSF_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindMSFRulesets.html#pelicun.tests.dl_calculation.rulesets.WindMSFRulesets.MSF_config">[docs]</a>
-<span class="k">def</span> <span class="nf">MSF_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="k">def</span> <span class="nf">MSF_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS MSF configuration based on BIM data.</span>
+<span class="sd">    Rules to identify a HAZUS MSF configuration based on BIM data</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -211,37 +211,36 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span> <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Roof-Wall Connection (RWC)</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;HazardProneRegion&#39;</span><span class="p">]:</span>
-        <span class="n">rwc</span> <span class="o">=</span> <span class="s1">&#39;strap&#39;</span>  <span class="c1"># Strap</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;HazardProneRegion&#39;</span><span class="p">]:</span>
+        <span class="n">RWC</span> <span class="o">=</span> <span class="s1">&#39;strap&#39;</span>  <span class="c1"># Strap</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">rwc</span> <span class="o">=</span> <span class="s1">&#39;tnail&#39;</span>  <span class="c1"># Toe-nail</span>
+        <span class="n">RWC</span> <span class="o">=</span> <span class="s1">&#39;tnail&#39;</span>  <span class="c1"># Toe-nail</span>
 
     <span class="c1"># Roof Frame Type</span>
-    <span class="n">rft</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofSystem&#39;</span><span class="p">]</span>
+    <span class="n">RFT</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofSystem&#39;</span><span class="p">]</span>
 
     <span class="c1"># Story Flag</span>
-    <span class="n">stories</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">stories</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="c1"># Shutters</span>
     <span class="c1"># IRC 2000-2015:</span>
-    <span class="c1"># R301.2.1.2 in NJ IRC 2015 says protection of openings required</span>
-    <span class="c1"># for buildings located in WindBorneDebris regions, mentions</span>
-    <span class="c1"># impact-rated protection for glazing, impact-resistance for</span>
-    <span class="c1"># garage door glazed openings, and finally states that wood</span>
-    <span class="c1"># structural panels with a thickness &gt; 7/16&quot; and a span &lt;8&#39; can be</span>
-    <span class="c1"># used, as long as they are precut, attached to the framing</span>
-    <span class="c1"># surrounding the opening, and the attachments are resistant to</span>
-    <span class="c1"># corrosion and are able to resist component and cladding loads;</span>
+    <span class="c1"># R301.2.1.2 in NJ IRC 2015 says protection of openings required for</span>
+    <span class="c1"># buildings located in WindBorneDebris regions, mentions impact-rated protection for</span>
+    <span class="c1"># glazing, impact-resistance for garage door glazed openings, and finally</span>
+    <span class="c1"># states that wood structural panels with a thickness &gt; 7/16&quot; and a</span>
+    <span class="c1"># span &lt;8&#39; can be used, as long as they are precut, attached to the framing</span>
+    <span class="c1"># surrounding the opening, and the attachments are resistant to corrosion</span>
+    <span class="c1"># and are able to resist component and cladding loads;</span>
     <span class="c1"># Earlier IRC editions provide similar rules.</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
+        <span class="n">shutters</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
     <span class="c1"># BOCA 1996 and earlier:</span>
     <span class="c1"># Shutters were not required by code until the 2000 IBC. Before 2000, the</span>
     <span class="c1"># percentage of commercial buildings that have shutters is assumed to be</span>
@@ -251,12 +250,15 @@
     <span class="c1"># facilities. In addition to that, 46% of business owners reported boarding</span>
     <span class="c1"># up their businesses before Hurricane Katrina. In addition, compliance</span>
     <span class="c1"># rates based on the Homeowners Survey data hover between 43 and 50 percent.</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofSystem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;trs&#39;</span><span class="p">:</span>
+
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofSystem&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;trs&#39;</span><span class="p">:</span>
+
         <span class="c1"># Roof Deck Attachment (RDA)</span>
         <span class="c1"># IRC codes:</span>
         <span class="c1"># NJ code requires 8d nails (with spacing 6”/12”) for sheathing thicknesses</span>
@@ -265,22 +267,22 @@
         <span class="c1"># codes. Commentary for Table R602.3(1) indicates 8d nails with 6”/6”</span>
         <span class="c1"># spacing (enhanced roof spacing) for ultimate wind speeds greater than</span>
         <span class="c1"># a speed_lim. speed_lim depends on the year of construction</span>
-        <span class="n">rda</span> <span class="o">=</span> <span class="s1">&#39;6d&#39;</span>  <span class="c1"># Default (aka A) in Reorganized Rulesets - WIND</span>
+        <span class="n">RDA</span> <span class="o">=</span> <span class="s1">&#39;6d&#39;</span> <span class="c1"># Default (aka A) in Reorganized Rulesets - WIND</span>
         <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">2016</span><span class="p">:</span>
             <span class="c1"># IRC 2015</span>
-            <span class="n">speed_lim</span> <span class="o">=</span> <span class="mf">130.0</span>  <span class="c1"># mph</span>
+            <span class="n">speed_lim</span> <span class="o">=</span> <span class="mf">130.0</span> <span class="c1"># mph</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># IRC 2000 - 2009</span>
-            <span class="n">speed_lim</span> <span class="o">=</span> <span class="mf">100.0</span>  <span class="c1"># mph</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">speed_lim</span><span class="p">:</span>
-            <span class="n">rda</span> <span class="o">=</span> <span class="s1">&#39;8s&#39;</span>  <span class="c1"># 8d @ 6&quot;/6&quot; (&#39;D&#39; in the Reorganized Rulesets - WIND)</span>
+            <span class="n">speed_lim</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="c1"># mph</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">speed_lim</span><span class="p">:</span>
+            <span class="n">RDA</span> <span class="o">=</span> <span class="s1">&#39;8s&#39;</span>  <span class="c1"># 8d @ 6&quot;/6&quot; (&#39;D&#39; in the Reorganized Rulesets - WIND)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">rda</span> <span class="o">=</span> <span class="s1">&#39;8d&#39;</span>  <span class="c1"># 8d @ 6&quot;/12&quot; (&#39;B&#39; in the Reorganized Rulesets - WIND)</span>
+            <span class="n">RDA</span> <span class="o">=</span> <span class="s1">&#39;8d&#39;</span>  <span class="c1"># 8d @ 6&quot;/12&quot; (&#39;B&#39; in the Reorganized Rulesets - WIND)</span>
 
         <span class="c1"># Secondary Water Resistance (SWR)</span>
         <span class="c1"># Minimum drainage recommendations are in place in NJ (See below).</span>
         <span class="c1"># However, SWR indicates a code-plus practice.</span>
-        <span class="n">swr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.6</span>
+        <span class="n">SWR</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.6</span>
 
         <span class="c1"># Garage</span>
         <span class="c1"># As per IRC 2015:</span>
@@ -297,68 +299,69 @@
         <span class="c1"># (and therefore do not have any strength requirements) that are older than</span>
         <span class="c1"># 30 years are considered to be weak, whereas those from the last 30 years</span>
         <span class="c1"># are considered to be standard.</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;Garage&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;Garage&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="c1"># no garage data, using the default &quot;none&quot;</span>
             <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;no&#39;</span>
-        <span class="k">elif</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">30</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;Garage&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;no&#39;</span>  <span class="c1"># None</span>
-            <span class="k">elif</span> <span class="n">shutters</span><span class="p">:</span>
-                <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># SFBC 1994</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># Standard</span>
-        <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;Garage&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;no&#39;</span>  <span class="c1"># None</span>
-        <span class="k">elif</span> <span class="n">shutters</span><span class="p">:</span>
-            <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;wkd&#39;</span>  <span class="c1"># Weak</span>
+            <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">30</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;Garage&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;no&#39;</span> <span class="c1"># None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">shutters</span><span class="p">:</span>
+                        <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span> <span class="c1"># SFBC 1994</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span> <span class="c1"># Standard</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># year &lt;= current year - 30</span>
+                <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;Garage&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;no&#39;</span> <span class="c1"># None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">shutters</span><span class="p">:</span>
+                        <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">garage</span> <span class="o">=</span> <span class="s1">&#39;wkd&#39;</span> <span class="c1"># Weak</span>
 
         <span class="c1"># Masonry Reinforcing (MR)</span>
         <span class="c1"># R606.6.4.1.2 Metal Reinforcement states that walls other than interior</span>
         <span class="c1"># non-load-bearing walls shall be anchored at vertical intervals of not</span>
-        <span class="c1"># more than 8 inches with joint reinforcement of not less than 9-gage.</span>
+        <span class="c1"># more than 8 inches with joint reinforcement of not less than 9 gage.</span>
         <span class="c1"># Therefore this ruleset assumes that all exterior or load-bearing masonry</span>
         <span class="c1"># walls will have reinforcement. Since our considerations deal with wind</span>
         <span class="c1"># speed, I made the assumption that only exterior walls are being taken</span>
         <span class="c1"># into consideration.</span>
-        <span class="n">mr</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">MR</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">stories</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">stories</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># extend the BIM dictionary</span>
-        <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s1">&#39;SecondaryWaterResistance&#39;</span><span class="p">:</span> <span class="n">swr</span><span class="p">,</span>
-                <span class="s1">&#39;RoofDeckAttachmentW&#39;</span><span class="p">:</span> <span class="n">rda</span><span class="p">,</span>
-                <span class="s1">&#39;RoofToWallConnection&#39;</span><span class="p">:</span> <span class="n">rwc</span><span class="p">,</span>
-                <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-                <span class="s1">&#39;AugmentGarage&#39;</span><span class="p">:</span> <span class="n">garage</span><span class="p">,</span>
-                <span class="s1">&#39;MasonryReinforcing&#39;</span><span class="p">:</span> <span class="n">mr</span><span class="p">,</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
+        <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">SecondaryWaterResistance</span> <span class="o">=</span> <span class="n">SWR</span><span class="p">,</span>
+            <span class="n">RoofDeckAttachmentW</span> <span class="o">=</span> <span class="n">RDA</span><span class="p">,</span>
+            <span class="n">RoofToWallConnection</span> <span class="o">=</span> <span class="n">RWC</span><span class="p">,</span>
+            <span class="n">Shutters</span> <span class="o">=</span> <span class="n">shutters</span><span class="p">,</span>
+            <span class="n">AugmentGarage</span> <span class="o">=</span> <span class="n">garage</span><span class="p">,</span>
+            <span class="n">MasonryReinforcing</span> <span class="o">=</span> <span class="n">MR</span><span class="p">,</span>
+            <span class="p">))</span>
 
-        <span class="n">bldg_config</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;M.SF.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">stories</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rwc</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rft</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rda</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">swr</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">garage</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">mr</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;null.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;M.SF.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">stories</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RWC</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RFT</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RDA</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">SWR</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">garage</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">MR</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;null.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Roof system = OSJW</span>
         <span class="c1"># r</span>
         <span class="c1"># A 2015 study found that there were 750,000 metal roof installed in 2015,</span>
         <span class="c1"># out of 5 million new roofs in the US annually. If these numbers stay</span>
-        <span class="c1"># relatively stable, that implies that roughly 15% of roofs are smlt.</span>
+        <span class="c1"># relatively stable, that implies that roughtly 15% of roofs are smlt.</span>
         <span class="c1"># ref. link: https://www.bdcnetwork.com/blog/metal-roofs-are-soaring-</span>
         <span class="c1"># popularity-residential-marmet</span>
         <span class="n">roof_cover_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;smtl&#39;</span><span class="p">,</span> <span class="s1">&#39;cshl&#39;</span><span class="p">]</span>
@@ -369,55 +372,45 @@
         <span class="c1"># high wind attachments are required for DSWII &gt; 142 mph</span>
         <span class="c1"># NJ IBC 1507.4.5 (for smtl)</span>
         <span class="c1"># high wind attachment are required for DSWII &gt; 142 mph</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">142.0</span><span class="p">:</span>
-            <span class="n">rda</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">142.0</span><span class="p">:</span>
+            <span class="n">RDA</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span> <span class="c1"># superior</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">rda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+            <span class="n">RDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span> <span class="c1"># standard</span>
 
         <span class="c1"># Secondary Water Resistance (SWR)</span>
         <span class="c1"># Minimum drainage recommendations are in place in NJ (See below).</span>
         <span class="c1"># However, SWR indicates a code-plus practice.</span>
+        <span class="n">SWR</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span> <span class="c1"># Default</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;flt&#39;</span><span class="p">:</span>
+            <span class="n">SWR</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;hip&#39;</span><span class="p">,</span> <span class="s1">&#39;gab&#39;</span><span class="p">])</span> <span class="ow">and</span> 
+              <span class="p">(</span><span class="n">roof_cover</span><span class="o">==</span><span class="s1">&#39;cshl&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">RDA</span><span class="o">==</span><span class="s1">&#39;sup&#39;</span><span class="p">)):</span>
+            <span class="n">SWR</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">)</span>
 
-        <span class="c1"># Default</span>
-        <span class="n">swr</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>  <span class="c1"># type: ignore[no-redef]</span>
-
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;flt&#39;</span><span class="p">:</span>
-            <span class="n">swr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore[assignment]</span>
-        <span class="k">elif</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;hip&#39;</span><span class="p">,</span> <span class="s1">&#39;gab&#39;</span><span class="p">})</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">roof_cover</span> <span class="o">==</span> <span class="s1">&#39;cshl&#39;</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">rda</span> <span class="o">==</span> <span class="s1">&#39;sup&#39;</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">swr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">)</span>
-
-        <span class="n">stories</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">stories</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># extend the BIM dictionary</span>
-        <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s1">&#39;SecondaryWaterResistance&#39;</span><span class="p">:</span> <span class="n">swr</span><span class="p">,</span>
-                <span class="s1">&#39;RoofDeckAttachmentW&#39;</span><span class="p">:</span> <span class="n">rda</span><span class="p">,</span>
-                <span class="s1">&#39;RoofToWallConnection&#39;</span><span class="p">:</span> <span class="n">rwc</span><span class="p">,</span>
-                <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-                <span class="s1">&#39;AugmentGarage&#39;</span><span class="p">:</span> <span class="n">garage</span><span class="p">,</span>  <span class="c1"># type: ignore[used-before-def]</span>
-                <span class="s1">&#39;MasonryReinforcing&#39;</span><span class="p">:</span> <span class="n">mr</span><span class="p">,</span>  <span class="c1"># type: ignore[used-before-def]</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
+        <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">SecondaryWaterResistance</span> <span class="o">=</span> <span class="n">SWR</span><span class="p">,</span>
+            <span class="n">RoofDeckAttachmentW</span> <span class="o">=</span> <span class="n">RDA</span><span class="p">,</span>
+            <span class="n">RoofToWallConnection</span> <span class="o">=</span> <span class="n">RWC</span><span class="p">,</span>
+            <span class="n">Shutters</span> <span class="o">=</span> <span class="n">shutters</span><span class="p">,</span>
+            <span class="n">AugmentGarage</span> <span class="o">=</span> <span class="n">garage</span><span class="p">,</span>
+            <span class="n">MasonryReinforcing</span> <span class="o">=</span> <span class="n">MR</span><span class="p">,</span>
+            <span class="p">))</span>
 
-        <span class="n">bldg_config</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;M.SF.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">stories</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rwc</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rft</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rda</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">swr</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;null.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;null.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;M.SF.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">stories</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RWC</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RFT</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RDA</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SWR</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;null.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;null.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">return</span> <span class="n">bldg_config</span></div>
 

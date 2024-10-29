@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.WindCERBRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -194,13 +195,14 @@
 <span class="c1"># Tracy Kijewski-Correa</span>
 
 <span class="kn">import</span> <span class="nn">random</span>
-
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 <div class="viewcode-block" id="CERB_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindCERBRulesets.html#pelicun.tests.dl_calculation.rulesets.WindCERBRulesets.CERB_config">[docs]</a>
-<span class="k">def</span> <span class="nf">CERB_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="k">def</span> <span class="nf">CERB_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS CERB configuration based on BIM data.</span>
+<span class="sd">    Rules to identify a HAZUS CERB configuration based on BIM data</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -210,25 +212,26 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span> <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Roof cover</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;gab&#39;</span><span class="p">,</span> <span class="s1">&#39;hip&#39;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gab&#39;</span><span class="p">,</span> <span class="s1">&#39;hip&#39;</span><span class="p">]:</span>
         <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
         <span class="c1"># Warning: HAZUS does not have N/A option for CECB, so here we use bur</span>
-    <span class="k">elif</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span><span class="p">:</span>
-        <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;spm&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># year &lt; 1975</span>
-        <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
+        <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span><span class="p">:</span>
+            <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;spm&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># year &lt; 1975</span>
+            <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
 
     <span class="c1"># shutters</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
+        <span class="n">shutters</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
     <span class="c1"># BOCA 1996 and earlier:</span>
     <span class="c1"># Shutters were not required by code until the 2000 IBC. Before 2000, the</span>
     <span class="c1"># percentage of commercial buildings that have shutters is assumed to be</span>
@@ -238,54 +241,54 @@
     <span class="c1"># facilities. In addition to that, 46% of business owners reported boarding</span>
     <span class="c1"># up their businesses before Hurricane Katrina. In addition, compliance</span>
     <span class="c1"># rates based on the Homeowners Survey data hover between 43 and 50 percent.</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># Wind Debris (widd in HAZUS)</span>
     <span class="c1"># HAZUS A: Res/Comm, B: Varies by direction, C: Residential, D: None</span>
-    <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>  <span class="c1"># residential (default)</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RES1&#39;</span><span class="p">,</span> <span class="s1">&#39;RES2&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">}:</span>
-        <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>  <span class="c1"># residential</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AGR1&#39;</span><span class="p">:</span>
-        <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;D&#39;</span>  <span class="c1"># None</span>
+    <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span> <span class="c1"># residential (default)</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES1&#39;</span><span class="p">,</span> <span class="s1">&#39;RES2&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;RES3D&#39;</span><span class="p">]:</span>
+        <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span> <span class="c1"># residential</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AGR1&#39;</span><span class="p">:</span>
+        <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;D&#39;</span> <span class="c1"># None</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>  <span class="c1"># Res/Comm</span>
+        <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span> <span class="c1"># Res/Comm</span>
 
     <span class="c1"># Window area ratio</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindowArea&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.33</span><span class="p">:</span>
-        <span class="n">wwr</span> <span class="o">=</span> <span class="s1">&#39;low&#39;</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindowArea&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
-        <span class="n">wwr</span> <span class="o">=</span> <span class="s1">&#39;med&#39;</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindowArea&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.33</span><span class="p">:</span>
+        <span class="n">WWR</span> <span class="o">=</span> <span class="s1">&#39;low&#39;</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindowArea&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">WWR</span> <span class="o">=</span> <span class="s1">&#39;med&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">wwr</span> <span class="o">=</span> <span class="s1">&#39;hig&#39;</span>
+        <span class="n">WWR</span> <span class="o">=</span> <span class="s1">&#39;hig&#39;</span>
 
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;C.ERB.L&#39;</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;C.ERB.M&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;C.ERB.H&#39;</span>
 
     <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;RoofCover&#39;</span><span class="p">:</span> <span class="n">roof_cover</span><span class="p">,</span>
-            <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-            <span class="s1">&#39;WindowAreaRatio&#39;</span><span class="p">:</span> <span class="n">wwr</span><span class="p">,</span>
-            <span class="s1">&#39;WindDebrisClass&#39;</span><span class="p">:</span> <span class="n">widd</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">RoofCover</span> <span class="o">=</span> <span class="n">roof_cover</span><span class="p">,</span>
+        <span class="n">Shutters</span> <span class="o">=</span> <span class="n">shutters</span><span class="p">,</span>
+        <span class="n">WindowAreaRatio</span> <span class="o">=</span> <span class="n">WWR</span><span class="p">,</span>
+        <span class="n">WindDebrisClass</span> <span class="o">=</span> <span class="n">WIDD</span>
+        <span class="p">))</span>
 
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">widd</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wwr</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WIDD</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WWR</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">bldg_config</span></div>
 
 </pre></div>
 

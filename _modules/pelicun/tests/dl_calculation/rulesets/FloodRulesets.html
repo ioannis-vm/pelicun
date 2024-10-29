@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.FloodRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -195,12 +196,11 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-
 <div class="viewcode-block" id="FL_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.FloodRulesets.html#pelicun.tests.dl_calculation.rulesets.FloodRulesets.FL_config">[docs]</a>
-<span class="k">def</span> <span class="nf">FL_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="k">def</span> <span class="nf">FL_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify the flood vulnerability category.</span>
+<span class="sd">    Rules to identify the flood vunerability category</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -210,129 +210,147 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span> <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Flood Type</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AO&#39;</span><span class="p">:</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;raz&#39;</span>  <span class="c1"># Riverline/A-Zone</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;AE&#39;</span><span class="p">}</span> <span class="ow">or</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;V&#39;</span><span class="p">):</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span>  <span class="c1"># Costal-Zone</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AO&#39;</span><span class="p">:</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;raz&#39;</span> <span class="c1"># Riverline/A-Zone</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;AE&#39;</span><span class="p">]:</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span> <span class="c1"># Costal-Zone</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;V&#39;</span><span class="p">):</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span> <span class="c1"># Costal-Zone</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span>  <span class="c1"># Default</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span> <span class="c1"># Default</span>
 
-    <span class="c1"># flake8 - unused variable: `FFE`.</span>
-    <span class="c1"># # First Floor Elevation (FFE)</span>
-    <span class="c1"># if flood_type in [&#39;raz&#39;, &#39;caz&#39;]:</span>
-    <span class="c1">#     FFE = BIM[&#39;FirstFloorElevation&#39;]</span>
-    <span class="c1"># else:</span>
-    <span class="c1">#     FFE = BIM[&#39;FirstFloorElevation&#39;] - 1.0</span>
+    <span class="c1"># First Floor Elevation (FFE)</span>
+    <span class="k">if</span> <span class="n">flood_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;raz&#39;</span><span class="p">,</span> <span class="s1">&#39;caz&#39;</span><span class="p">]:</span>
+        <span class="n">FFE</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FirstFloorElevation&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">FFE</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FirstFloorElevation&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.0</span>
 
     <span class="c1"># PostFIRM</span>
-    <span class="n">post_firm</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Default</span>
-    <span class="n">city_list</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;Absecon&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Atlantic&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Brigantine&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Buena&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Buena Vista&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Corbin City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Egg Harbor City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Egg Harbor&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Estell Manor&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Folsom&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Galloway&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Hamilton&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Hammonton&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Linwood&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Longport&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Margate City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Mullica&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Northfield&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Pleasantville&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Port Republic&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Somers Point&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Ventnor City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Weymouth&#39;</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="n">year_list</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="mi">1976</span><span class="p">,</span>
-        <span class="mi">1971</span><span class="p">,</span>
-        <span class="mi">1971</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1979</span><span class="p">,</span>
-        <span class="mi">1981</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1978</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1977</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1974</span><span class="p">,</span>
-        <span class="mi">1974</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1979</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1971</span><span class="p">,</span>
-        <span class="mi">1979</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">22</span><span class="p">):</span>
-        <span class="n">post_firm</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;City&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">city_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">year</span> <span class="o">&gt;</span> <span class="n">year_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="p">)</span> <span class="ow">or</span> <span class="n">post_firm</span>
+    <span class="n">PostFIRM</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Default</span>
+    <span class="n">city_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Absecon&#39;</span><span class="p">,</span> <span class="s1">&#39;Atlantic&#39;</span><span class="p">,</span> <span class="s1">&#39;Brigantine&#39;</span><span class="p">,</span> <span class="s1">&#39;Buena&#39;</span><span class="p">,</span> <span class="s1">&#39;Buena Vista&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Corbin City&#39;</span><span class="p">,</span> <span class="s1">&#39;Egg Harbor City&#39;</span><span class="p">,</span> <span class="s1">&#39;Egg Harbor&#39;</span><span class="p">,</span> <span class="s1">&#39;Estell Manor&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Folsom&#39;</span><span class="p">,</span> <span class="s1">&#39;Galloway&#39;</span><span class="p">,</span> <span class="s1">&#39;Hamilton&#39;</span><span class="p">,</span> <span class="s1">&#39;Hammonton&#39;</span><span class="p">,</span> <span class="s1">&#39;Linwood&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Longport&#39;</span><span class="p">,</span> <span class="s1">&#39;Margate City&#39;</span><span class="p">,</span> <span class="s1">&#39;Mullica&#39;</span><span class="p">,</span> <span class="s1">&#39;Northfield&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Pleasantville&#39;</span><span class="p">,</span> <span class="s1">&#39;Port Republic&#39;</span><span class="p">,</span> <span class="s1">&#39;Somers Point&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Ventnor City&#39;</span><span class="p">,</span> <span class="s1">&#39;Weymouth&#39;</span><span class="p">]</span>
+    <span class="n">year_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1976</span><span class="p">,</span> <span class="mi">1971</span><span class="p">,</span> <span class="mi">1971</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1979</span><span class="p">,</span> <span class="mi">1981</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1978</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span>
+                 <span class="mi">1983</span><span class="p">,</span> <span class="mi">1977</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1974</span><span class="p">,</span> <span class="mi">1974</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span> <span class="mi">1979</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span>
+                 <span class="mi">1982</span><span class="p">,</span> <span class="mi">1971</span><span class="p">,</span> <span class="mi">1979</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">22</span><span class="p">):</span>
+        <span class="n">PostFIRM</span> <span class="o">=</span> <span class="p">(((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;City&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">city_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">year</span> <span class="o">&gt;</span> <span class="n">year_list</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="ow">or</span> \
+                    <span class="n">PostFIRM</span><span class="p">)</span>
 
     <span class="c1"># Basement Type</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;SplitLevel&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FoundationType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3504</span><span class="p">):</span>
-        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;spt&#39;</span>  <span class="c1"># Split-Level Basement</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FoundationType&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">3501</span><span class="p">,</span> <span class="mi">3502</span><span class="p">,</span> <span class="mi">3503</span><span class="p">,</span> <span class="mi">3505</span><span class="p">,</span> <span class="mi">3506</span><span class="p">,</span> <span class="mi">3507</span><span class="p">}:</span>
-        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;bn&#39;</span>  <span class="c1"># No Basement</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;SplitLevel&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FoundationType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3504</span><span class="p">):</span>
-        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;bw&#39;</span>  <span class="c1"># Basement</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;SplitLevel&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FoundationType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3504</span><span class="p">):</span>
+        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;spt&#39;</span> <span class="c1"># Split-Level Basement</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FoundationType&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">3501</span><span class="p">,</span> <span class="mi">3502</span><span class="p">,</span> <span class="mi">3503</span><span class="p">,</span> <span class="mi">3505</span><span class="p">,</span> <span class="mi">3506</span><span class="p">,</span> <span class="mi">3507</span><span class="p">]:</span>
+        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;bn&#39;</span> <span class="c1"># No Basement</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;SplitLevel&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FoundationType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3504</span><span class="p">):</span>
+        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;bw&#39;</span> <span class="c1"># Basement</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;bw&#39;</span>  <span class="c1"># Default</span>
+        <span class="n">bmt_type</span> <span class="o">=</span> <span class="s1">&#39;bw&#39;</span> <span class="c1"># Default</span>
 
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RES1&#39;</span><span class="p">,</span> <span class="s1">&#39;RES2&#39;</span><span class="p">}:</span>
-        <span class="k">if</span> <span class="s1">&#39;RES3&#39;</span> <span class="ow">in</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]:</span>
-            <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;RES3&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="c1"># Duration</span>
+    <span class="n">dur</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
+
+    <span class="c1"># Occupancy Type</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES1&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;raz&#39;</span><span class="p">:</span>
+                <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF1XA&#39;</span>
+            <span class="k">elif</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;cvz&#39;</span><span class="p">:</span>
+                <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF1XV&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES2&#39;</span><span class="p">:</span>
-        <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">elif</span> <span class="n">bmt_type</span> <span class="o">==</span> <span class="s1">&#39;spt&#39;</span><span class="p">:</span>
-        <span class="n">fl_config</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;sl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;bw&#39;</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+            <span class="k">if</span> <span class="n">bmt_type</span> <span class="o">==</span> <span class="s1">&#39;nav&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;raz&#39;</span><span class="p">:</span>
+                    <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF2XA&#39;</span>
+                <span class="k">elif</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;cvz&#39;</span><span class="p">:</span>
+                    <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF2XV&#39;</span>
+            <span class="k">elif</span> <span class="n">bmt_type</span> <span class="o">==</span> <span class="s1">&#39;bmt&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;raz&#39;</span><span class="p">:</span>
+                    <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF2BA&#39;</span>
+                <span class="k">elif</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;cvz&#39;</span><span class="p">:</span>
+                    <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF2BV&#39;</span>
+            <span class="k">elif</span> <span class="n">bmt_type</span> <span class="o">==</span> <span class="s1">&#39;spt&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;raz&#39;</span><span class="p">:</span>
+                    <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF2SA&#39;</span>
+                <span class="k">elif</span> <span class="n">flood_type</span> <span class="o">==</span> <span class="s1">&#39;cvz&#39;</span><span class="p">:</span>
+                    <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;SF2SV&#39;</span>
+    <span class="k">elif</span> <span class="s1">&#39;RES3&#39;</span> <span class="ow">in</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]:</span>
+        <span class="n">OT</span> <span class="o">=</span> <span class="s1">&#39;APT&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">st</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span> <span class="mi">3</span><span class="p">]))</span>
-        <span class="n">fl_config</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">st</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bmt_type</span><span class="si">}</span><span class="s2">_&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="n">ap_OT</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;RES2&#39;</span><span class="p">:</span> <span class="s1">&#39;MH&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;RES4&#39;</span><span class="p">:</span> <span class="s1">&#39;HOT&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;RES5&#39;</span><span class="p">:</span> <span class="s1">&#39;NURSE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;RES6&#39;</span><span class="p">:</span> <span class="s1">&#39;NURSE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM1&#39;</span><span class="p">:</span> <span class="s1">&#39;RETAL&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM2&#39;</span><span class="p">:</span> <span class="s1">&#39;WHOLE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM3&#39;</span><span class="p">:</span> <span class="s1">&#39;SERVICE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM4&#39;</span><span class="p">:</span> <span class="s1">&#39;OFFICE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM5&#39;</span><span class="p">:</span> <span class="s1">&#39;BANK&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM6&#39;</span><span class="p">:</span> <span class="s1">&#39;HOSP&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM7&#39;</span><span class="p">:</span> <span class="s1">&#39;MED&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM8&#39;</span><span class="p">:</span> <span class="s1">&#39;REC&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM9&#39;</span><span class="p">:</span> <span class="s1">&#39;THEAT&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;COM10&#39;</span><span class="p">:</span> <span class="s1">&#39;GARAGE&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;IND1&#39;</span><span class="p">:</span> <span class="s1">&#39;INDH&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;IND2&#39;</span><span class="p">:</span> <span class="s1">&#39;INDL&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;IND3&#39;</span><span class="p">:</span> <span class="s1">&#39;CHEM&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;IND4&#39;</span><span class="p">:</span> <span class="s1">&#39;PROC&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;IND5&#39;</span><span class="p">:</span> <span class="s1">&#39;CHEM&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;IND6&#39;</span><span class="p">:</span> <span class="s1">&#39;CONST&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;AGR1&#39;</span><span class="p">:</span> <span class="s1">&#39;AGRI&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;REL1&#39;</span><span class="p">:</span> <span class="s1">&#39;RELIG&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;GOV1&#39;</span><span class="p">:</span> <span class="s1">&#39;CITY&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;GOV2&#39;</span><span class="p">:</span> <span class="s1">&#39;EMERG&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDU1&#39;</span><span class="p">:</span> <span class="s1">&#39;SCHOOL&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EDU2&#39;</span><span class="p">:</span> <span class="s1">&#39;SCHOOL&#39;</span>
+        <span class="p">}</span>
+        <span class="n">ap_OT</span><span class="p">[</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]]</span>
+
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES1&#39;</span><span class="p">,</span> <span class="s1">&#39;RES2&#39;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="s1">&#39;RES3&#39;</span> <span class="ow">in</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]:</span>
+            <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;RES3&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES2&#39;</span><span class="p">:</span>
+        <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bmt_type</span> <span class="o">==</span> <span class="s1">&#39;spt&#39;</span><span class="p">:</span>
+            <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;sl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;bw&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">st</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">],</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="n">fl_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">st</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bmt_type</span><span class="si">}</span><span class="s2">_&quot;</span> \
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;FloodType&#39;</span><span class="p">:</span> <span class="n">flood_type</span><span class="p">,</span>
-            <span class="s1">&#39;BasementType&#39;</span><span class="p">:</span> <span class="n">bmt_type</span><span class="p">,</span>
-            <span class="s1">&#39;PostFIRM&#39;</span><span class="p">:</span> <span class="n">post_firm</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">FloodType</span> <span class="o">=</span> <span class="n">flood_type</span><span class="p">,</span>
+        <span class="n">BasementType</span><span class="o">=</span><span class="n">bmt_type</span><span class="p">,</span>
+        <span class="n">PostFIRM</span><span class="o">=</span><span class="n">PostFIRM</span><span class="p">,</span>
+        <span class="p">))</span>
 
     <span class="k">return</span> <span class="n">fl_config</span></div>
+
 
 </pre></div>
 

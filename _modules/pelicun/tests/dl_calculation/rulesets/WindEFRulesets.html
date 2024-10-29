@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.WindEFRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -193,15 +194,16 @@
 <span class="c1"># Meredith Lockhead</span>
 <span class="c1"># Tracy Kijewski-Correa</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 
 <div class="viewcode-block" id="HUEFFS_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindEFRulesets.html#pelicun.tests.dl_calculation.rulesets.WindEFRulesets.HUEFFS_config">[docs]</a>
-<span class="k">def</span> <span class="nf">HUEFFS_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">HUEFFS_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS HUEFFS/HUEFSS configuration based on BIM data.</span>
+<span class="sd">    Rules to identify a HAZUS HUEFFS/HUEFSS configuration based on BIM data</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -211,79 +213,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
 
-    <span class="c1"># Roof cover</span>
-    <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;spm&#39;</span> <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span> <span class="k">else</span> <span class="s1">&#39;bur&#39;</span>
-
-    <span class="c1"># Wind debris</span>
-    <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
-
-    <span class="c1"># Roof deck age</span>
-    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">50</span><span class="p">):</span>
-        <span class="n">dq</span> <span class="o">=</span> <span class="s1">&#39;god&#39;</span>  <span class="c1"># new or average</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dq</span> <span class="o">=</span> <span class="s1">&#39;por&#39;</span>  <span class="c1"># old</span>
-
-    <span class="c1"># Metal-RDA</span>
-    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
-
-    <span class="c1"># Shutters</span>
-    <span class="n">shutters</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WBD&#39;</span><span class="p">])</span>
-
-    <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;RoofCover&#39;</span><span class="p">:</span> <span class="n">roof_cover</span><span class="p">,</span>
-            <span class="s1">&#39;RoofDeckAttachmentM&#39;</span><span class="p">:</span> <span class="n">mrda</span><span class="p">,</span>
-            <span class="s1">&#39;RoofDeckAge&#39;</span><span class="p">:</span> <span class="n">dq</span><span class="p">,</span>
-            <span class="s1">&#39;WindDebrisClass&#39;</span><span class="p">:</span> <span class="n">widd</span><span class="p">,</span>
-            <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
-
-    <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.FS&#39;</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">shutters</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">widd</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dq</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mrda</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="HUEFSS_config">
-<a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindEFRulesets.html#pelicun.tests.dl_calculation.rulesets.WindEFRulesets.HUEFSS_config">[docs]</a>
-<span class="k">def</span> <span class="nf">HUEFSS_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS HUEFFS/HUEFSS configuration based on BIM data.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    BIM: dictionary</span>
-<span class="sd">        Information about the building characteristics.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Roof cover</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span><span class="p">:</span>
@@ -293,55 +227,122 @@
         <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
 
     <span class="c1"># Wind debris</span>
-    <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+    <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
 
     <span class="c1"># Roof deck age</span>
-    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">50</span><span class="p">):</span>
-        <span class="n">dq</span> <span class="o">=</span> <span class="s1">&#39;god&#39;</span>  <span class="c1"># new or average</span>
+    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="n">DQ</span> <span class="o">=</span> <span class="s1">&#39;god&#39;</span> <span class="c1"># new or average</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">dq</span> <span class="o">=</span> <span class="s1">&#39;por&#39;</span>  <span class="c1"># old</span>
+        <span class="n">DQ</span> <span class="o">=</span> <span class="s1">&#39;por&#39;</span> <span class="c1"># old</span>
 
     <span class="c1"># Metal-RDA</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
 
     <span class="c1"># Shutters</span>
-    <span class="n">shutters</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
+    <span class="n">shutters</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WBD&#39;</span><span class="p">])</span>
 
     <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;RoofCover&#39;</span><span class="p">:</span> <span class="n">roof_cover</span><span class="p">,</span>
-            <span class="s1">&#39;RoofDeckAttachmentM&#39;</span><span class="p">:</span> <span class="n">mrda</span><span class="p">,</span>
-            <span class="s1">&#39;RoofDeckAge&#39;</span><span class="p">:</span> <span class="n">dq</span><span class="p">,</span>
-            <span class="s1">&#39;WindDebrisClass&#39;</span><span class="p">:</span> <span class="n">widd</span><span class="p">,</span>
-            <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">RoofCover</span> <span class="o">=</span> <span class="n">roof_cover</span><span class="p">,</span>
+        <span class="n">RoofDeckAttachmentM</span> <span class="o">=</span> <span class="n">MRDA</span><span class="p">,</span>
+        <span class="n">RoofDeckAge</span><span class="o">=</span><span class="n">DQ</span><span class="p">,</span>
+        <span class="n">WindDebrisClass</span> <span class="o">=</span> <span class="n">WIDD</span><span class="p">,</span>
+        <span class="n">Shutters</span> <span class="o">=</span> <span class="n">shutters</span>
+        <span class="p">))</span>
+
+    <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.FS&#39;</span>
+    <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">shutters</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WIDD</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DQ</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MRDA</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">bldg_config</span></div>
+
+
+<div class="viewcode-block" id="HUEFSS_config">
+<a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindEFRulesets.html#pelicun.tests.dl_calculation.rulesets.WindEFRulesets.HUEFSS_config">[docs]</a>
+<span class="k">def</span> <span class="nf">HUEFSS_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rules to identify a HAZUS HUEFFS/HUEFSS configuration based on BIM data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    BIM: dictionary</span>
+<span class="sd">        Information about the building characteristics.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    config: str</span>
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+
+    <span class="c1"># Roof cover</span>
+    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span><span class="p">:</span>
+        <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;spm&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># year &lt; 1975</span>
+        <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
+
+    <span class="c1"># Wind debris</span>
+    <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+
+    <span class="c1"># Roof deck age</span>
+    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="n">DQ</span> <span class="o">=</span> <span class="s1">&#39;god&#39;</span> <span class="c1"># new or average</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">DQ</span> <span class="o">=</span> <span class="s1">&#39;por&#39;</span> <span class="c1"># old</span>
+
+    <span class="c1"># Metal-RDA</span>
+    <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+
+    <span class="c1"># Shutters</span>
+    <span class="n">shutters</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
+
+    <span class="c1"># extend the BIM dictionary</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">RoofCover</span> <span class="o">=</span> <span class="n">roof_cover</span><span class="p">,</span>
+        <span class="n">RoofDeckAttachmentM</span> <span class="o">=</span> <span class="n">MRDA</span><span class="p">,</span>
+        <span class="n">RoofDeckAge</span><span class="o">=</span><span class="n">DQ</span><span class="p">,</span>
+        <span class="n">WindDebrisClass</span> <span class="o">=</span> <span class="n">WIDD</span><span class="p">,</span>
+        <span class="n">Shutters</span><span class="o">=</span><span class="n">shutters</span>
+        <span class="p">))</span>
 
     <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.S.S&#39;</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">widd</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dq</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mrda</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WIDD</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DQ</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MRDA</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">bldg_config</span></div>
 
 
 
 <div class="viewcode-block" id="HUEFH_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindEFRulesets.html#pelicun.tests.dl_calculation.rulesets.WindEFRulesets.HUEFH_config">[docs]</a>
-<span class="k">def</span> <span class="nf">HUEFH_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">HUEFH_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS HUEFH configuration based on BIM data.</span>
+<span class="sd">    Rules to identify a HAZUS HUEFH configuration based on BIM data</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -351,11 +352,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Roof cover</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span><span class="p">:</span>
@@ -365,53 +366,50 @@
         <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
 
     <span class="c1"># Wind debris</span>
-    <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+    <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
 
     <span class="c1"># Shutters</span>
-    <span class="n">shutters</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
+    <span class="n">shutters</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
 
     <span class="c1"># Metal-RDA</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
 
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span><span class="mi">2</span><span class="p">:</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.H.S&#39;</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.H.M&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.H.L&#39;</span>
 
     <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;RoofCover&#39;</span><span class="p">:</span> <span class="n">roof_cover</span><span class="p">,</span>
-            <span class="s1">&#39;RoofDeckAttachmentM&#39;</span><span class="p">:</span> <span class="n">mrda</span><span class="p">,</span>
-            <span class="s1">&#39;WindDebrisClass&#39;</span><span class="p">:</span> <span class="n">widd</span><span class="p">,</span>
-            <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">RoofCover</span> <span class="o">=</span> <span class="n">roof_cover</span><span class="p">,</span>
+        <span class="n">RoofDeckAttachmentM</span> <span class="o">=</span> <span class="n">MRDA</span><span class="p">,</span>
+        <span class="n">WindDebrisClass</span> <span class="o">=</span> <span class="n">WIDD</span><span class="p">,</span>
+        <span class="n">Shutters</span><span class="o">=</span><span class="n">shutters</span>
+        <span class="p">))</span>
 
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">widd</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mrda</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WIDD</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MRDA</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
 
+    <span class="k">return</span> <span class="n">bldg_config</span></div>
 
 
 <div class="viewcode-block" id="HUEFS_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindEFRulesets.html#pelicun.tests.dl_calculation.rulesets.WindEFRulesets.HUEFS_config">[docs]</a>
-<span class="k">def</span> <span class="nf">HUEFS_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">HUEFS_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS HUEFS configuration based on BIM data.</span>
+<span class="sd">    Rules to identify a HAZUS HUEFS configuration based on BIM data</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -421,11 +419,11 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Roof cover</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1975</span><span class="p">:</span>
@@ -435,46 +433,49 @@
         <span class="n">roof_cover</span> <span class="o">=</span> <span class="s1">&#39;bur&#39;</span>
 
     <span class="c1"># Wind debris</span>
-    <span class="n">widd</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
+    <span class="n">WIDD</span> <span class="o">=</span> <span class="s1">&#39;C&#39;</span>
 
     <span class="c1"># Shutters</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.46</span>
+        <span class="n">shutters</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># year &lt;= 2000</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.46</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="c1"># Metal-RDA</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">142</span><span class="p">:</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
+            <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;sup&#39;</span>  <span class="c1"># superior</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mrda</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
+        <span class="n">MRDA</span> <span class="o">=</span> <span class="s1">&#39;std&#39;</span>  <span class="c1"># standard</span>
 
-    <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.S.M&#39;</span> <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">&#39;HUEF.S.L&#39;</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">&lt;=</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.S.M&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;HUEF.S.L&#39;</span>
 
     <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;RoofCover&#39;</span><span class="p">:</span> <span class="n">roof_cover</span><span class="p">,</span>
-            <span class="s1">&#39;RoofDeckAttachmentM&#39;</span><span class="p">:</span> <span class="n">mrda</span><span class="p">,</span>
-            <span class="s1">&#39;WindDebrisClass&#39;</span><span class="p">:</span> <span class="n">widd</span><span class="p">,</span>
-            <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">RoofCover</span> <span class="o">=</span> <span class="n">roof_cover</span><span class="p">,</span>
+        <span class="n">RoofDeckAttachmentM</span> <span class="o">=</span> <span class="n">MRDA</span><span class="p">,</span>
+        <span class="n">WindDebrisClass</span> <span class="o">=</span> <span class="n">WIDD</span><span class="p">,</span>
+        <span class="n">Shutters</span><span class="o">=</span><span class="n">shutters</span>
+        <span class="p">))</span>
 
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">widd</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;null.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mrda</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">roof_cover</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WIDD</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;null.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MRDA</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">bldg_config</span></div>
 
 </pre></div>
 

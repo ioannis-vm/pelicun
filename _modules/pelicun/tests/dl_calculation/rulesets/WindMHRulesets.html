@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.WindMHRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -194,13 +195,14 @@
 <span class="c1"># Tracy Kijewski-Correa</span>
 
 <span class="kn">import</span> <span class="nn">random</span>
-
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 <div class="viewcode-block" id="MH_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.WindMHRulesets.html#pelicun.tests.dl_calculation.rulesets.WindMHRulesets.MH_config">[docs]</a>
-<span class="k">def</span> <span class="nf">MH_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">MH_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify a HAZUS WSF configuration based on BIM data.</span>
+<span class="sd">    Rules to identify a HAZUS WSF configuration based on BIM data</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -210,47 +212,58 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span> <span class="c1"># just for the sake of brevity</span>
     <span class="k">if</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="mi">1976</span><span class="p">:</span>
         <span class="c1"># MHPHUD</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;MH.PHUD&#39;</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span> <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># TieDowns</span>
-        <span class="n">tie_downs</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
+        <span class="n">TD</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
 
     <span class="k">elif</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="mi">1994</span><span class="p">:</span>
         <span class="c1"># MH76HUD</span>
         <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;MH.76HUD&#39;</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span> <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindBorneDebris&#39;</span><span class="p">]:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># TieDowns</span>
-        <span class="n">tie_downs</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
+        <span class="n">TD</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.45</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># MH94HUD I, II, III</span>
-        <span class="n">shutters</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">100.0</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">100.0</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shutters</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># TieDowns</span>
-        <span class="n">tie_downs</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">70.0</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;V_ult&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">70.0</span><span class="p">:</span>
+            <span class="n">TD</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">TD</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;MH.94HUD&#39;</span> <span class="o">+</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;WindZone&#39;</span><span class="p">]</span>
+        <span class="n">bldg_tag</span> <span class="o">=</span> <span class="s1">&#39;MH.94HUD&#39;</span> <span class="o">+</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;WindZone&#39;</span><span class="p">]</span>
 
     <span class="c1"># extend the BIM dictionary</span>
-    <span class="n">bim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="p">{</span>
-            <span class="s1">&#39;TieDowns&#39;</span><span class="p">:</span> <span class="n">tie_downs</span><span class="p">,</span>
-            <span class="s1">&#39;Shutters&#39;</span><span class="p">:</span> <span class="n">shutters</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">)</span>
+    <span class="n">BIM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="n">TieDowns</span> <span class="o">=</span> <span class="n">TD</span><span class="p">,</span>
+        <span class="n">Shutters</span> <span class="o">=</span> <span class="n">shutters</span><span class="p">,</span>
+        <span class="p">))</span>
 
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">tie_downs</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span></div>
+    <span class="n">bldg_config</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bldg_tag</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">shutters</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">TD</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;TerrainRoughness&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">bldg_config</span></div>
+
 
 </pre></div>
 

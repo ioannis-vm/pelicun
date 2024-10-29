@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.BldgClassRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -193,12 +194,15 @@
 <span class="c1"># Meredith Lockhead</span>
 <span class="c1"># Tracy Kijewski-Correa</span>
 
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 <div class="viewcode-block" id="building_class">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.BldgClassRulesets.html#pelicun.tests.dl_calculation.rulesets.BldgClassRulesets.building_class">[docs]</a>
-<span class="k">def</span> <span class="nf">building_class</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">hazard</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+<span class="k">def</span> <span class="nf">building_class</span><span class="p">(</span><span class="n">BIM</span><span class="p">,</span> <span class="n">hazard</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Short description.</span>
+<span class="sd">    Short description</span>
 
 <span class="sd">    Long description</span>
 
@@ -213,182 +217,97 @@
 <span class="sd">    -------</span>
 <span class="sd">    bldg_class: str</span>
 <span class="sd">        One of the standard building class labels from HAZUS</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># check hazard</span>
-    <span class="k">if</span> <span class="n">hazard</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;wind&#39;</span><span class="p">,</span> <span class="s1">&#39;inundation&#39;</span><span class="p">}:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;WARNING: The provided hazard is not recognized: </span><span class="si">{</span><span class="n">hazard</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># noqa: T201</span>
+    <span class="k">if</span> <span class="n">hazard</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;wind&#39;</span><span class="p">,</span> <span class="s1">&#39;inundation&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;WARNING: The provided hazard is not recognized: </span><span class="si">{</span><span class="n">hazard</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">hazard</span> <span class="o">==</span> <span class="s1">&#39;wind&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Wood&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES1&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;flt&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># noqa: PLC1901</span>
-            <span class="p">):</span>
+        <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Wood&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES1&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;flt&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">))):</span>
                 <span class="c1"># OccupancyClass = RES1</span>
                 <span class="c1"># Wood Single-Family Homes (WSF1 or WSF2)</span>
                 <span class="c1"># OR roof type = flat (HAZUS can only map flat to WSF1)</span>
                 <span class="c1"># OR default (by &#39;&#39;)</span>
-                <span class="k">if</span> <span class="p">(</span>
-                    <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;flt&#39;</span>
-                <span class="p">):</span>  <span class="c1"># checking if there is a misclassication</span>
-                    <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="c1"># ensure the WSF has gab (by default, note gab</span>
-                        <span class="c1"># is more vulnerable than hip)</span>
-                        <span class="s1">&#39;gab&#39;</span>
-                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;flt&#39;</span><span class="p">:</span> <span class="c1"># checking if there is a misclassication</span>
+                    <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;RoofShape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gab&#39;</span> <span class="c1"># ensure the WSF has gab (by default, note gab is more vulneable than hip)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;WSF&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># OccupancyClass = RES3, RES5, RES6, or COM8</span>
                 <span class="c1"># Wood Multi-Unit Hotel (WMUH1, WMUH2, or WMUH3)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;WMUH&#39;</span>
 
-        <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Steel&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">}</span>
-            <span class="p">):</span>
+        <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Steel&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
+                                                <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">])):</span>
                 <span class="c1"># Steel Engineered Residential Building (SERBL, SERBM, SERBH)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;SERB&#39;</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">in</span> <span class="p">{</span>
-                    <span class="s1">&#39;COM1&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM2&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM3&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM4&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM5&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM6&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM7&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM8&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM9&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM10&#39;</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">):</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                  <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;COM1&#39;</span><span class="p">,</span> <span class="s1">&#39;COM2&#39;</span><span class="p">,</span> <span class="s1">&#39;COM3&#39;</span><span class="p">,</span> <span class="s1">&#39;COM4&#39;</span><span class="p">,</span> <span class="s1">&#39;COM5&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;COM6&#39;</span><span class="p">,</span> <span class="s1">&#39;COM7&#39;</span><span class="p">,</span> <span class="s1">&#39;COM8&#39;</span><span class="p">,</span> <span class="s1">&#39;COM9&#39;</span><span class="p">,</span><span class="s1">&#39;COM10&#39;</span><span class="p">])):</span>
                 <span class="c1"># Steel Engineered Commercial Building (SECBL, SECBM, SECBH)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;SECB&#39;</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;PE&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">}</span>
-            <span class="p">):</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;PE&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                  <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">])):</span>
                 <span class="c1"># Steel Pre-Engineered Metal Building (SPMBS, SPMBM, SPMBL)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;SPMB&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;SECB&#39;</span>
 
-        <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Concrete&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">in</span> <span class="p">{</span>
-                    <span class="s1">&#39;RES3A&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES3F&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES5&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;RES6&#39;</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">):</span>
+        <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Concrete&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">,</span> <span class="s1">&#39;RES5&#39;</span><span class="p">,</span> <span class="s1">&#39;RES6&#39;</span><span class="p">])):</span>
                 <span class="c1"># Concrete Engineered Residential Building (CERBL, CERBM, CERBH)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;CERB&#39;</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">in</span> <span class="p">{</span>
-                    <span class="s1">&#39;COM1&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM2&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM3&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM4&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM5&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM6&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM7&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM8&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM9&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM10&#39;</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">):</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                  <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;COM1&#39;</span><span class="p">,</span> <span class="s1">&#39;COM2&#39;</span><span class="p">,</span> <span class="s1">&#39;COM3&#39;</span><span class="p">,</span> <span class="s1">&#39;COM4&#39;</span><span class="p">,</span> <span class="s1">&#39;COM5&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;COM6&#39;</span><span class="p">,</span> <span class="s1">&#39;COM7&#39;</span><span class="p">,</span> <span class="s1">&#39;COM8&#39;</span><span class="p">,</span> <span class="s1">&#39;COM9&#39;</span><span class="p">,</span><span class="s1">&#39;COM10&#39;</span><span class="p">])):</span>
                 <span class="c1"># Concrete Engineered Commercial Building (CECBL, CECBM, CECBH)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;CECB&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;CECB&#39;</span>
 
-        <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Masonry&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES1&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Masonry&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RES1&#39;</span><span class="p">:</span>
                 <span class="c1"># OccupancyClass = RES1</span>
                 <span class="c1"># Masonry Single-Family Homes (MSF1 or MSF2)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MSF&#39;</span>
-            <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">}</span>
-            <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)):</span>
                 <span class="c1"># Masonry Engineered Residential Building (MERBL, MERBM, MERBH)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MERB&#39;</span>
-            <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span>
-                <span class="ow">in</span> <span class="p">{</span>
-                    <span class="s1">&#39;COM1&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM2&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM3&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM4&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM5&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM6&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM7&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM8&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM9&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;COM10&#39;</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;COM1&#39;</span><span class="p">,</span> <span class="s1">&#39;COM2&#39;</span><span class="p">,</span> <span class="s1">&#39;COM3&#39;</span><span class="p">,</span> <span class="s1">&#39;COM4&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;COM5&#39;</span><span class="p">,</span> <span class="s1">&#39;COM6&#39;</span><span class="p">,</span> <span class="s1">&#39;COM7&#39;</span><span class="p">,</span> <span class="s1">&#39;COM8&#39;</span><span class="p">,</span> <span class="s1">&#39;COM9&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;COM10&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;DesignLevel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;E&#39;</span><span class="p">)):</span>
                 <span class="c1"># Masonry Engineered Commercial Building (MECBL, MECBM, MECBH)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MECB&#39;</span>
-            <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span>
-                <span class="s1">&#39;IND1&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;IND2&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;IND3&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;IND4&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;IND5&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;IND6&#39;</span><span class="p">,</span>
-            <span class="p">}:</span>
+            <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;IND1&#39;</span><span class="p">,</span> <span class="s1">&#39;IND2&#39;</span><span class="p">,</span> <span class="s1">&#39;IND3&#39;</span><span class="p">,</span> <span class="s1">&#39;IND4&#39;</span><span class="p">,</span> <span class="s1">&#39;IND5&#39;</span><span class="p">,</span> <span class="s1">&#39;IND6&#39;</span><span class="p">]:</span>
                 <span class="c1"># Masonry Low-Rise Masonry Warehouse/Factory (MLRI)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MLRI&#39;</span>
-            <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span>
-                <span class="s1">&#39;RES3A&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES3F&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES5&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;RES6&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;COM8&#39;</span><span class="p">,</span>
-            <span class="p">}:</span>
+            <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RES3A&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3B&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3C&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3D&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;RES3E&#39;</span><span class="p">,</span> <span class="s1">&#39;RES3F&#39;</span><span class="p">,</span> <span class="s1">&#39;RES5&#39;</span><span class="p">,</span> <span class="s1">&#39;RES6&#39;</span><span class="p">,</span> <span class="s1">&#39;COM8&#39;</span><span class="p">]:</span>
                 <span class="c1"># OccupancyClass = RES3X or COM8</span>
                 <span class="c1"># Masonry Multi-Unit Hotel/Motel (MMUH1, MMUH2, or MMUH3)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MMUH&#39;</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;COM1&#39;</span><span class="p">,</span> <span class="s1">&#39;COM2&#39;</span><span class="p">}</span>
-            <span class="p">):</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;COM1&#39;</span><span class="p">,</span> <span class="s1">&#39;COM2&#39;</span><span class="p">])):</span>
                 <span class="c1"># Low-Rise Masonry Strip Mall (MLRM1 or MLRM2)</span>
                 <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MLRM&#39;</span>
-            <span class="c1"># elif (</span>
-            <span class="c1">#     BIM[&#39;OccupancyClass&#39;]</span>
-            <span class="c1">#     in [</span>
-            <span class="c1">#         &#39;RES3A&#39;,</span>
-            <span class="c1">#         &#39;RES3B&#39;,</span>
-            <span class="c1">#         &#39;RES3C&#39;,</span>
-            <span class="c1">#         &#39;RES3D&#39;,</span>
-            <span class="c1">#         &#39;RES3E&#39;,</span>
-            <span class="c1">#         &#39;RES3F&#39;,</span>
-            <span class="c1">#         &#39;RES5&#39;,</span>
-            <span class="c1">#         &#39;RES6&#39;,</span>
-            <span class="c1">#         &#39;COM8&#39;,</span>
-            <span class="c1">#     ]</span>
-            <span class="c1"># ) and (BIM[&#39;DesignLevel&#39;] in [&#39;NE&#39;, &#39;ME&#39;]):</span>
-            <span class="c1">#     # Masonry Multi-Unit Hotel/Motel Non-Engineered</span>
-            <span class="c1">#     # (MMUH1NE, MMUH2NE, or MMUH3NE)</span>
-            <span class="c1">#     bldg_class = &#39;MMUHNE&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MECB&#39;</span>  <span class="c1"># for others not covered by the above</span>
+                <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MECB&#39;</span> <span class="c1"># for others not covered by the above</span>
+            <span class="c1">#elif ((BIM[&#39;OccupancyClass&#39;] in [&#39;RES3A&#39;, &#39;RES3B&#39;, &#39;RES3C&#39;, &#39;RES3D&#39;,</span>
+            <span class="c1">#                                &#39;RES3E&#39;, &#39;RES3F&#39;, &#39;RES5&#39;, &#39;RES6&#39;,</span>
+            <span class="c1">#                                &#39;COM8&#39;]) and (BIM[&#39;DesignLevel&#39;] in [&#39;NE&#39;, &#39;ME&#39;])):</span>
+            <span class="c1">#    # Masonry Multi-Unit Hotel/Motel Non-Engineered</span>
+            <span class="c1">#    # (MMUH1NE, MMUH2NE, or MMUH3NE)</span>
+            <span class="c1">#    bldg_class = &#39;MMUHNE&#39;</span>
 
-        <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Manufactured&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;BuildingType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Manufactured&quot;</span><span class="p">:</span>
             <span class="n">bldg_class</span> <span class="o">=</span> <span class="s1">&#39;MH&#39;</span>
 
         <span class="k">else</span><span class="p">:</span>

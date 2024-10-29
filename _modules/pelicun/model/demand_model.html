@@ -918,7 +918,7 @@
         <span class="p">)</span>
 
         <span class="n">demand_theta</span><span class="p">,</span> <span class="n">demand_rho</span> <span class="o">=</span> <span class="n">uq</span><span class="o">.</span><span class="n">fit_distribution_to_sample</span><span class="p">(</span>
-            <span class="n">raw_samples</span><span class="o">=</span><span class="n">demand_sample</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="n">raw_sample</span><span class="o">=</span><span class="n">demand_sample</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
             <span class="n">distribution</span><span class="o">=</span><span class="n">cal_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Family&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
             <span class="n">censored_count</span><span class="o">=</span><span class="n">censored_count</span><span class="p">,</span>
             <span class="n">detection_limits</span><span class="o">=</span><span class="n">cal_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>  <span class="c1"># type: ignore</span>

@@ -550,18 +550,18 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
             <span class="c1"># first transform from normal to uniform</span>
-            <span class="n">uni_samples</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">samples_i</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">theta_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">theta_i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">uni_sample</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">samples_i</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">theta_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">theta_i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
             <span class="c1"># replace 0 and 1 values with the nearest float</span>
-            <span class="n">uni_samples</span><span class="p">[</span><span class="n">uni_samples</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">uni_samples</span><span class="p">[</span><span class="n">uni_samples</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">uni_sample</span><span class="p">[</span><span class="n">uni_sample</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">uni_sample</span><span class="p">[</span><span class="n">uni_sample</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
             <span class="c1"># consider truncation if needed</span>
             <span class="n">p_a</span><span class="p">,</span> <span class="n">p_b</span> <span class="o">=</span> <span class="n">_get_limit_probs</span><span class="p">(</span><span class="n">tr_lim_i</span><span class="p">,</span> <span class="n">dist_i</span><span class="p">,</span> <span class="n">theta_i</span><span class="p">)</span>
-            <span class="n">uni_samples</span> <span class="o">=</span> <span class="p">(</span><span class="n">uni_samples</span> <span class="o">-</span> <span class="n">p_a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p_b</span> <span class="o">-</span> <span class="n">p_a</span><span class="p">)</span>
+            <span class="n">uni_sample</span> <span class="o">=</span> <span class="p">(</span><span class="n">uni_sample</span> <span class="o">-</span> <span class="n">p_a</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p_b</span> <span class="o">-</span> <span class="n">p_a</span><span class="p">)</span>
 
             <span class="c1"># then transform from uniform to standard normal</span>
-            <span class="n">std_samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">uni_samples</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">std_samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">uni_sample</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Unsupported distribution: </span><span class="si">{</span><span class="n">dist_i</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -620,7 +620,7 @@
     <span class="c1"># otherwise, we can try to fix the matrix using SVD</span>
     <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">u_matrix</span><span class="p">,</span> <span class="n">s_matrix</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span>
+            <span class="n">u_matrix</span><span class="p">,</span> <span class="n">s_vector</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span>
                 <span class="n">rho_hat</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -628,7 +628,7 @@
             <span class="c1"># if this also fails, we give up</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">s_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diagflat</span><span class="p">(</span><span class="n">s_matrix</span><span class="p">)</span>
+        <span class="n">s_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diagflat</span><span class="p">(</span><span class="n">s_vector</span><span class="p">)</span>
 
         <span class="n">rho_hat</span> <span class="o">=</span> <span class="n">u_matrix</span> <span class="o">@</span> <span class="n">s_diag</span> <span class="o">@</span> <span class="n">u_matrix</span><span class="o">.</span><span class="n">T</span>
         <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">rho_hat</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
@@ -840,21 +840,21 @@
     <span class="n">likelihoods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">likelihoods</span><span class="p">,</span> <span class="n">a_min</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">a_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="c1"># calculate the total negative log likelihood</span>
-    <span class="n">null</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span>
+    <span class="n">negative_log_likelihood</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">likelihoods</span><span class="p">))</span>  <span class="c1"># from samples</span>
         <span class="o">+</span> <span class="n">censored_count</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cen_likelihood</span><span class="p">)</span>
     <span class="p">)</span>  <span class="c1"># censoring influence</span>
 
-    <span class="c1"># normalize the NLL with the sample count</span>
-    <span class="k">return</span> <span class="n">null</span> <span class="o">/</span> <span class="n">samples</span><span class="o">.</span><span class="n">size</span>
-
     <span class="c1"># print(theta[0], params, NLL)</span>
+
+    <span class="c1"># normalize the NLL with the sample count</span>
+    <span class="k">return</span> <span class="n">negative_log_likelihood</span> <span class="o">/</span> <span class="n">samples</span><span class="o">.</span><span class="n">size</span>
 
 
 <div class="viewcode-block" id="fit_distribution_to_sample">
 <a class="viewcode-back" href="../../api_reference/_autosummary/pelicun.uq.html#pelicun.uq.fit_distribution_to_sample">[docs]</a>
 <span class="k">def</span> <span class="nf">fit_distribution_to_sample</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
-    <span class="n">raw_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">raw_sample</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">distribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">truncation_limits</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
     <span class="n">censored_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -874,7 +874,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    raw_samples: float ndarray</span>
+<span class="sd">    raw_sample: float ndarray</span>
 <span class="sd">        Raw data that serves as the basis of estimation. The number of samples</span>
 <span class="sd">        equals the number of columns and each row introduces a new feature. In</span>
 <span class="sd">        other words: a list of sample lists is expected where each sample list</span>
@@ -883,7 +883,7 @@
 <span class="sd">        Defines the target probability distribution type. Different types of</span>
 <span class="sd">        distributions can be mixed by providing a list rather than a single</span>
 <span class="sd">        value. Each element of the list corresponds to one of the features in</span>
-<span class="sd">        the raw_samples.</span>
+<span class="sd">        the raw_sample.</span>
 <span class="sd">    truncation_limits: float ndarray, optional, default: [None, None]</span>
 <span class="sd">        Lower and/or upper truncation limits for the specified distributions.</span>
 <span class="sd">        A two-element vector can be used for a univariate case, while two lists</span>
@@ -934,7 +934,7 @@
 <span class="sd">        If NaN values are produced during standard normal space transformation</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">raw_samples</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">raw_sample</span><span class="p">)</span>
     <span class="n">tr_limits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">truncation_limits</span><span class="p">)</span>
     <span class="n">det_limits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">detection_limits</span><span class="p">)</span>
     <span class="n">dist_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">distribution</span><span class="p">)</span>
@@ -1000,8 +1000,8 @@
 
     <span class="c1"># There is nothing to gain from a time-consuming optimization if..</span>
     <span class="c1">#     the number of samples is too small</span>
-    <span class="n">small_n_samples</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">n_samples</span> <span class="o">&lt;</span> <span class="n">small_n_samples</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+    <span class="n">min_sample_size_for_optimization</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n_samples</span> <span class="o">&lt;</span> <span class="n">min_sample_size_for_optimization</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
         <span class="c1"># there are no truncation or detection limits involved</span>
         <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">tr_limits</span><span class="p">))</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">det_limits</span><span class="p">))</span>
     <span class="p">):</span>
@@ -1285,11 +1285,11 @@
         <span class="s1">&#39;RV_set&#39;</span><span class="p">,</span>
         <span class="s1">&#39;_sample&#39;</span><span class="p">,</span>
         <span class="s1">&#39;_sample_DF&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;_uni_sample&#39;</span><span class="p">,</span>
         <span class="s1">&#39;anchor&#39;</span><span class="p">,</span>
         <span class="s1">&#39;distribution&#39;</span><span class="p">,</span>
         <span class="s1">&#39;f_map&#39;</span><span class="p">,</span>
         <span class="s1">&#39;name&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;uni_samples&#39;</span><span class="p">,</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1318,7 +1318,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_map</span> <span class="o">=</span> <span class="n">f_map</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uni_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uni_sample</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">RV_set</span><span class="p">:</span> <span class="n">RandomVariableSet</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_DF</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1384,7 +1384,9 @@
 <span class="sd">          The sample from the controlling uniform distribution.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor</span><span class="o">.</span><span class="n">uni_samples</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_uni_sample</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">anchor</span><span class="o">.</span><span class="n">uni_sample</span>
 
     <span class="nd">@uni_sample</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">uni_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1397,7 +1399,7 @@
 <span class="sd">            An array of floating point values in the [0, 1] domain.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uni_samples</span> <span class="o">=</span> <span class="n">value</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uni_sample</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
 
@@ -1457,7 +1459,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the inverse CDF.</span>
 
-<span class="sd">        Usses inverse probability integral transformation on the</span>
+<span class="sd">        Uses inverse probability integral transformation on the</span>
 <span class="sd">        provided values.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span></div>
@@ -1527,7 +1529,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the inverse CDF.</span>
 
-<span class="sd">        Usses inverse probability integral transformation on the</span>
+<span class="sd">        Uses inverse probability integral transformation on the</span>
 <span class="sd">        provided values.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span></div>
@@ -1828,7 +1830,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the inverse CDF.</span>
 
-<span class="sd">        Usses inverse probability integral transformation on the</span>
+<span class="sd">        Uses inverse probability integral transformation on the</span>
 <span class="sd">        provided values.</span>
 
 <span class="sd">        Parameters</span>
@@ -1936,7 +1938,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the inverse CDF.</span>
 
-<span class="sd">        Usses inverse probability integral transformation on the</span>
+<span class="sd">        Uses inverse probability integral transformation on the</span>
 <span class="sd">        provided values.</span>
 
 <span class="sd">        Parameters</span>
@@ -2049,7 +2051,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the inverse CDF.</span>
 
-<span class="sd">        Usses inverse probability integral transformation on the</span>
+<span class="sd">        Uses inverse probability integral transformation on the</span>
 <span class="sd">        provided values.</span>
 
 <span class="sd">        Parameters</span>
@@ -2208,7 +2210,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate the inverse CDF.</span>
 
-<span class="sd">        Usses inverse probability integral transformation on the</span>
+<span class="sd">        Uses inverse probability integral transformation on the</span>
 <span class="sd">        provided values.</span>
 
 <span class="sd">        Parameters</span>
@@ -2242,7 +2244,7 @@
 <span class="k">class</span> <span class="nc">EmpiricalRandomVariable</span><span class="p">(</span><span class="n">RandomVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Empirical random variable.&quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_raw_samples&#39;</span><span class="p">]</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_raw_sample&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2267,7 +2269,7 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="si">}</span><span class="s1"> RVs do not support truncation&#39;</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EmpiricalRandomVariable.inverse_transform">
 <a class="viewcode-back" href="../../api_reference/_autosummary/pelicun.uq.html#pelicun.uq.EmpiricalRandomVariable.inverse_transform">[docs]</a>
@@ -2294,8 +2296,8 @@
 <span class="sd">          normalized positions.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">s_ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_samples</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_samples</span><span class="p">[</span><span class="n">s_ids</span><span class="p">]</span></div>
+        <span class="n">s_ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_sample</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_sample</span><span class="p">[</span><span class="n">s_ids</span><span class="p">]</span></div>
 </div>
 
 
@@ -2305,7 +2307,7 @@
 <span class="k">class</span> <span class="nc">CoupledEmpiricalRandomVariable</span><span class="p">(</span><span class="n">UtilityRandomVariable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Coupled empirical random variable.&quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_raw_samples&#39;</span><span class="p">]</span>
+    <span class="vm">__slots__</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_raw_sample&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2354,7 +2356,7 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="si">}</span><span class="s1"> RVs do not support truncation&#39;</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CoupledEmpiricalRandomVariable.inverse_transform">
 <a class="viewcode-back" href="../../api_reference/_autosummary/pelicun.uq.html#pelicun.uq.CoupledEmpiricalRandomVariable.inverse_transform">[docs]</a>
@@ -2381,9 +2383,9 @@
 <span class="sd">          dataset.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">raw_sample_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_samples</span><span class="p">)</span>
+        <span class="n">raw_sample_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_sample</span><span class="p">)</span>
         <span class="n">new_sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_size</span> <span class="o">/</span> <span class="n">raw_sample_count</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_sample</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_size</span> <span class="o">/</span> <span class="n">raw_sample_count</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">new_sample</span><span class="p">[:</span><span class="n">sample_size</span><span class="p">]</span></div>
 </div>

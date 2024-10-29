@@ -149,7 +149,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pelicun.tests.dl_calculation.rulesets.FloodAssmRulesets</h1><div class="highlight"><pre>
-<span></span><span class="c1">#</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
 <span class="c1"># Copyright (c) 2018 Leland Stanford Junior University</span>
 <span class="c1"># Copyright (c) 2018 The Regents of the University of California</span>
 <span class="c1">#</span>
@@ -194,15 +195,16 @@
 <span class="c1"># Meredith Lockhead</span>
 <span class="c1"># Tracy Kijewski-Correa</span>
 
-
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
-
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <div class="viewcode-block" id="Assm_config">
 <a class="viewcode-back" href="../../../../../api_reference/_autosummary/pelicun.tests.dl_calculation.rulesets.FloodAssmRulesets.html#pelicun.tests.dl_calculation.rulesets.FloodAssmRulesets.Assm_config">[docs]</a>
-<span class="k">def</span> <span class="nf">Assm_config</span><span class="p">(</span><span class="n">bim</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">Assm_config</span><span class="p">(</span><span class="n">BIM</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rules to identify the flood vulnerability category.</span>
+<span class="sd">    Rules to identify the flood vunerability category</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -212,89 +214,46 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    config: str</span>
-<span class="sd">        A string that identifies a specific configuration within this</span>
-<span class="sd">        building class.</span>
-
+<span class="sd">        A string that identifies a specific configration within this buidling</span>
+<span class="sd">        class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span>  <span class="c1"># just for the sake of brevity</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;YearBuilt&#39;</span><span class="p">]</span> <span class="c1"># just for the sake of brevity</span>
 
     <span class="c1"># Flood Type</span>
-    <span class="k">if</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;AO&#39;</span><span class="p">:</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;raz&#39;</span>  <span class="c1"># Riverline/A-Zone</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;AE&#39;</span><span class="p">,</span> <span class="s1">&#39;AH&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">}:</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;caz&#39;</span>  <span class="c1"># Costal/A-Zone</span>
-    <span class="k">elif</span> <span class="n">bim</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;VE&#39;</span><span class="p">:</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span>  <span class="c1"># Costal/V-Zone</span>
+    <span class="k">if</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;AO&#39;</span><span class="p">]:</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;raz&#39;</span> <span class="c1"># Riverline/A-Zone</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;AE&#39;</span><span class="p">,</span> <span class="s1">&#39;AH&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">]:</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;caz&#39;</span> <span class="c1"># Costal/A-Zone</span>
+    <span class="k">elif</span> <span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;FloodZone&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;VE&#39;</span><span class="p">]:</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;cvz&#39;</span> <span class="c1"># Costal/V-Zone</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;caz&#39;</span>  <span class="c1"># Default</span>
+        <span class="n">flood_type</span> <span class="o">=</span> <span class="s1">&#39;caz&#39;</span> <span class="c1"># Default</span>
 
     <span class="c1"># PostFIRM</span>
-    <span class="n">post_firm</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Default</span>
-    <span class="n">city_list</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;Absecon&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Atlantic&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Brigantine&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Buena&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Buena Vista&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Corbin City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Egg Harbor City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Egg Harbor&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Estell Manor&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Folsom&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Galloway&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Hamilton&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Hammonton&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Linwood&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Longport&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Margate City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Mullica&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Northfield&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Pleasantville&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Port Republic&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Somers Point&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Ventnor City&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Weymouth&#39;</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="n">year_list</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="mi">1976</span><span class="p">,</span>
-        <span class="mi">1971</span><span class="p">,</span>
-        <span class="mi">1971</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1979</span><span class="p">,</span>
-        <span class="mi">1981</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1978</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1977</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1974</span><span class="p">,</span>
-        <span class="mi">1974</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1979</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1983</span><span class="p">,</span>
-        <span class="mi">1982</span><span class="p">,</span>
-        <span class="mi">1971</span><span class="p">,</span>
-        <span class="mi">1979</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">22</span><span class="p">):</span>
-        <span class="n">post_firm</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;City&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">city_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">year</span> <span class="o">&gt;</span> <span class="n">year_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="p">)</span> <span class="ow">or</span> <span class="n">post_firm</span>
+    <span class="n">PostFIRM</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Default</span>
+    <span class="n">city_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Absecon&#39;</span><span class="p">,</span> <span class="s1">&#39;Atlantic&#39;</span><span class="p">,</span> <span class="s1">&#39;Brigantine&#39;</span><span class="p">,</span> <span class="s1">&#39;Buena&#39;</span><span class="p">,</span> <span class="s1">&#39;Buena Vista&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Corbin City&#39;</span><span class="p">,</span> <span class="s1">&#39;Egg Harbor City&#39;</span><span class="p">,</span> <span class="s1">&#39;Egg Harbor&#39;</span><span class="p">,</span> <span class="s1">&#39;Estell Manor&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Folsom&#39;</span><span class="p">,</span> <span class="s1">&#39;Galloway&#39;</span><span class="p">,</span> <span class="s1">&#39;Hamilton&#39;</span><span class="p">,</span> <span class="s1">&#39;Hammonton&#39;</span><span class="p">,</span> <span class="s1">&#39;Linwood&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Longport&#39;</span><span class="p">,</span> <span class="s1">&#39;Margate City&#39;</span><span class="p">,</span> <span class="s1">&#39;Mullica&#39;</span><span class="p">,</span> <span class="s1">&#39;Northfield&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Pleasantville&#39;</span><span class="p">,</span> <span class="s1">&#39;Port Republic&#39;</span><span class="p">,</span> <span class="s1">&#39;Somers Point&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;Ventnor City&#39;</span><span class="p">,</span> <span class="s1">&#39;Weymouth&#39;</span><span class="p">]</span>
+    <span class="n">year_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1976</span><span class="p">,</span> <span class="mi">1971</span><span class="p">,</span> <span class="mi">1971</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1979</span><span class="p">,</span> <span class="mi">1981</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1978</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span>
+                 <span class="mi">1983</span><span class="p">,</span> <span class="mi">1977</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1974</span><span class="p">,</span> <span class="mi">1974</span><span class="p">,</span> <span class="mi">1982</span><span class="p">,</span> <span class="mi">1979</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span> <span class="mi">1983</span><span class="p">,</span>
+                 <span class="mi">1982</span><span class="p">,</span> <span class="mi">1971</span><span class="p">,</span> <span class="mi">1979</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">22</span><span class="p">):</span>
+        <span class="n">PostFIRM</span> <span class="o">=</span> <span class="p">(((</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;City&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">city_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">year</span> <span class="o">&gt;</span> <span class="n">year_list</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="ow">or</span> \
+                    <span class="n">PostFIRM</span><span class="p">)</span>
 
     <span class="c1"># fl_assm</span>
-    <span class="n">fl_assm</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl_surge_assm&#39;</span><span class="si">}</span><span class="s2">_&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">post_firm</span><span class="p">)</span><span class="si">}</span><span class="s2">_&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span>
+    <span class="n">fl_assm</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;fl_surge_assm&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span> \
+              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">PostFIRM</span><span class="p">)</span><span class="si">}</span><span class="s2">_&quot;</span> \
+              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">flood_type</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="c1"># hu_assm</span>
-    <span class="n">hu_assm</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;hu_surge_assm&#39;</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">bim</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">post_firm</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">hu_assm</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;hu_surge_assm&#39;</span><span class="si">}</span><span class="s2">_&quot;</span> \
+              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BIM</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_&quot;</span> \
+              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">PostFIRM</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">return</span> <span class="n">hu_assm</span><span class="p">,</span> <span class="n">fl_assm</span></div>
 
