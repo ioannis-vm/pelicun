@@ -197,10 +197,10 @@
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">..rulesets.MetaVarRulesets</span> <span class="kn">import</span> <span class="n">parse_BIM</span>
-<span class="kn">from</span> <span class="nn">..rulesets.BldgClassRulesets</span> <span class="kn">import</span> <span class="n">building_class</span>
-<span class="kn">from</span> <span class="nn">..rulesets.WindWSFRulesets</span> <span class="kn">import</span> <span class="n">WSF_config</span>
-<span class="kn">from</span> <span class="nn">..rulesets.WindWMUHRulesets</span> <span class="kn">import</span> <span class="n">WMUH_config</span>
+<span class="kn">from</span> <span class="nn">pelicun.tests.dl_calculation.rulesets.MetaVarRulesets</span> <span class="kn">import</span> <span class="n">parse_BIM</span>
+<span class="kn">from</span> <span class="nn">pelicun.tests.dl_calculation.rulesets.BldgClassRulesets</span> <span class="kn">import</span> <span class="n">building_class</span>
+<span class="kn">from</span> <span class="nn">pelicun.tests.dl_calculation.rulesets.WindWSFRulesets</span> <span class="kn">import</span> <span class="n">WSF_config</span>
+<span class="kn">from</span> <span class="nn">pelicun.tests.dl_calculation.rulesets.WindWMUHRulesets</span> <span class="kn">import</span> <span class="n">WMUH_config</span>
 
 
 <div class="viewcode-block" id="auto_populate">
@@ -235,7 +235,7 @@
     <span class="c1"># parse the GI data</span>
     <span class="n">GI_ap</span> <span class="o">=</span> <span class="n">parse_BIM</span><span class="p">(</span>
         <span class="n">GI</span><span class="p">,</span>
-        <span class="n">location</span><span class="o">=</span><span class="s2">&quot;LA&quot;</span><span class="p">,</span>
+        <span class="n">location</span><span class="o">=</span><span class="s1">&#39;LA&#39;</span><span class="p">,</span>
         <span class="n">hazards</span><span class="o">=</span><span class="p">[</span>
             <span class="s1">&#39;wind&#39;</span><span class="p">,</span>
         <span class="p">],</span>
@@ -252,8 +252,8 @@
         <span class="n">bldg_config</span> <span class="o">=</span> <span class="n">WMUH_config</span><span class="p">(</span><span class="n">GI_ap</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Building class </span><span class="si">{</span><span class="n">bldg_class</span><span class="si">}</span><span class="s2"> not recognized by the &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;auto-population routine.&quot;</span>
+            <span class="sa">f</span><span class="s1">&#39;Building class </span><span class="si">{</span><span class="n">bldg_class</span><span class="si">}</span><span class="s1"> not recognized by the &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;auto-population routine.&#39;</span>
         <span class="p">)</span>
 
     <span class="c1"># drop keys of internal variables from GI_ap dict</span>
@@ -271,24 +271,24 @@
     <span class="p">)</span><span class="o">.</span><span class="n">T</span>
 
     <span class="n">DL_ap</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;Asset&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;ComponentAssignmentFile&quot;</span><span class="p">:</span> <span class="s2">&quot;CMP_QNT.csv&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ComponentDatabase&quot;</span><span class="p">:</span> <span class="s2">&quot;Hazus Hurricane&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;NumberOfStories&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GI_ap</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;OccupancyType&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GI_ap</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;PlanArea&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GI_ap</span><span class="p">[</span><span class="s1">&#39;PlanArea&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;Asset&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;ComponentAssignmentFile&#39;</span><span class="p">:</span> <span class="s1">&#39;CMP_QNT.csv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ComponentDatabase&#39;</span><span class="p">:</span> <span class="s1">&#39;Hazus Hurricane&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;NumberOfStories&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GI_ap</span><span class="p">[</span><span class="s1">&#39;NumberOfStories&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;OccupancyType&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GI_ap</span><span class="p">[</span><span class="s1">&#39;OccupancyClass&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;PlanArea&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">GI_ap</span><span class="p">[</span><span class="s1">&#39;PlanArea&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">},</span>
-        <span class="s2">&quot;Damage&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;DamageProcess&quot;</span><span class="p">:</span> <span class="s2">&quot;Hazus Hurricane&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;Demands&quot;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="s2">&quot;Losses&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;BldgRepair&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;ConsequenceDatabase&quot;</span><span class="p">:</span> <span class="s2">&quot;Hazus Hurricane&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;MapApproach&quot;</span><span class="p">:</span> <span class="s2">&quot;Automatic&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;DecisionVariables&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;Cost&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                    <span class="s2">&quot;Carbon&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                    <span class="s2">&quot;Energy&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                    <span class="s2">&quot;Time&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;Damage&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;DamageProcess&#39;</span><span class="p">:</span> <span class="s1">&#39;Hazus Hurricane&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;Demands&#39;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s1">&#39;Losses&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;BldgRepair&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;ConsequenceDatabase&#39;</span><span class="p">:</span> <span class="s1">&#39;Hazus Hurricane&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;MapApproach&#39;</span><span class="p">:</span> <span class="s1">&#39;Automatic&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;DecisionVariables&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;Cost&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s1">&#39;Carbon&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;Energy&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;Time&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">}</span>
         <span class="p">},</span>
