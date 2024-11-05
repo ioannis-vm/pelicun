@@ -51,6 +51,7 @@ pelicun.base
       :template: custom-class-template.rst
    
       Logger
+      LoggerRegistry
       Options
    
    

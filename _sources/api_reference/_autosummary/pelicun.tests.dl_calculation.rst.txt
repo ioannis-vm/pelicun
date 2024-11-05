@@ -30,6 +30,7 @@ pelicun.tests.dl\_calculation
    :recursive:
 
    e1
+   e1_no_autopop
    e2
    e3
    e4

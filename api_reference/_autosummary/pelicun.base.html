@@ -244,7 +244,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.Logger" title="pelicun.base.Logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Logger</span></code></a>(log_file, *, verbose, log_show_ms, ...)</p></td>
 <td><p>Generate log files documenting execution events.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.Options" title="pelicun.base.Options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Options</span></code></a>(user_config_options[, assessment])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pelicun.base.LoggerRegistry" title="pelicun.base.LoggerRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LoggerRegistry</span></code></a>()</p></td>
+<td><p>Registry to manage all logger instances.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pelicun.base.Options" title="pelicun.base.Options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Options</span></code></a>(user_config_options[, assessment])</p></td>
 <td><p>Analysis options and logging configuration.</p></td>
 </tr>
 </tbody>
@@ -324,6 +327,24 @@
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pelicun.base.LoggerRegistry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pelicun.base.</span></span><span class="sig-name descname"><span class="pre">LoggerRegistry</span></span><a class="reference internal" href="../../_modules/pelicun/base.html#LoggerRegistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.LoggerRegistry" title="Link to this definition"></a></dt>
+<dd><p>Registry to manage all logger instances.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.LoggerRegistry.log_exception">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><span class="pre">type</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#BaseException" title="(in Python v3.13)"><span class="pre">BaseException</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#BaseException" title="(in Python v3.13)"><span class="pre">BaseException</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_traceback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TracebackType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#LoggerRegistry.log_exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.LoggerRegistry.log_exception" title="Link to this definition"></a></dt>
+<dd><p>Log exceptions to all registered loggers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pelicun.base.LoggerRegistry.register">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pelicun.base.Logger" title="pelicun.base.Logger"><span class="pre">Logger</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/pelicun/base.html#LoggerRegistry.register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pelicun.base.LoggerRegistry.register" title="Link to this definition"></a></dt>
+<dd><p>Register a logger instance.</p>
 </dd></dl>
 
 </dd></dl>

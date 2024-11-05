@@ -24,6 +24,7 @@ pelicun.tests.basic.test\_base
       test_int_or_None
       test_invert_mapping
       test_logger_div
+      test_logger_exception
       test_logger_init
       test_logger_msg
       test_merge_default_config

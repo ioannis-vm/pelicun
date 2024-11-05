@@ -1100,6 +1100,7 @@
         <span class="n">damage_process_approach</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">damage_process_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">custom_model_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scaling_specification</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">is_for_water_network_assessment</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1117,8 +1118,6 @@
 <span class="sd">            Optional path to a component database file.</span>
 <span class="sd">        collapse_fragility: dict or None</span>
 <span class="sd">            Collapse fragility information.</span>
-<span class="sd">        is_for_water_network_assessment: bool</span>
-<span class="sd">            Whether the assessment is for a water network.</span>
 <span class="sd">        irreparable_damage: dict or None</span>
 <span class="sd">            Information for irreparable damage.</span>
 <span class="sd">        damage_process_approach: str or None</span>
@@ -1127,6 +1126,16 @@
 <span class="sd">            Optional path to a damage process file.</span>
 <span class="sd">        custom_model_dir: str or None</span>
 <span class="sd">            Optional directory for custom models.</span>
+<span class="sd">        scaling_specification: dict, optional</span>
+<span class="sd">            A dictionary defining the shift in median.</span>
+<span class="sd">            Example: {&#39;CMP-1-1&#39;: &#39;*1.2&#39;, &#39;CMP-1-2&#39;: &#39;/1.4&#39;}</span>
+<span class="sd">            The keys are individual components that should be present</span>
+<span class="sd">            in the `capacity_sample`.  The values should be strings</span>
+<span class="sd">            containing an operation followed by the value formatted as</span>
+<span class="sd">            a float.  The operation can be &#39;+&#39; for addition, &#39;-&#39; for</span>
+<span class="sd">            subtraction, &#39;*&#39; for multiplication, and &#39;/&#39; for division.</span>
+<span class="sd">        is_for_water_network_assessment: bool</span>
+<span class="sd">            Whether the assessment is for a water network.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -1398,7 +1407,10 @@
                 <span class="p">)</span>
 
         <span class="c1"># calculate damages</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">damage</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">dmg_process</span><span class="o">=</span><span class="n">dmg_process</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">damage</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span>
+            <span class="n">dmg_process</span><span class="o">=</span><span class="n">dmg_process</span><span class="p">,</span>
+            <span class="n">scaling_specification</span><span class="o">=</span><span class="n">scaling_specification</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DLCalculationAssessment.calculate_loss">
