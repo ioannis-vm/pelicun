@@ -1383,6 +1383,16 @@
 
                     <span class="n">dmg_process</span> <span class="o">=</span> <span class="n">new_dmg_process</span>
 
+                <span class="c1"># Remove components not present in the asset model</span>
+                <span class="c1"># from the source components of the damage process.</span>
+                <span class="n">asset_components</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asset</span><span class="o">.</span><span class="n">list_unique_component_ids</span><span class="p">())</span>
+                <span class="n">filtered_dmg_process</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dmg_process</span><span class="p">:</span>
+                    <span class="n">component</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">asset_components</span><span class="p">:</span>
+                        <span class="n">filtered_dmg_process</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dmg_process</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">dmg_process</span> <span class="o">=</span> <span class="n">filtered_dmg_process</span>
+
             <span class="k">elif</span> <span class="n">damage_process_approach</span> <span class="o">==</span> <span class="s1">&#39;User Defined&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">damage_process_file_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -1554,8 +1564,8 @@
 
         <span class="c1"># prepare additional loss map entries, if needed</span>
         <span class="k">if</span> <span class="s1">&#39;DMG-collapse&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loss_map</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-            <span class="n">loss_map</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;DMG-collapse&#39;</span><span class="p">,</span> <span class="s1">&#39;Repair&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;replacement&#39;</span>
-            <span class="n">loss_map</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;DMG-irreparable&#39;</span><span class="p">,</span> <span class="s1">&#39;Repair&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;replacement&#39;</span>
+            <span class="n">loss_map</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;collapse&#39;</span><span class="p">,</span> <span class="s1">&#39;Repair&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;replacement&#39;</span>
+            <span class="n">loss_map</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;irreparable&#39;</span><span class="p">,</span> <span class="s1">&#39;Repair&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;replacement&#39;</span>
 
         <span class="k">if</span> <span class="n">decision_variables</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">decision_variables</span> <span class="o">=</span> <span class="n">decision_variables</span>
@@ -2102,7 +2112,7 @@
                 <span class="k">continue</span>
 
             <span class="k">if</span> <span class="n">dmg_cmp</span> <span class="ow">in</span> <span class="n">loss_cmps</span><span class="p">:</span>
-                <span class="n">drivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DMG-</span><span class="si">{</span><span class="n">dmg_cmp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">drivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dmg_cmp</span><span class="p">)</span>
                 <span class="n">loss_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dmg_cmp</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="n">dl_method</span> <span class="ow">in</span> <span class="p">{</span>
@@ -2122,7 +2132,7 @@
                 <span class="n">loss_cmp</span> <span class="o">=</span> <span class="n">cmp_class</span>
 
             <span class="k">if</span> <span class="n">loss_cmp</span> <span class="ow">in</span> <span class="n">loss_cmps</span><span class="p">:</span>
-                <span class="n">drivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DMG-</span><span class="si">{</span><span class="n">dmg_cmp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">drivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dmg_cmp</span><span class="p">)</span>
                 <span class="n">loss_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss_cmp</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">loss_models</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Repair&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">drivers</span><span class="p">)</span>

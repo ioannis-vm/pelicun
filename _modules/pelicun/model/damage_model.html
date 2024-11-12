@@ -1566,6 +1566,11 @@
 
                     <span class="n">theta_0</span> <span class="o">=</span> <span class="n">frg_params_ls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Theta_0&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
                     <span class="n">family</span> <span class="o">=</span> <span class="n">frg_params_ls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Family&#39;</span><span class="p">,</span> <span class="s1">&#39;deterministic&#39;</span><span class="p">)</span>
+
+                    <span class="c1"># if `family` is defined but is `None`, we</span>
+                    <span class="c1"># consider it to be `deterministic`</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">family</span><span class="p">:</span>
+                        <span class="n">family</span> <span class="o">=</span> <span class="s1">&#39;deterministic&#39;</span>
                     <span class="n">ds_weights</span> <span class="o">=</span> <span class="n">frg_params_ls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DamageStateWeights&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
                     <span class="c1"># check if the limit state is defined for the component</span>
@@ -1577,7 +1582,7 @@
                     <span class="p">]</span>
 
                     <span class="k">if</span> <span class="n">capacity_adjustment_operation</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;normal&#39;</span><span class="p">,</span> <span class="s1">&#39;lognormal&#39;</span><span class="p">}:</span>
+                        <span class="k">if</span> <span class="n">family</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;normal&#39;</span><span class="p">,</span> <span class="s1">&#39;lognormal&#39;</span><span class="p">,</span> <span class="s1">&#39;deterministic&#39;</span><span class="p">}:</span>
                             <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_operation</span><span class="p">(</span>
                                 <span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                 <span class="n">capacity_adjustment_operation</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
