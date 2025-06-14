@@ -37,7 +37,7 @@
     "inchps": 0.0254,
     "ftps": 0.3048
   },
-  "accelleration": {
+  "acceleration": {
     "mps2": 1.0,
     "inps2": 0.0254,
     "inchps2": 0.0254,
@@ -55,6 +55,13 @@
     "lbf": 4.4482179868,
     "kip": 4448.2179868,
     "kips": 4448.2179868
+  },
+  "line_force": {
+    "Npm": 1.0,
+    "kNpm": 1000.0,
+    "lbpft": 14.5939,
+    "kippft": 14593.9,
+    "kipspft": 14593.9
   },
   "pressure": {
     "Pa": 1.0,

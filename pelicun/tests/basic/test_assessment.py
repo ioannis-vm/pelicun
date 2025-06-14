@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2018 Leland Stanford Junior University
 # Copyright (c) 2018 The Regents of the University of California
@@ -38,27 +37,20 @@
 # Adam Zsarnóczay
 # John Vouvakis Manousakis
 
-"""
-These are unit and integration tests on the assessment module of pelicun.
-"""
+"""These are unit and integration tests on the assessment module of pelicun."""
 
 from __future__ import annotations
+
 import pytest
+
 from pelicun import assessment
 
-# pylint: disable=missing-function-docstring
-# pylint: disable=missing-return-doc, missing-return-type-doc
+
+def create_assessment_obj(config: dict | None = None) -> assessment.Assessment:
+    return assessment.Assessment(config) if config else assessment.Assessment({})
 
 
-def create_assessment_obj(config=None):
-    if config:
-        asmt = assessment.Assessment(config)
-    else:
-        asmt = assessment.Assessment({})
-    return asmt
-
-
-def test_Assessment_init():
+def test_Assessment_init() -> None:
     asmt = create_assessment_obj()
     # confirm attributes
     for attribute in (
@@ -78,30 +70,39 @@ def test_Assessment_init():
         assert hasattr(asmt, attribute)
     # confirm that creating an attribute on the fly is not allowed
     with pytest.raises(AttributeError):
-        # pylint: disable=assigning-non-slot
-        asmt.my_attribute = 2
+        asmt.my_attribute = 2  # type: ignore
 
 
-def test_assessment_get_default_metadata():
+def test_assessment_get_default_metadata() -> None:
     asmt = create_assessment_obj()
 
-    data_sources = (
+    method_names = (
+        # test for backwards compatibility
         'damage_DB_FEMA_P58_2nd',
         'damage_DB_Hazus_EQ_bldg',
         'damage_DB_Hazus_EQ_trnsp',
         'loss_repair_DB_FEMA_P58_2nd',
         'loss_repair_DB_Hazus_EQ_bldg',
         'loss_repair_DB_Hazus_EQ_trnsp',
+        # current valid values
+        'Hazus Earthquake - Buildings',
+        'Hazus Earthquake - Stories',
+        'Hazus Earthquake - Transportation',
+        'Hazus Hurricane Wind - Buildings',
     )
 
-    for data_source in data_sources:
-        # here we just test that we can load the data file, without
-        # checking the contents.
-        asmt.get_default_data(data_source)
-        asmt.get_default_metadata(data_source)
+    for method_name in method_names:
+        for model_type in ['fragility', 'consequence_repair']:
+            if method_name.startswith(('damage', 'loss')):
+                model_type = None  # noqa: PLW2901
+
+            # here we just test that we can load the data file, without
+            # checking the contents.
+            asmt.get_default_data(method_name, model_type)
+            asmt.get_default_metadata(method_name, model_type)
 
 
-def test_assessment_calc_unit_scale_factor():
+def test_assessment_calc_unit_scale_factor() -> None:
     # default unit file
     asmt = create_assessment_obj()
 
@@ -135,7 +136,7 @@ def test_assessment_calc_unit_scale_factor():
         # 1 smoot was 67 inches in 1958.
 
 
-def test_assessment_scale_factor():
+def test_assessment_scale_factor() -> None:
     # default unit file
     asmt = create_assessment_obj()
     assert asmt.scale_factor('m') == 1.00
@@ -156,5 +157,5 @@ def test_assessment_scale_factor():
     assert asmt.scale_factor('m') == 39.3701
 
     # exceptions
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Unknown unit: helen'):
         asmt.scale_factor('helen')
