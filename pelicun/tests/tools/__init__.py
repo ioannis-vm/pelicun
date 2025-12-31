@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2018 Leland Stanford Junior University
-# Copyright (c) 2018 The Regents of the University of California
+# Copyright (c) 2025 Leland Stanford Junior University
+# Copyright (c) 2025 The Regents of the University of California
 #
 # This file is part of pelicun.
 #
@@ -32,36 +32,8 @@
 #
 # You should have received a copy of the BSD 3-Clause License along with
 # pelicun. If not, see <http://www.opensource.org/licenses/>.
+#
+# Contributors:
+# Adam Zsarnóczay
 
-from __future__ import annotations
-
-import argparse
-import sys
-from pathlib import Path
-
-import pandas as pd
-
-
-def convert_HDF(hdf_path) -> None:  # noqa: N802
-    hdf_ext = hdf_path.split('.')[-1]
-    csv_base = hdf_path[: -len(hdf_ext) - 1]
-
-    hdf_path = Path(hdf_path).resolve()
-
-    store = pd.HDFStore(hdf_path)
-
-    for key in store:
-        store[key].to_csv(f'{csv_base}_{key[1:].replace("/", "_")}.csv')
-
-    store.close()
-
-
-if __name__ == '__main__':
-    args = sys.argv[1:]
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('HDF_path')
-
-    parser_args = parser.parse_args(args)
-
-    convert_HDF(parser_args.HDF_path)
+"""This module contains tests for the tools module of pelicun."""
